@@ -12,7 +12,8 @@
 
 #### Dockerを使用しない場合
 
-- TODO
+- OpenJDK 21
+- Gradle 8.10.2
 
 ### 開発環境の構築
 
