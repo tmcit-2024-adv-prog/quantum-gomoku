@@ -2,6 +2,7 @@ plugins {
     application
     id("com.diffplug.spotless") version "7.0.0.BETA2"
     id("com.github.spotbugs") version "6.0.24"
+    jacoco
 }
 
 repositories {
@@ -30,11 +31,41 @@ application {
     mainClass = "org.example.App"
 }
 
+val jar by tasks.getting(Jar::class) {
+  manifest {
+     attributes["Main-Class"] = application.mainClass
+  }
+}
+
 spotless {
     java {
         cleanthat()
         formatAnnotations()
         googleJavaFormat()
         importOrder("java|javax", "com.acme", "", "\\#com.acme", "\\#")
+    }
+}
+
+tasks {
+    spotbugsMain {
+        reports.create("sarif") {
+            enabled = true
+        }
+        jvmArgs = listOf("-Duser.language=ja")
+    }
+    spotbugsTest {
+        reports.create("sarif") {
+            enabled = true
+        }
+        jvmArgs = listOf("-Duser.language=ja")
+    }
+    test {
+        finalizedBy(jacocoTestReport)
+    }
+    jacocoTestReport {
+        dependsOn(test)
+        reports {
+            xml.required = true
+        }
     }
 }

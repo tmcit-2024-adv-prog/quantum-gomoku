@@ -1,0 +1,72 @@
+on:
+  pull_request:
+    branches: 
+      - main
+      - release/*
+    types: 
+      - opened
+      - synchronize
+      - reopened 
+  push:
+    branches-ignore:
+      - main
+      - release/*
+
+jobs:
+  spotless:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "corretto"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Spotless
+        run: ./gradlew spotlessApply
+
+      - name: Suggest changes
+        uses: reviewdog/action-suggester@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tool_name: spotless
+
+  spotbugs:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "corretto"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Spotbugs
+        run: ./gradlew spotbugsMain spotbugsTest
+
+      - name: Set up reviewdog
+        uses: reviewdog/action-setup@v1
+
+      - name: Run reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: cat ./build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -tee
