@@ -93,6 +93,4 @@ jobs:
       - name: Check Editorconfig
         id: editorconfig-checker
         run: |
-          RESULT="$(editorconfig-checker -format github-actions)"
-          RESULT="${RESULT//'\n'/'\\n'}"
-          echo "${RESULT}"
+          echo "$(editorconfig-checker -format github-actions)"
