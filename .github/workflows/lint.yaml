@@ -92,4 +92,4 @@ jobs:
 
       - name: Check Editorconfig
         id: editorconfig-checker
-        run: editorconfig-checker -format github-actions
+        run: editorconfig-checker -format github-actions 2>&1
