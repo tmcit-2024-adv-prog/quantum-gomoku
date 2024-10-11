@@ -94,4 +94,4 @@ jobs:
         id: editorconfig-checker
         run: |
           set -o pipefail
-          editorconfig-checker -format github-actions | sed -E "s/\x1b\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[mGK]//g" | sed -ne "/^::error/ p"
+          editorconfig-checker -format github-actions -exclude "gradlew(\.bar)?" | sed -E "s/\x1b\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[mGK]//g" | sed -ne "/^::error/ p"
