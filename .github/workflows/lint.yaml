@@ -87,7 +87,8 @@ jobs:
         uses: actions/setup-go@v5
 
       - name: Install editorconfig-checker
-        run: go install github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@latest
+        # ここでHEADを指定してるのはまずいけどv3.0.4がリリースされないと使えないので仕方ない
+        run: go install github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@HEAD
 
       - name: Check Editorconfig
         run: editorconfig-checker -format github-actions
