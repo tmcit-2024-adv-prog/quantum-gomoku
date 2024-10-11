@@ -100,4 +100,7 @@ jobs:
       
       - name: Show results
         if: cancelled() != true
-        run: echo '${{ steps.editorconfig-checker.outputs.checker }}'
+        run: |
+          for line in ${{ steps.editorconfig-checker.outputs.checker }}; do
+            echo "${line}"
+          done
