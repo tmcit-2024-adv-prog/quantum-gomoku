@@ -98,4 +98,4 @@ jobs:
       
       - name: Show results
         if: cancelled() != true
-        run: echo ${{ steps.editorconfig-checker.outputs.output }}
+        run: echo '${{ steps.editorconfig-checker.outputs.output }}'
