@@ -91,4 +91,9 @@ jobs:
         run: go install github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@HEAD
 
       - name: Check Editorconfig
+        id: editorconfig-checker
         run: editorconfig-checker -format github-actions
+        
+      - name: Echo Result
+        if: cancelled() != true
+        run: echo "${{ steps.editorconfig-checker.outputs.result }}"
