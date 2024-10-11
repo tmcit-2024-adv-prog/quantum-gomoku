@@ -92,15 +92,4 @@ jobs:
 
       - name: Check Editorconfig
         id: editorconfig-checker
-        run: |
-          echo "checker<<EOF" >> $GITHUB_OUTPUT
-          echo "$(editorconfig-checker -format github-actions)" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          editorconfig-checker
-      
-      - name: Show results
-        if: cancelled() != true
-        run: |
-          for line in ${{ steps.editorconfig-checker.outputs.checker }}; do
-            echo "${line}"
-          done
+        run: editorconfig-checker -format github-actions | sed -E "s/\x1b\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[mGK]//g" | sed -ne "/^::error/ p"
