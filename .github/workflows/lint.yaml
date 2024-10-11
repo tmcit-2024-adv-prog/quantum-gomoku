@@ -72,3 +72,19 @@ jobs:
         run: |
           cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -tee
           cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -tee
+
+  editorconfig:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Editorconfig checker
+        uses: editorconfig-checker/action-editorconfig-checker@v2
+
+      - name: Check Editorconfig
+        run: editorconfig-checker -format github-actions
