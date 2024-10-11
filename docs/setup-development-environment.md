@@ -146,7 +146,23 @@ code .
 
 Visual Studio Codeでこのリポジトリを開いた状態で、左下の`><`のアイコンをクリックし、`Reopen in Container`を選択してください。
 
-### 8. 開発環境構築完了
+### 8. 動作検証
+
+Devcontainerが正常に起動したら、以下のコマンドを実行して動作検証を行ってください。
+
+```bash
+java -version
+```
+
+以下のような出力が表示されれば、Javaが正常にインストールされています。
+
+```
+openjdk version "21.0.4" 2024-07-16 LTS
+OpenJDK Runtime Environment Corretto-21.0.4.7.1 (build 21.0.4+7-LTS)
+OpenJDK 64-Bit Server VM Corretto-21.0.4.7.1 (build 21.0.4+7-LTS, mixed mode, sharing)
+```
+
+### 9. 開発環境構築完了
 
 これで開発環境の構築が完了しました。
 開発を行う際は、このDevcontainerを使用してください。
