@@ -93,7 +93,7 @@ jobs:
       - name: Check Editorconfig
         id: editorconfig-checker
         run: |
-          echo "checker << EOF" >> $GITHUB_OUTPUT
+          echo "checker<<EOF" >> $GITHUB_OUTPUT
           echo "$(editorconfig-checker -format github-actions)" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           editorconfig-checker
