@@ -93,9 +93,9 @@ jobs:
       - name: Check Editorconfig
         id: editorconfig-checker
         run: |
-          echo "output=$(editorconfig-checker -format github-actions)" >> $GITHUB_OUTPUT
+          echo "checker=$(editorconfig-checker -format github-actions)" >> $GITHUB_OUTPUT
           editorconfig-checker
       
       - name: Show results
         if: cancelled() != true
-        run: echo '${{ steps.editorconfig-checker.outputs.output }}'
+        run: echo '${{ steps.editorconfig-checker.outputs.checker }}'
