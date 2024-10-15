@@ -32,10 +32,22 @@ sudo apt install -y uidmap iptables
 以下のコマンドを実行してDockerをインストールしてください。
 
 ```bash
-curl -fsSL https://get.docker.com/rootless | sh
+curl -fsSL https://get.docker.com | sh
 ```
 
 インストールが完了したら以下のコマンドを実行してShellを再起動してください。
+
+```bash
+exec $SHELL -l
+```
+
+次に以下のコマンドを実行してRootless Dockerをセットアップしてください。
+
+```bash
+dockerd-rootless-setuptool.sh install
+```
+
+セットアップが完了したら以下のコマンドを実行してShellを再起動してください。
 
 ```bash
 exec $SHELL -l
