@@ -45,7 +45,15 @@ brew install colima
 colima start
 ```
 
-### 4. Dockerの動作確認
+### 4. Buildx関連ファイルの権限変更
+
+以下のコマンドを実行してBuildx関連ファイルの権限を変更します。
+
+```bash
+sudo chown -R $(id -u):$(id -g) ~/.docker/buildx
+```
+
+### 5. Dockerの動作確認
 
 以下のコマンドを実行してDockerが正常に動作していることを確認します。
 
