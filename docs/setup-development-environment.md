@@ -115,6 +115,12 @@ cat ~/.ssh/id_ed25519.pub
 ssh -T git@github.com
 ```
 
+以下のようなメッセージが表示されれば、SSH接続が成功しています。
+
+```
+Hi <ユーザ名>! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
 ### 5. このリポジトリをクローン
 
 開発環境を構築したいディレクトリでシェルを開く、あるいはシェル内で`cd`コマンドを用いて移動してください。
