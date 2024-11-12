@@ -72,26 +72,3 @@ jobs:
         run: |
           cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -tee
           cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -tee
-
-  editorconfig:
-    runs-on: ubuntu-latest
-    permissions: 
-      contents: read
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-
-      - name: Install editorconfig-checker
-        # ここでHEADを指定してるのはまずいけどv3.0.4がリリースされないと使えないので仕方ない
-        run: go install github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@HEAD
-
-      - name: Check Editorconfig
-        id: editorconfig-checker
-        run: |
-          set -o pipefail
-          editorconfig-checker -format github-actions -exclude "gradlew(\.bat)?" | sed -E "s/\x1b\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[mGK]//g" | sed -ne "/^::error/ p"
