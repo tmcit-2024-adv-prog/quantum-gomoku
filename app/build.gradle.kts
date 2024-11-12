@@ -28,7 +28,7 @@ java {
 }
 
 application {
-    mainClass = "org.example.App"
+    mainClass = "jp.ac.metro_cit.adv_prog_2024.gomoku.App"
 }
 
 val jar by tasks.getting(Jar::class) {
