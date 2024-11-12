@@ -26,13 +26,11 @@
 - 相手プレイヤー
 - Sender
 - Receiver
+- UIに対して試合の状態を送るためのコールバック
 
 ## パブリックメソッド
 
 これは外からアクセス可能なメソッド
-
-<!-- - ReceiveData(obj: Object←これ未定): void
-  - Receiverがこれを叩いてデータを受け取る -->
   
 - CreatePlayer(name: String): Player
   - これを操作しているプレイヤーを定義する
@@ -46,17 +44,20 @@
   - 石を置く
   - 石を配置したあとの試合の状況を返す
   - おけなっかたらPutStoneExceptionを投げる
-  - Senderを通して相手に石を置いたことを通知する
-  - 7(UI), 9(Receiver)で呼び出される
+  - 7(UI)で呼び出される
 
 - surrender(): void
   - ばいばい
   - 12でUIから呼び出される
-  - 任意のタイミングでReceiverから呼び出される
   
 - getGameStatus(): GameStatus
   - 現在の試合の状態を取得する
   - 任意のタイミングでUIから呼び出される
+
+- setGameStatus(GameStatus status): void
+  - 現在の試合の状態を設定する
+  - 任意のタイミングでReceiverから呼び出される
+  - Receiverはこのメソッドを利用して受け取ったデータを試合に反映する
   
 ## プライベートメソッド
 
@@ -70,3 +71,46 @@
   - これはサーバ側で呼び出される
   - 石の色を決める
   - 6で呼び出される
+
+## 備考
+
+### UIに対して試合の状態を送るためのコールバック
+
+イメージ↓
+
+```java
+public interface GameStatusCallback {
+    void onGameStatusChanged(GameStatus status);
+}
+
+public class GUI implements GameStatusCallback {
+    public GUI() {
+      // なんとかかんとか
+    }
+
+    @Override
+    public void onGameStatusChanged(GameStatus status) {
+        this.display.showStone(status.board.getStone()[0][0]);
+    }
+}
+```
+
+### Sender
+
+相手にデータを送るためのクラス
+
+```java
+public interface Sender {
+    void send(GameStatus status);
+}
+```
+
+### Receiver
+
+相手からデータを受け取るためのクラス
+
+```java
+public interface Receiver {
+    void startReceive();
+}
+```
