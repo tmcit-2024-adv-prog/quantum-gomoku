@@ -1,6 +1,6 @@
 ## 落書き
 
-![image](https://hackmd.io/_uploads/Syui9tjyJe.png)
+![image](./imgs/class-draft.png)
 
 ## クラス図
 
