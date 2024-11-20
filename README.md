@@ -20,3 +20,32 @@
 開発環境の構築手順は以下のリンクを参照してください。
 
 [開発環境構築手順](./docs/setup-development-environment.md)
+
+## ディレクトリ構成
+
+```
+(repository root)
+├── docs              # ドキュメント
+└── app
+    └── src
+        ├── main
+        │   ├── java  # Javaソースコード
+        │   │   └── jp/ac/metro_cit/adv_prog_2024/quantum_gomoku  # 五目並べのパッケージ
+        │   │       ├── interfaces      # インターフェース定義
+        │   │       ├── models          # モデル データを保持するためのクラス
+        │   │       ├── services        # システムロジックを実装するクラス
+        │   │       ├── ui              # UIを実装するクラス
+        │   │       ├── communications  # 通信を行うクラス
+        │   │       ├── controllers     # コントローラー 通信を受け取り、サービスを呼び出すクラス
+        │   │       └── utils           # 全体で使用するユーティリティクラス
+        │   └── resources # リソース
+        └── test
+            └── java  # テストコード
+                └── jp/ac/metro_cit/adv_prog_2024/quantum_gomoku
+                    ├── models
+                    ├── services
+                    ├── ui
+                    ├── communications
+                    ├── controllers
+                    └── utils
+```
