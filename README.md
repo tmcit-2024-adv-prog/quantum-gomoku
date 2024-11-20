@@ -32,20 +32,20 @@
         │   ├── java  # Javaソースコード
         │   │   └── jp/ac/metro_cit/adv_prog_2024/quantum_gomoku  # 五目並べのパッケージ
         │   │       ├── interfaces      # インターフェース定義
-        │   │       ├── model           # モデル データを保持するためのクラス
-        │   │       ├── service         # システムロジックを実装するクラス
+        │   │       ├── models          # モデル データを保持するためのクラス
+        │   │       ├── services        # システムロジックを実装するクラス
         │   │       ├── ui              # UIを実装するクラス
-        │   │       ├── communication   # 通信を行うクラス
-        │   │       ├── controller      # コントローラー 通信を受け取り、サービスを呼び出すクラス
-        │   │       └── util            # 全体で使用するユーティリティクラス
+        │   │       ├── communications  # 通信を行うクラス
+        │   │       ├── controllers     # コントローラー 通信を受け取り、サービスを呼び出すクラス
+        │   │       └── utils           # 全体で使用するユーティリティクラス
         │   └── resources # リソース
         └── test
             └── java  # テストコード
                 └── jp/ac/metro_cit/adv_prog_2024/quantum_gomoku
-                    ├── model
-                    ├── service
+                    ├── models
+                    ├── services
                     ├── ui
-                    ├── communication
-                    ├── controller
-                    └── util
+                    ├── communications
+                    ├── controllers
+                    └── utils
 ```
