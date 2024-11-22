@@ -20,4 +20,7 @@
   },
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "automatic",
+  "conventionalCommits.promptScopes": false,
+  "conventionalCommits.promptFooter": false,
+  "conventionalCommits.promptBody": false,
 }

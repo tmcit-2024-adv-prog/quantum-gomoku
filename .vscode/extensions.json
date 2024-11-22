@@ -3,6 +3,8 @@
         "vscjava.vscode-java-pack",
         "richardwillis.vscode-spotless-gradle",
         "github.vscode-github-actions",
-        "editorconfig.editorconfig"
+        "editorconfig.editorconfig",
+        "yzhang.markdown-all-in-one",
+        "vivaxy.vscode-conventional-commits"
     ]
 }
