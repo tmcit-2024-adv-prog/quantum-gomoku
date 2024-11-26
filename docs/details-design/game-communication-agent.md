@@ -42,8 +42,8 @@
 
 ### 投了処理
 
-- 投了ボタンを押したときに相手に対して試合フェーズが終了済みになったGameStatusを送信する
-- 試合フェーズが終了済みになったGameStatusを受け取った場合、勝敗判定を行なって5つ並んでいなかった場合は投了されたと判断する
+- 投了ボタンを押したときに相手に対して試合フェーズが終了済みになったGameStateを送信する
+- 試合フェーズが終了済みになったGameStateを受け取った場合、勝敗判定を行なって5つ並んでいなかった場合は投了されたと判断する
 
 ## メンバ変数
 
@@ -66,7 +66,7 @@
   - 相手プレイヤーを定義する
   - 5でReceiverから呼び出される
 
-- PutStone(color: Color, x: int, y: int): GameStatus throws PutStoneException
+- PutStone(color: Color, x: int, y: int): GameState throws PutStoneException
   - 石を置く
   - 石を配置したあとの試合の状況を返す
   - おけなっかたらPutStoneExceptionを投げる
@@ -76,11 +76,11 @@
   - ばいばい
   - 12でUIから呼び出される
   
-- getGameStatus(): GameStatus
+- getGameState(): GameState
   - 現在の試合の状態を取得する
   - 任意のタイミングでUIから呼び出される
 
-- setGameStatus(GameStatus status): void
+- setGameState(GameState state): void
   - 現在の試合の状態を設定する
   - 任意のタイミングでReceiverから呼び出される
   - Receiverはこのメソッドを利用して受け取ったデータを試合に反映する
@@ -105,18 +105,18 @@
 イメージ↓
 
 ```java
-public interface GameStatusCallback {
-    void onGameStatusChanged(GameStatus status);
+public interface GameStateCallback {
+    void onGameStateChanged(GameState state);
 }
 
-public class GUI implements GameStatusCallback {
+public class GUI implements GameStateCallback {
     public GUI() {
       // なんとかかんとか
     }
 
     @Override
-    public void onGameStatusChanged(GameStatus status) {
-        this.display.showStone(status.board.getStone()[0][0]);
+    public void onGameStateChanged(GameState state) {
+        this.display.showStone(state.board.getStone()[0][0]);
     }
 }
 ```
@@ -127,7 +127,7 @@ public class GUI implements GameStatusCallback {
 
 ```java
 public interface Sender {
-    void send(GameStatus status);
+    void send(GameState state);
 }
 ```
 
