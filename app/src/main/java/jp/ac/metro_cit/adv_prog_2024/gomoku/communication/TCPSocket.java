@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,9 +42,9 @@ public class TCPSocket implements Sender, Receiver {
       this.serverSocket = new ServerSocket(port, 50, InetAddress.getByName(address));
     }
 
-    // タイムアウトを300秒に設定
-    // 300秒間コネクションがなかった場合はエラーを投げる
-    this.serverSocket.setSoTimeout(300000);
+    // タイムアウトを30秒に設定
+    // 30秒間コネクションがなかった場合はエラーを投げる
+    this.serverSocket.setSoTimeout(30000);
     // 別のスレッドで通信の待受を行う
     new Thread(() -> {
       try {
@@ -71,19 +72,22 @@ public class TCPSocket implements Sender, Receiver {
     if (address == null) {
       throw new IllegalArgumentException();
     } else {
-      new Thread(() -> {
-        try {
-          Socket socket = new Socket(address, port);
-          this.socket = socket;
-          // Objectの受け渡しを行うため、ObjectInput/OutputStreamに変換してグローバル変数に代入
-          socket.getInputStream();
-          this.oos = new ObjectOutputStream(socket.getOutputStream());
-          oos.flush();
-          this.ois = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }).start();
+      try {
+        this.socket = new Socket(address, port);
+        new Thread(() -> {
+          try {
+            // Objectの受け渡しを行うため、ObjectInput/OutputStreamに変換してグローバル変数に代入
+            socket.getInputStream();
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
+            this.ois = new ObjectInputStream(socket.getInputStream());
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        }).start();
+      } catch (ConnectException e) {
+        onReceive(new GameStatus("Connection refused"));
+      }
     }
   }
 
