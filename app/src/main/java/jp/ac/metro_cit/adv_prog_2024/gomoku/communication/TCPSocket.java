@@ -8,10 +8,35 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 
 /**
  * TCPで通信を行うためのクラス
+ * <p>
+ * 本クラスを使用する際にはセンダー側(通信を待ち受ける側)およびレシーバー側(接続する側)にそれぞれ以下のように記載します。
+ * <p>
+ * センダー側
+ * <pre>{@code
+ *  public void someSenderSideMethod() {
+ *     // 接続を最初に受け待つ側の処理
+ *     TCPSocket tcpSocket = new TCPSocket(new TCPSocketProps(null, 5050));
+ *     // ソケットの初期化
+ *     tcpSocket.initSender();
+ *     // 接続相手からの通信を待ち受ける
+ *     tcpSocket.startReceive();
+ * }
+ * }</pre>
+ *
+ * レシーバー側
+ * <pre>{@code
+ * public void someReceiverSideMethod() {
+ *     // 接続を最初に受け待つ側の処理
+ *     TCPSocket tcpSocket = new TCPSocket(new TCPSocketProps("192.168.100.1", 5050));
+ *     // ソケットの初期化
+ *     tcpSocket.initReceiver();
+ *     // 接続相手からの通信を待ち受ける
+ *     tcpSocket.startReceive();
+ * }
+ * }</pre>
  *
  * @author A Kokubo
  */
