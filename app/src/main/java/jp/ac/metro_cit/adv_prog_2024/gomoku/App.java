@@ -11,7 +11,7 @@ public class App {
   }
 
   public static void main(String[] args) {
-    Ui.openWindow();
+    Ui.openStartWindow();
     System.out.println(new App().getGreeting());
   }
 }
