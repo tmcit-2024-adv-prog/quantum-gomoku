@@ -3,12 +3,15 @@
  */
 package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.Ui;
+
 public class App {
   public String getGreeting() {
     return "Hello World!";
   }
 
   public static void main(String[] args) {
+    Ui.openWindow();
     System.out.println(new App().getGreeting());
   }
 }

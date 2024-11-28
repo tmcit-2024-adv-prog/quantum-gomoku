@@ -5,7 +5,7 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AppTest {
   @Test

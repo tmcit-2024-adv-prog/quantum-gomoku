@@ -20,6 +20,7 @@ RUN apt-get -qq update; \
   echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | tee /etc/apt/sources.list.d/corretto.list; \
   apt-get -qq update; \
   apt-get -qq install -y --no-install-recommends java-21-amazon-corretto-jdk; \
+  apt-get -qq install -y --no-install-recommends libxext6 libxtst6 libxi6 libxrender1; \
   apt-get clean; \
   rm -rf /var/lib/apt/lists/*
 
