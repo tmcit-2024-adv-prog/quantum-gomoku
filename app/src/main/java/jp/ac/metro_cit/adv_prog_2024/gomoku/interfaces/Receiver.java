@@ -60,4 +60,6 @@ public interface Receiver {
    * @throws IOException 通信時に発生したエラー
    */
   void disconnect() throws IOException;
+
+  void startRecive();
 }

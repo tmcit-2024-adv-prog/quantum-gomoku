@@ -66,13 +66,13 @@
   - 1(UI)で呼び出される
   - GameStateCallbackが設定されていない場合は例外を投げる
 
-- putStone(color: Color, pos: Vector2D): GameState throws PutStoneException
+- PutStone(color: Color, x: int, y: int): GameState throws PutStoneException
   - 石を置く
   - 石を配置したあとの試合の状況を返す
   - おけなっかたらPutStoneExceptionを投げる
   - 7(UI)で呼び出される
 
-- surrender(): void
+- surrender(): GameState
   - ばいばい
   - 降参時に呼び出される
   
@@ -90,6 +90,17 @@
   - 1の前にUIから呼び出される
   
 ## プライベートメソッド
+
+これは外からアクセスできないメソッド
+
+- startListen(): void
+  - Recieverを用いて待ち受けを開始する
+  - 3で呼び出される
+
+- DecideColor(): Color
+  - これはサーバ側で呼び出される
+  - 石の色を決める
+  - 6で呼び出される
 
 ## 備考
 
