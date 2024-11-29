@@ -58,21 +58,21 @@
 
 これは外からアクセス可能なメソッド
   
-- CreatePlayer(name: String): Player
+- createControlPlayer(name: String): Player
   - これを操作しているプレイヤーを定義する
   - 2でUIから呼び出される
 
-- CreateRemotePlayer(name: String): Player
+- createRemotePlayer(name: String): Player
   - 相手プレイヤーを定義する
   - 5でReceiverから呼び出される
 
-- PutStone(color: Color, x: int, y: int): GameState throws PutStoneException
+- putStone(color: Color, x: int, y: int): GameState throws PutStoneException
   - 石を置く
   - 石を配置したあとの試合の状況を返す
   - おけなっかたらPutStoneExceptionを投げる
   - 7(UI)で呼び出される
 
-- surrender(): void
+- surrender(): GameState
   - ばいばい
   - 12でUIから呼び出される
   
@@ -89,7 +89,7 @@
 
 これは外からアクセスできないメソッド
 
-- StartListen(): void
+- startListen(): void
   - Recieverを用いて待ち受けを開始する
   - 3で呼び出される
 
