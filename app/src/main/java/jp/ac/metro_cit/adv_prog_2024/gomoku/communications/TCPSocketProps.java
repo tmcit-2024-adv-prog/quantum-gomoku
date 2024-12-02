@@ -1,5 +1,6 @@
-package jp.ac.metro_cit.adv_prog_2024.gomoku.communication;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.communications;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.SocketProps;
 import javax.annotation.Nullable;
 
 /**

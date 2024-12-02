@@ -1,5 +1,8 @@
-package jp.ac.metro_cit.adv_prog_2024.gomoku.communication;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.communications;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -47,7 +50,7 @@ public class TCPSocket implements Sender, Receiver {
   private Socket socket = null;
   private ObjectOutputStream oos = null;
   private ObjectInputStream ois = null;
-  private GameStatus latestStatus = null;
+  private GameState latestStatus = null;
 
   public TCPSocket(TCPSocketProps props) {
     // 渡された引数がTCPSocket用のものであるかを検証
@@ -111,7 +114,7 @@ public class TCPSocket implements Sender, Receiver {
           }
         }).start();
       } catch (ConnectException e) {
-        onReceive(new GameStatus("Connection refused"));
+        onReceive(new GameState("Connection refused"));
       }
     }
   }
@@ -127,16 +130,16 @@ public class TCPSocket implements Sender, Receiver {
       try {
         while (socket != null && !socket.isClosed()) {
           // データを受け取ったら処理を引き渡す
-          GameStatus nextStatus = (GameStatus) ois.readObject();
+          GameState nextStatus = (GameState) ois.readObject();
           latestStatus = nextStatus;
           onReceive(nextStatus);
         }
       } catch (EOFException e) {
         // 相手からのデータが読めなくなった際はClose扱いにする
-        onReceive(new GameStatus("Closed"));
+        onReceive(new GameState("Closed"));
       } catch (IOException | ClassNotFoundException e) {
         if ((socket != null && socket.isClosed())) {
-          onReceive(new GameStatus("Closed"));
+          onReceive(new GameState("Closed"));
         } else {
           throw new RuntimeException(e);
         }
@@ -157,23 +160,23 @@ public class TCPSocket implements Sender, Receiver {
   }
 
   @Override
-  public void send(GameStatus gameStatus) throws IOException {
+  public void send(GameState gameState) throws IOException {
     // ソケットがすでに開かれていることを確認
     if (oos == null) {
       throw new IllegalStateException();
     } else {
       // データを送信する
-      oos.writeObject(gameStatus);
+      oos.writeObject(gameState);
       oos.flush();
     }
   }
 
   @Override
-  public void onReceive(GameStatus gameStatus) {
+  public void onReceive(GameState gameState) {
     // TODO: 受け取ったデータをいい感じにするアレに投げる
   }
 
-  public GameStatus getLatestStatus() {
+  public GameState getLatestStatus() {
     return latestStatus;
   }
 }

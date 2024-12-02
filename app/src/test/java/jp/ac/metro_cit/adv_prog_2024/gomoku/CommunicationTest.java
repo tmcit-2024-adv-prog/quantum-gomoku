@@ -1,12 +1,10 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communication.GameStatus;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communication.TCPSocket;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communication.TCPSocketProps;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocket;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocketProps;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 
 /**
  * 通信周りのテストケース
@@ -29,7 +27,7 @@ public class CommunicationTest {
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, () -> {
-      socket.send(new GameStatus("data"));
+      socket.send(new GameState("data"));
     });
   }
 
@@ -44,7 +42,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(socket::initSender);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, () -> {
-      socket.send(new GameStatus("data"));
+      socket.send(new GameState("data"));
     });
   }
 
@@ -61,7 +59,7 @@ public class CommunicationTest {
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, () -> {
-      socket.send(new GameStatus("data"));
+      socket.send(new GameState("data"));
     });
   }
 
@@ -88,7 +86,7 @@ public class CommunicationTest {
 
     System.out.println("Check sender -> receiver");
     Assertions.assertDoesNotThrow(() -> {
-      sender.send(new GameStatus("Hello"));
+      sender.send(new GameState("Hello"));
     });
 
     System.out.println("Waiting for receive");
@@ -100,7 +98,7 @@ public class CommunicationTest {
 
     System.out.println("Check receiver -> sender");
     Assertions.assertDoesNotThrow(() -> {
-      receiver.send(new GameStatus("Hello"));
+      receiver.send(new GameState("Hello"));
     });
 
     System.out.println("Waiting for receive");
