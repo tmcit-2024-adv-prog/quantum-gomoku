@@ -15,13 +15,14 @@ on:
 jobs:
   spotless:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: read
       checks: write
       issues: write
       pull-requests: write
     steps:
       - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request_target'
         id: pr
         with:
           script: |
@@ -32,8 +33,12 @@ jobs:
             return pullRequest
             
       - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request_target'
         with:
           ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push'
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -58,12 +63,14 @@ jobs:
 
   spotbugs:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: read
+      checks: write
       issues: write
       pull-requests: write
     steps:
       - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request_target'
         id: pr
         with:
           script: |
@@ -74,8 +81,12 @@ jobs:
             return pullRequest
             
       - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request_target'
         with:
           ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push'
 
       - name: Setup Java
         uses: actions/setup-java@v4
