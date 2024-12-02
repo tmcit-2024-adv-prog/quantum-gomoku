@@ -1,8 +1,5 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.communications;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,12 +9,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
+
 /**
  * TCPで通信を行うためのクラス
- * <p>
- * 本クラスを使用する際にはセンダー側(通信を待ち受ける側)およびレシーバー側(接続する側)にそれぞれ以下のように記載します。
- * <p>
- * センダー側
+ *
+ * <p>本クラスを使用する際にはセンダー側(通信を待ち受ける側)およびレシーバー側(接続する側)にそれぞれ以下のように記載します。
+ *
+ * <p>センダー側
+ *
  * <pre>{@code
  *  public void someSenderSideMethod() {
  *     // 接続を最初に受け待つ側の処理
@@ -30,6 +32,7 @@ import java.net.Socket;
  * }</pre>
  *
  * レシーバー側
+ *
  * <pre>{@code
  * public void someReceiverSideMethod() {
  *     // 接続を最初に受け待つ側の処理
@@ -74,21 +77,23 @@ public class TCPSocket implements Sender, Receiver {
     // 30秒間コネクションがなかった場合はエラーを投げる
     this.serverSocket.setSoTimeout(30000);
     // 別のスレッドで通信の待受を行う
-    new Thread(() -> {
-      try {
-        // Socketが開いている間は通信の待受をし続ける
-        while (!serverSocket.isClosed()) {
-          Socket socket = this.serverSocket.accept();
-          this.socket = socket;
-          // Objectの受け渡しを行うため、ObjectInput/OutputStreamに変換してグローバル変数に代入
-          oos = new ObjectOutputStream(socket.getOutputStream());
-          oos.flush();
-          ois = new ObjectInputStream(socket.getInputStream());
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }).start();
+    new Thread(
+            () -> {
+              try {
+                // Socketが開いている間は通信の待受をし続ける
+                while (!serverSocket.isClosed()) {
+                  Socket socket = this.serverSocket.accept();
+                  this.socket = socket;
+                  // Objectの受け渡しを行うため、ObjectInput/OutputStreamに変換してグローバル変数に代入
+                  oos = new ObjectOutputStream(socket.getOutputStream());
+                  oos.flush();
+                  ois = new ObjectInputStream(socket.getInputStream());
+                }
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .start();
   }
 
   @Override
@@ -102,17 +107,19 @@ public class TCPSocket implements Sender, Receiver {
     } else {
       try {
         this.socket = new Socket(address, port);
-        new Thread(() -> {
-          try {
-            // Objectの受け渡しを行うため、ObjectInput/OutputStreamに変換してグローバル変数に代入
-            socket.getInputStream();
-            this.oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.flush();
-            this.ois = new ObjectInputStream(socket.getInputStream());
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        }).start();
+        new Thread(
+                () -> {
+                  try {
+                    // Objectの受け渡しを行うため、ObjectInput/OutputStreamに変換してグローバル変数に代入
+                    socket.getInputStream();
+                    this.oos = new ObjectOutputStream(socket.getOutputStream());
+                    oos.flush();
+                    this.ois = new ObjectInputStream(socket.getInputStream());
+                  } catch (IOException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .start();
       } catch (ConnectException e) {
         onReceive(new GameState("Connection refused"));
       }
@@ -126,25 +133,27 @@ public class TCPSocket implements Sender, Receiver {
       throw new IllegalStateException();
     }
     // スレッドを作成し、別プロセスとしてデータを待ち受ける
-    new Thread(() -> {
-      try {
-        while (socket != null && !socket.isClosed()) {
-          // データを受け取ったら処理を引き渡す
-          GameState nextStatus = (GameState) ois.readObject();
-          latestStatus = nextStatus;
-          onReceive(nextStatus);
-        }
-      } catch (EOFException e) {
-        // 相手からのデータが読めなくなった際はClose扱いにする
-        onReceive(new GameState("Closed"));
-      } catch (IOException | ClassNotFoundException e) {
-        if ((socket != null && socket.isClosed())) {
-          onReceive(new GameState("Closed"));
-        } else {
-          throw new RuntimeException(e);
-        }
-      }
-    }).start();
+    new Thread(
+            () -> {
+              try {
+                while (socket != null && !socket.isClosed()) {
+                  // データを受け取ったら処理を引き渡す
+                  GameState nextStatus = (GameState) ois.readObject();
+                  latestStatus = nextStatus;
+                  onReceive(nextStatus);
+                }
+              } catch (EOFException e) {
+                // 相手からのデータが読めなくなった際はClose扱いにする
+                onReceive(new GameState("Closed"));
+              } catch (IOException | ClassNotFoundException e) {
+                if ((socket != null && socket.isClosed())) {
+                  onReceive(new GameState("Closed"));
+                } else {
+                  throw new RuntimeException(e);
+                }
+              }
+            })
+        .start();
   }
 
   @Override
