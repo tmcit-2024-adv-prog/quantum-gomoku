@@ -34,7 +34,7 @@ public class CommunicationTest {
   /** センダー側で正しくタイムアウトが発生することと接続前にデータの受信を開始した際にエラーが発生することを確認する */
   @Test
   void initSender() {
-    TCPSocketProps props = new TCPSocketProps(null, 5000);
+    TCPSocketProps props = new TCPSocketProps(null, 5001);
     TCPSocket socket = new TCPSocket(props);
     // 通信の待受時にエラーが発生しないことを確認
     Assertions.assertDoesNotThrow(socket::initSender);
@@ -49,7 +49,7 @@ public class CommunicationTest {
   /** レシーバー側で接続前にデータの受信を開始した際にエラーが発生することを確認する */
   @Test
   void initReceiver() {
-    TCPSocketProps props = new TCPSocketProps("127.0.0.1", 5000);
+    TCPSocketProps props = new TCPSocketProps("127.0.0.1", 5002);
     TCPSocket socket = new TCPSocket(props);
     // 通信の開始時にエラーが発生しないことを確認する
     Assertions.assertDoesNotThrow(socket::initReceiver);
@@ -66,11 +66,11 @@ public class CommunicationTest {
   /** センダー・レシーバー間でデータのやり取りが行えることを確認する */
   @Test
   void initCommunication() {
-    TCPSocketProps senderProps = new TCPSocketProps(null, 5000);
+    TCPSocketProps senderProps = new TCPSocketProps(null, 5003);
     TCPSocket sender = new TCPSocket(senderProps);
     Assertions.assertDoesNotThrow(sender::initSender);
 
-    TCPSocketProps receiverProps = new TCPSocketProps("127.0.0.1", 5000);
+    TCPSocketProps receiverProps = new TCPSocketProps("127.0.0.1", 5003);
     TCPSocket receiver = new TCPSocket(receiverProps);
     System.out.println("Init Receiver");
     Assertions.assertDoesNotThrow(receiver::initReceiver);
