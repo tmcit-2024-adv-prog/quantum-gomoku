@@ -33,11 +33,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Spotless
-        run: ./gradlew spotlessApply
+      - name: check
+        if: github.event_name == 'push'
+        run: ./gradlew check
 
       - name: Suggest changes
         uses: reviewdog/action-suggester@v1
+        if: github.event_name == 'pull_request_target'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: spotless
