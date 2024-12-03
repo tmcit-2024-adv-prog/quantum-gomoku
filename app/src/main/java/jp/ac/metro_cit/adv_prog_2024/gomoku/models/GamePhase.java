@@ -4,5 +4,5 @@ public enum GamePhase {
   BEFORE_START,
   BLACK_TURN,
   WHITE_TURN,
-  FINISH,
+  FINISHED,
 }

@@ -31,28 +31,27 @@ public class GameTest {
         "Current player is not BLACK"); // 現在のプレイヤーはBLACK
 
     while (count < 20) {
-      boolean isPlaced = game.putStone(game.getCurrentPlayer().getColor(), pos.x, pos.y);
+      boolean isPlaced = game.putStone(game.getCurrentPlayer().getColor(), pos);
       if (!isPlaced) {
         System.out.println("Already placed");
         return;
       }
 
       game.checkWinner(pos);
-      if (game.getPhase() == GamePhase.FINISH) {
+      if (game.getPhase() == GamePhase.FINISHED) {
         assertNotEquals(
             game.getPhase(), GamePhase.BLACK_TURN, "Game phase is not BLACK_TURN"); // ゲームは終了している
         assertNotEquals(
             game.getPhase(), GamePhase.WHITE_TURN, "Game phase is not WHITE_TURN"); // ゲームは終了している
         return;
       }
-      assertNotEquals(game.getPhase(), GamePhase.FINISH, "Game phase is not END"); // ゲームは終了していない
+      assertNotEquals(game.getPhase(), GamePhase.FINISHED, "Game phase is not END"); // ゲームは終了していない
 
       // 設置場所の変更
       if (game.getPhase() == GamePhase.WHITE_TURN) {
-        pos.x++;
-        pos.y = 0;
+        pos = new Vector2D(pos.x + 1, 0);
       } else {
-        pos.y = 1;
+        pos = new Vector2D(pos.x, pos.y + 1);
       }
 
       game.nextPhase();

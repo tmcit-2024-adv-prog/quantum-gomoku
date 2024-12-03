@@ -29,7 +29,7 @@ public class Game {
   }
 
   void endGame() {
-    phase = GamePhase.FINISH;
+    phase = GamePhase.FINISHED;
   }
 
   public void nextPhase() {
@@ -54,8 +54,7 @@ public class Game {
     return new Player(currentPlayer.getColor(), currentPlayer.getName());
   }
 
-  public boolean putStone(Color color, int x, int y) {
-    Vector2D pos = new Vector2D(x, y);
+  public boolean putStone(Color color, Vector2D pos) {
     if (board.getStone(pos) != null) {
       return false;
     }
