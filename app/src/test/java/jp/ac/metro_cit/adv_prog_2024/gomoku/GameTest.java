@@ -1,6 +1,5 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Color;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
@@ -32,22 +31,21 @@ public class GameTest {
         "Current player is not BLACK"); // 現在のプレイヤーはBLACK
 
     while (count < 20) {
-      try {
-        game.putStone(game.getCurrentPlayer().getColor(), pos.x, pos.y);
-      } catch (PutStoneException e) {
-        System.out.println("Error: " + e.getMessage());
+      boolean isPlaced = game.putStone(game.getCurrentPlayer().getColor(), pos.x, pos.y);
+      if (!isPlaced) {
+        System.out.println("Already placed");
         return;
       }
 
       game.checkWinner(pos);
-      if (game.getPhase() == GamePhase.END) {
+      if (game.getPhase() == GamePhase.FINISH) {
         assertNotEquals(
             game.getPhase(), GamePhase.BLACK_TURN, "Game phase is not BLACK_TURN"); // ゲームは終了している
         assertNotEquals(
             game.getPhase(), GamePhase.WHITE_TURN, "Game phase is not WHITE_TURN"); // ゲームは終了している
         return;
       }
-      assertNotEquals(game.getPhase(), GamePhase.END, "Game phase is not END"); // ゲームは終了していない
+      assertNotEquals(game.getPhase(), GamePhase.FINISH, "Game phase is not END"); // ゲームは終了していない
 
       // 設置場所の変更
       if (game.getPhase() == GamePhase.WHITE_TURN) {

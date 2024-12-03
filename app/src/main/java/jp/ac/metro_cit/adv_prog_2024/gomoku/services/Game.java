@@ -1,46 +1,42 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Color;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 
 public class Game {
   private GamePhase phase;
-  private Player player1;
-  private Player player2;
+  private Player blackPlayer;
+  private Player whitePlayer;
   private Player currentPlayer;
   private Board board;
-  private GameState gameState;
 
   public Game(Player blackPlayer, Player whitePlayer, Board board) {
-    phase = GamePhase.SETUP;
-    gameState = new GameState("Game is not started yet");
-    this.player1 = new Player(blackPlayer.getColor(), blackPlayer.getName());
-    this.player2 = new Player(whitePlayer.getColor(), whitePlayer.getName());
+    this.phase = GamePhase.BEFORE_START;
+    this.blackPlayer = new Player(blackPlayer.getColor(), blackPlayer.getName());
+    this.whitePlayer = new Player(whitePlayer.getColor(), whitePlayer.getName());
     this.board = new Board(board.getSize());
   }
 
   public void startGame() {
-    player1 = new Player(Color.BLACK, player1.getName());
-    player2 = new Player(Color.WHITE, player2.getName());
-    currentPlayer = player1;
+    blackPlayer = new Player(Color.BLACK, blackPlayer.getName());
+    whitePlayer = new Player(Color.WHITE, whitePlayer.getName());
+    currentPlayer = blackPlayer;
     phase = GamePhase.BLACK_TURN;
   }
 
   void endGame() {
-    phase = GamePhase.END;
+    phase = GamePhase.FINISH;
   }
 
   public void nextPhase() {
-    if (currentPlayer == player1) {
-      currentPlayer = player2;
+    if (currentPlayer == blackPlayer) {
+      currentPlayer = whitePlayer;
     } else {
-      currentPlayer = player1;
+      currentPlayer = blackPlayer;
     }
 
     if (currentPlayer.getColor() == Color.BLACK) {
@@ -58,16 +54,14 @@ public class Game {
     return new Player(currentPlayer.getColor(), currentPlayer.getName());
   }
 
-  public void putStone(Color color, int x, int y) throws PutStoneException {
+  public boolean putStone(Color color, int x, int y) {
     Vector2D pos = new Vector2D(x, y);
     if (board.getStone(pos) != null) {
-      System.err.println("Error: Already placed stone");
-      return;
+      return false;
     }
     Stone stone = new Stone(color, pos);
     board.setStone(pos, stone);
-    board.show();
-    return;
+    return true;
   }
 
   public void checkWinner(Vector2D pos) {
@@ -133,14 +127,4 @@ public class Game {
     if (stoneNum >= 5) endGame();
     return;
   }
-
-  public void surrender() {
-    phase = GamePhase.END;
-  }
-
-  public GameState gameState() {
-    return gameState;
-  }
-
-  public void setGameState(GameState state) {}
 }

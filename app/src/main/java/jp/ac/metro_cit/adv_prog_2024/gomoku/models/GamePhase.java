@@ -1,8 +1,8 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
 public enum GamePhase {
-  SETUP,
+  BEFORE_START,
   BLACK_TURN,
   WHITE_TURN,
-  END,
+  FINISH,
 }
