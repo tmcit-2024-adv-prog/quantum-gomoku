@@ -13,6 +13,7 @@ public class Board {
   }
 
   public Stone getStone(Vector2D pos) {
+    if(pos.x < 0 || pos.x >= stone.length || pos.y < 0 || pos.y >= stone[0].length) return null;
     return stone[pos.x][pos.y];
   }
 

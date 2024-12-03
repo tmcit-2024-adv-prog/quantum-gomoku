@@ -17,28 +17,23 @@ public class Game {
   private Player player2;
   private Player currentPlayer;
   private Board board;
-  private Random rand;
 
-  public Game(Player player1, Player player2, Board board) {
+  public Game(Player blackPlayer, Player whitePlayer, Board board) {
     phase = GamePhase.SETUP;
-    this.player1 = player1;
-    this.player2 = player2;
+    this.player1 = blackPlayer;
+    this.player2 = whitePlayer;
     this.board = board;
-    rand = new Random();
   }
 
   public void startGame() {
-    boolean turn = rand.nextBoolean();
-    if (turn) {
-      player1 = new Player(Color.BLACK, player1.getName());
-      player2 = new Player(Color.WHITE, player2.getName());
-      currentPlayer = player1;
-    } else {
-      player1 = new Player(Color.WHITE, player1.getName());
-      player2 = new Player(Color.BLACK, player2.getName());
-      currentPlayer = player2;
-    }
+    player1 = new Player(Color.BLACK, player1.getName());
+    player2 = new Player(Color.WHITE, player2.getName());
+    currentPlayer = player1;
     phase = GamePhase.BLACK_TURN;
+  }
+
+  void endGame() {
+    phase = GamePhase.END;
   }
 
   public void nextPhase() {
@@ -65,15 +60,9 @@ public class Game {
     return currentPlayer;
   }
 
-  boolean containBoard(Vector2D pos) {
-    if (pos.x < 0 || pos.x > board.GetSize().x || pos.y < 0 || pos.y > board.GetSize().y)
-      return false;
-    return true;
-  }
-
   public void putStone(Color color, int x, int y) throws PutStoneException {
     Vector2D pos = new Vector2D(x, y);
-    if (!containBoard(pos) || board.getStone(pos) != null) {
+    if (board.getStone(pos) != null) {
       System.err.println("Error: Already placed stone");
       return;
     }
@@ -83,7 +72,7 @@ public class Game {
     return;
   }
 
-  public boolean checkWinner(Vector2D pos) {
+  public void checkWinner(Vector2D pos) {
     Color stoneColor = board.getStone(pos).getColor();
     Stone stone;
 
@@ -100,7 +89,7 @@ public class Game {
       if (stone == null || stone.getColor() != stoneColor) break;
       stoneNum++;
     }
-    if (stoneNum >= 5) return true;
+    if (stoneNum >= 5) endGame();
 
     // 縦方向の確認
     stoneNum = 1;
@@ -114,7 +103,7 @@ public class Game {
       if (stone == null || stone.getColor() != stoneColor) break;
       stoneNum++;
     }
-    if (stoneNum >= 5) return true;
+    if (stoneNum >= 5) endGame();
 
     // 左斜め方向の確認
     stoneNum = 1;
@@ -128,7 +117,7 @@ public class Game {
       if (stone == null || stone.getColor() != stoneColor) break;
       stoneNum++;
     }
-    if (stoneNum >= 5) return true;
+    if (stoneNum >= 5) endGame();
 
     // 右斜め方向の確認
     stoneNum = 1;
@@ -143,9 +132,8 @@ public class Game {
       stoneNum++;
     }
 
-    if (stoneNum >= 5) return true;
-    System.out.println("NUM:" + stoneNum);
-    return false;
+    if (stoneNum >= 5) endGame();
+    return;
   }
 
   public void surrender() {
