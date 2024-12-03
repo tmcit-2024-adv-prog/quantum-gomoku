@@ -15,13 +15,30 @@ on:
 jobs:
   spotless:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: read
+      checks: write
       issues: write
       pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request_target'
+        id: pr
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            return pullRequest
+            
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request_target'
+        with:
+          ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push'
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -32,24 +49,44 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Spotless
-        run: ./gradlew spotlessApply
+      - name: check
+        if: github.event_name == 'push'
+        run: ./gradlew check
 
       - name: Suggest changes
         uses: reviewdog/action-suggester@v1
+        if: github.event_name == 'pull_request_target'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: spotless
+          fail_on_error: true
 
   spotbugs:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: read
+      checks: write
       issues: write
       pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request_target'
+        id: pr
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            return pullRequest
+            
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request_target'
+        with:
+          ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push'
 
       - name: Setup Java
         uses: actions/setup-java@v4
