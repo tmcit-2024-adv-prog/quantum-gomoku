@@ -103,6 +103,6 @@ VSCodeを使用している場合はテストの網羅率（カバレッジ）�
 
 <summary>カバレッジの確認方法</summary>
 
-<video src="./videos/vscode-coverage.mp4" controls=true />
+https://github.com/user-attachments/assets/997692e0-858c-4b22-bfce-4c3023cdf119
 
 </details>
