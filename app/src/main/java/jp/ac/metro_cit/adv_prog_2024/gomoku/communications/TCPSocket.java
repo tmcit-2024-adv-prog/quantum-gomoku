@@ -56,7 +56,6 @@ public class TCPSocket implements Sender, Receiver {
   private Socket socket = null;
   private ObjectOutputStream oos = null;
   private ObjectInputStream ois = null;
-  private GameState latestStatus = null;
 
   // スレッドセーフなQueueで送られてきたデータを保持する
   private final ConcurrentLinkedQueue<GameState> gameStates = new ConcurrentLinkedQueue<>();
@@ -147,7 +146,6 @@ public class TCPSocket implements Sender, Receiver {
                   // データを受け取ったら処理を引き渡す
                   Serializable next = (Serializable) ois.readObject();
                   if (next instanceof GameState nextState) {
-                    latestStatus = nextState;
                     gameStates.add(nextState);
                   } else if (next instanceof GameMessage nextMessage) {
                     messages.add(nextMessage);
