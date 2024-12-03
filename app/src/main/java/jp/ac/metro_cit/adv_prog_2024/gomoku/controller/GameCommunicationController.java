@@ -59,7 +59,7 @@ public class GameCommunicationController {
     this.receiver.startRecive();
   }
 
-  // private Color decideColor() {
-
-  // }
+  private Color decideColor() {
+    return this.controlPlayer.setColoer(Color.BLACK);
+  }
 }
