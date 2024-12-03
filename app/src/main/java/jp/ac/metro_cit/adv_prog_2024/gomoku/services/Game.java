@@ -1,7 +1,5 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
-import java.util.Random;
-
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Color;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
