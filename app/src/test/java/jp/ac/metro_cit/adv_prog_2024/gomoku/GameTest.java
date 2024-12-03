@@ -1,75 +1,56 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
-import java.awt.Point;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
+
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.services.Game;
 
 public class GameTest {
-  public String GameTest(int dir, Point initPos) {
-    // 初期化
-    Game game = new Game();
-    game.StartGame();
-    Point pos = initPos;
+  @Test
+  void gameTest() {
+    Game game = new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(9, 9)));
+    Vector2D pos = new Vector2D(0, 0);
     int count = 0;
 
+    assertNotNull(game, "Create Game instance");
+    assertNotNull(game.getPhase() == GamePhase.SETUP, "Game phase is SETUP");
+
     // ゲーム開始
+    game.startGame();
     while (count < 20) {
-      System.out.println("player: " + game.currentPlayer.stoneColor);
-      Stone stone = new Stone(game.currentPlayer.stoneColor);
-      stone.pos = pos;
-      Boolean bool = game.SetStone(pos, stone);
-      if (!bool) {
-        return "Error: SetStone";
+      System.out.println(game.getCurrentPlayer().getName() + " turn");
+
+      try {
+        game.putStone(game.getCurrentPlayer().getColor(), pos.x, pos.y);
+      } catch (PutStoneException e) {
+        System.out.println("Error: " + e.getMessage());
+        return;
       }
-      if (game.CheckWinner(pos)) {
-        return "Winner: " + game.currentPlayer.stoneColor;
+      
+      if (game.checkWinner(pos)) {
+        System.out.println("Winner: " + game.getCurrentPlayer().getName());
+        return;
       }
 
       // 設置場所の変更
-      if (game.phase == GamePhase.WHITE_TURN) {
-        switch (dir) {
-          case 0:
-            pos.x++;
-            pos.y = 0;
-            break;
-          case 1:
-            pos.y++;
-            pos.x = 0;
-            break;
-          case 2:
-            pos.x++;
-            break;
-          case 3:
-            pos.x--;
-            break;
-
-          default:
-            break;
-        }
-        pos.x--;
+      if (game.getPhase() == GamePhase.WHITE_TURN) {
+        pos.x++;
+        pos.y = 0;
       } else {
-        switch (dir) {
-          case 0:
-            pos.y = 1;
-            break;
-          case 1:
-            pos.x = 1;
-            break;
-          case 2:
-            pos.y++;
-            break;
-          case 3:
-            pos.y--;
-            break;
-        }
+        pos.y = 1;
       }
-      game.NextPhase();
+
+      game.nextPhase();
       count++;
     }
-    return null;
-  }
 
-  public static void main(String[] args) {
-    for (int i = 0; i < 4; i++) {
-      System.out.println(new App().GameTest(i, new Point(5, 5)));
-    }
+    System.out.println("noWinner");
+    return;
   }
 }
