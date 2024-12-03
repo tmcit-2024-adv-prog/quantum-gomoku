@@ -155,7 +155,7 @@ public class TCPSocket implements Sender, Receiver {
                 // 相手からのデータが読めなくなった際はClose扱いにする
                 messages.add(new GameMessage(("Closed")));
               } catch (IOException | ClassNotFoundException e) {
-                if ((socket != null && socket.isClosed())) {
+                if (socket.isClosed()) {
                   messages.add(new GameMessage(("Closed")));
                 } else {
                   throw new RuntimeException(e);
