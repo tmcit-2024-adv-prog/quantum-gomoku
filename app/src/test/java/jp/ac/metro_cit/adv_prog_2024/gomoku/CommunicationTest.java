@@ -14,9 +14,7 @@ import org.junit.jupiter.api.Test;
  */
 public class CommunicationTest {
 
-  /**
-   * レシーバー側のアドレスがnullの場合にエラーが発生することを確認する
-   */
+  /** レシーバー側のアドレスがnullの場合にエラーが発生することを確認する */
   @Test
   void initReceiverWithNullAddress() {
     TCPSocketProps props = new TCPSocketProps(null, 5000);
@@ -30,9 +28,7 @@ public class CommunicationTest {
     Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
   }
 
-  /**
-   * センダー側で正しくタイムアウトが発生することと接続前にデータの受信を開始した際にエラーが発生することを確認する
-   */
+  /** センダー側で正しくタイムアウトが発生することと接続前にデータの受信を開始した際にエラーが発生することを確認する */
   @Test
   void initSender() {
     TCPSocketProps props = new TCPSocketProps(null, 5001);
@@ -43,9 +39,7 @@ public class CommunicationTest {
     Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
   }
 
-  /**
-   * レシーバー側で接続前にデータの受信を開始した際にエラーが発生することを確認する
-   */
+  /** レシーバー側で接続前にデータの受信を開始した際にエラーが発生することを確認する */
   @Test
   void initReceiver() {
     TCPSocketProps props = new TCPSocketProps("127.0.0.1", 5002);
@@ -58,9 +52,7 @@ public class CommunicationTest {
     Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
   }
 
-  /**
-   * センダー・レシーバー間でデータのやり取りが行えることを確認する
-   */
+  /** センダー・レシーバー間でデータのやり取りが行えることを確認する */
   @Test
   void initCommunication() {
     TCPSocketProps senderProps = new TCPSocketProps(null, 5003);
