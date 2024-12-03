@@ -23,7 +23,7 @@ public class GameTest {
     assertNotNull(game, "Create Game instance"); // ゲームインスタンスの生成
     assertNotEquals(game.getPhase(), GamePhase.BLACK_TURN, "Game phase is SETUP"); // ゲームフェーズはSETUP
 
-    // ゲーム開始
+    // ゲームを開始
     game.startGame();
     assertNotNull(game.getCurrentPlayer(), "Current player is not null"); // 現在のプレイヤーはnullでない
     assertNotEquals(
