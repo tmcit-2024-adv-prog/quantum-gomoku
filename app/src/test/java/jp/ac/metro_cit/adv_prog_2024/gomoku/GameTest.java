@@ -15,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class GameTest {
   @Test
   void gameTest() {
-    Game game = new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
     Vector2D pos = new Vector2D(0, 0);
     int count = 0;
 
@@ -25,7 +26,10 @@ public class GameTest {
     // ゲーム開始
     game.startGame();
     assertNotNull(game.getCurrentPlayer(), "Current player is not null"); // 現在のプレイヤーはnullでない
-    assertNotEquals(game.getCurrentPlayer().getColor(), Color.WHITE, "Current player is not BLACK"); // 現在のプレイヤーはBLACK
+    assertNotEquals(
+        game.getCurrentPlayer().getColor(),
+        Color.WHITE,
+        "Current player is not BLACK"); // 現在のプレイヤーはBLACK
 
     while (count < 20) {
       try {
@@ -36,9 +40,11 @@ public class GameTest {
       }
 
       game.checkWinner(pos);
-      if(game.getPhase() == GamePhase.END) {
-        assertNotEquals(game.getPhase(), GamePhase.BLACK_TURN, "Game phase is not BLACK_TURN"); // ゲームは終了している
-        assertNotEquals(game.getPhase(), GamePhase.WHITE_TURN, "Game phase is not WHITE_TURN"); // ゲームは終了している
+      if (game.getPhase() == GamePhase.END) {
+        assertNotEquals(
+            game.getPhase(), GamePhase.BLACK_TURN, "Game phase is not BLACK_TURN"); // ゲームは終了している
+        assertNotEquals(
+            game.getPhase(), GamePhase.WHITE_TURN, "Game phase is not WHITE_TURN"); // ゲームは終了している
         return;
       }
       assertNotEquals(game.getPhase(), GamePhase.END, "Game phase is not END"); // ゲームは終了していない

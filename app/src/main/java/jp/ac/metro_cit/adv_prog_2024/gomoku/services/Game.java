@@ -1,12 +1,12 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Color;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 
 public class Game {
@@ -37,15 +37,13 @@ public class Game {
   public void nextPhase() {
     if (currentPlayer == player1) {
       currentPlayer = player2;
-    }
-    else {
+    } else {
       currentPlayer = player1;
     }
 
     if (currentPlayer.getColor() == Color.BLACK) {
       phase = GamePhase.BLACK_TURN;
-    }
-    else {
+    } else {
       phase = GamePhase.WHITE_TURN;
     }
   }
