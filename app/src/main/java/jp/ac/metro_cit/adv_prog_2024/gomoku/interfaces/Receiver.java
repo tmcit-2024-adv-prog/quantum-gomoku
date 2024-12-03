@@ -2,6 +2,7 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces;
 
 import java.io.IOException;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 
 /**
@@ -11,6 +12,8 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
  */
 public interface Receiver {
   void onReceive(GameState gameState);
+
+  void onReceive(GameMessage message);
 
   void initReceiver() throws IOException;
 

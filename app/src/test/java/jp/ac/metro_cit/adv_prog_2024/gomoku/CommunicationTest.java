@@ -2,6 +2,7 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocket;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocketProps;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -87,6 +88,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(
         () -> {
           sender.send(new GameState("Hello"));
+          sender.send(new GameMessage("Hello"));
         });
 
     System.out.println("Waiting for receive");
@@ -101,6 +103,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(
         () -> {
           receiver.send(new GameState("Hello"));
+          receiver.send(new GameMessage("Hello"));
         });
 
     System.out.println("Waiting for receive");
