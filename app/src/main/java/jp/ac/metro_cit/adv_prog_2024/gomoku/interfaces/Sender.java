@@ -2,6 +2,7 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces;
 
 import java.io.IOException;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 
 /**
@@ -23,4 +24,6 @@ public interface Sender {
    * @param gameState 送信するデータ
    */
   void send(GameState gameState) throws IOException;
+
+  void send(GameMessage message) throws IOException;
 }

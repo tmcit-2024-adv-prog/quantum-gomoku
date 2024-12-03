@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -11,6 +12,7 @@ import java.net.Socket;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 
 /**
@@ -138,16 +140,20 @@ public class TCPSocket implements Sender, Receiver {
               try {
                 while (socket != null && !socket.isClosed()) {
                   // データを受け取ったら処理を引き渡す
-                  GameState nextStatus = (GameState) ois.readObject();
-                  latestStatus = nextStatus;
-                  onReceive(nextStatus);
+                  Serializable next = (Serializable) ois.readObject();
+                  if (next instanceof GameState nextState) {
+                    latestStatus = nextState;
+                    onReceive(nextState);
+                  } else if (next instanceof GameMessage nextMessage) {
+                    onReceive(nextMessage);
+                  }
                 }
               } catch (EOFException e) {
                 // 相手からのデータが読めなくなった際はClose扱いにする
-                onReceive(new GameState("Closed"));
+                onReceive(new GameMessage("Closed"));
               } catch (IOException | ClassNotFoundException e) {
                 if ((socket != null && socket.isClosed())) {
-                  onReceive(new GameState("Closed"));
+                  onReceive(new GameMessage("Closed"));
                 } else {
                   throw new RuntimeException(e);
                 }
@@ -181,7 +187,24 @@ public class TCPSocket implements Sender, Receiver {
   }
 
   @Override
+  public void send(GameMessage message) throws IOException {
+    // ソケットがすでに開かれていることを確認
+    if (oos == null) {
+      throw new IllegalStateException();
+    } else {
+      // データを送信する
+      oos.writeObject(message);
+      oos.flush();
+    }
+  }
+
+  @Override
   public void onReceive(GameState gameState) {
+    // TODO: 受け取ったデータをいい感じにするアレに投げる
+  }
+
+  @Override
+  public void onReceive(GameMessage message) {
     // TODO: 受け取ったデータをいい感じにするアレに投げる
   }
 
