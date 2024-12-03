@@ -9,6 +9,7 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
@@ -55,7 +56,10 @@ public class TCPSocket implements Sender, Receiver {
   private Socket socket = null;
   private ObjectOutputStream oos = null;
   private ObjectInputStream ois = null;
-  private GameState latestStatus = null;
+
+  // スレッドセーフなQueueで送られてきたデータを保持する
+  private final ConcurrentLinkedQueue<GameState> gameStates = new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<GameMessage> messages = new ConcurrentLinkedQueue<>();
 
   public TCPSocket(TCPSocketProps props) {
     // 渡された引数がTCPSocket用のものであるかを検証
@@ -123,7 +127,7 @@ public class TCPSocket implements Sender, Receiver {
                 })
             .start();
       } catch (ConnectException e) {
-        onReceive(new GameState("Connection refused"));
+        messages.add(new GameMessage(("Connection refused")));
       }
     }
   }
@@ -142,18 +146,17 @@ public class TCPSocket implements Sender, Receiver {
                   // データを受け取ったら処理を引き渡す
                   Serializable next = (Serializable) ois.readObject();
                   if (next instanceof GameState nextState) {
-                    latestStatus = nextState;
-                    onReceive(nextState);
+                    gameStates.add(nextState);
                   } else if (next instanceof GameMessage nextMessage) {
-                    onReceive(nextMessage);
+                    messages.add(nextMessage);
                   }
                 }
               } catch (EOFException e) {
                 // 相手からのデータが読めなくなった際はClose扱いにする
-                onReceive(new GameMessage("Closed"));
+                messages.add(new GameMessage(("Closed")));
               } catch (IOException | ClassNotFoundException e) {
-                if ((socket != null && socket.isClosed())) {
-                  onReceive(new GameMessage("Closed"));
+                if (socket.isClosed()) {
+                  messages.add(new GameMessage(("Closed")));
                 } else {
                   throw new RuntimeException(e);
                 }
@@ -199,16 +202,14 @@ public class TCPSocket implements Sender, Receiver {
   }
 
   @Override
-  public void onReceive(GameState gameState) {
-    // TODO: 受け取ったデータをいい感じにするアレに投げる
+  public GameMessage receive() {
+    // messagesのQueueから先頭の要素を取得し削除
+    return messages.poll();
   }
 
   @Override
-  public void onReceive(GameMessage message) {
-    // TODO: 受け取ったデータをいい感じにするアレに投げる
-  }
-
-  public GameState getLatestStatus() {
-    return latestStatus;
+  public GameState receiveState() {
+    // gameStatesのQueueから先頭の要素を取得し削除
+    return gameStates.poll();
   }
 }

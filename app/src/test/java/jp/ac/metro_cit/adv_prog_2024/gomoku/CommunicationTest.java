@@ -77,7 +77,10 @@ public class CommunicationTest {
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-    Assertions.assertEquals("Hello", receiver.getLatestStatus().data());
+    Assertions.assertEquals("Hello", receiver.receiveState().data());
+    Assertions.assertEquals("Hello", receiver.receive().message());
+    Assertions.assertNull(receiver.receiveState());
+    Assertions.assertNull(receiver.receive());
 
     System.out.println("Check receiver -> sender");
     Assertions.assertDoesNotThrow(() -> receiver.send(new GameState("Hello")));
@@ -86,7 +89,10 @@ public class CommunicationTest {
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-    Assertions.assertEquals("Hello", sender.getLatestStatus().data());
+    Assertions.assertEquals("Hello", sender.receiveState().data());
+    Assertions.assertEquals("Hello", sender.receive().message());
+    Assertions.assertNull(sender.receiveState());
+    Assertions.assertNull(sender.receive());
 
     System.out.println("Disconnect");
     Assertions.assertDoesNotThrow(receiver::disconnect);
