@@ -1,10 +1,10 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces;
 
 import java.io.IOException;
+import javax.annotation.Nullable;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
-import javax.annotation.Nullable;
 
 /**
  * 通信を受信する側のインターフェイス
@@ -24,7 +24,8 @@ public interface Receiver {
 
   /**
    * 相手から送られてきた{@link GameMessage}を取得する
-   * 指定されたタイムアウト(ミリ秒)以内に取得できない場合はnullを返す
+   *
+   * <p>指定されたタイムアウト(ミリ秒)以内に取得できない場合はnullを返す
    *
    * <p>送られてきたデータがない場合はnullを返す
    *
