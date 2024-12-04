@@ -9,7 +9,8 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
@@ -58,8 +59,8 @@ public class TCPSocket implements Sender, Receiver {
   private ObjectInputStream ois = null;
 
   // スレッドセーフなQueueで送られてきたデータを保持する
-  private final ConcurrentLinkedQueue<GameState> gameStates = new ConcurrentLinkedQueue<>();
-  private final ConcurrentLinkedQueue<GameMessage> messages = new ConcurrentLinkedQueue<>();
+  private final LinkedBlockingQueue<GameState> gameStates = new LinkedBlockingQueue<>();
+  private final LinkedBlockingQueue<GameMessage> messages = new LinkedBlockingQueue<>();
 
   public TCPSocket(TCPSocketProps props) {
     // 渡された引数がTCPSocket用のものであるかを検証
@@ -202,14 +203,19 @@ public class TCPSocket implements Sender, Receiver {
   }
 
   @Override
-  public GameMessage receive() {
+  public GameMessage receive() throws InterruptedException {
     // messagesのQueueから先頭の要素を取得し削除
-    return messages.poll();
+    return messages.take();
   }
 
   @Override
-  public GameState receiveState() {
+  public GameMessage receive(long timeout) throws InterruptedException {
+    return messages.poll(timeout, TimeUnit.MILLISECONDS);
+  }
+
+  @Override
+  public GameState receiveState() throws InterruptedException {
     // gameStatesのQueueから先頭の要素を取得し削除
-    return gameStates.poll();
+    return gameStates.take();
   }
 }
