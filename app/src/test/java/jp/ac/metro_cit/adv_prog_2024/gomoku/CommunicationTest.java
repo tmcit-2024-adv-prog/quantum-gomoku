@@ -54,7 +54,7 @@ public class CommunicationTest {
 
   /** センダー・レシーバー間でデータのやり取りが行えることを確認する */
   @Test
-  void initCommunication() {
+  void initCommunication() throws InterruptedException {
     TCPSocketProps senderProps = new TCPSocketProps(null, 5003);
     TCPSocket sender = new TCPSocket(senderProps);
     Assertions.assertDoesNotThrow(sender::initSender);
@@ -79,8 +79,7 @@ public class CommunicationTest {
 
     Assertions.assertEquals("Hello", receiver.receiveState().data());
     Assertions.assertEquals("Hello", receiver.receive().message());
-    Assertions.assertNull(receiver.receiveState());
-    Assertions.assertNull(receiver.receive());
+    Assertions.assertNull((receiver.receive(3000)));
 
     System.out.println("Check receiver -> sender");
     Assertions.assertDoesNotThrow(() -> receiver.send(new GameState("Hello")));
@@ -91,8 +90,7 @@ public class CommunicationTest {
 
     Assertions.assertEquals("Hello", sender.receiveState().data());
     Assertions.assertEquals("Hello", sender.receive().message());
-    Assertions.assertNull(sender.receiveState());
-    Assertions.assertNull(sender.receive());
+    Assertions.assertNull((sender.receive(3000)));
 
     System.out.println("Disconnect");
     Assertions.assertDoesNotThrow(receiver::disconnect);
