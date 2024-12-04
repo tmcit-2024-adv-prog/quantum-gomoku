@@ -51,7 +51,11 @@ jobs:
 
       - name: check
         if: github.event_name == 'push'
-        run: ./gradlew check
+        run: ./gradlew spotlessCheck
+
+      - name: apply
+        if: github.event_name == 'pull_request_target'
+        run: ./gradlew spotlessApply
 
       - name: Suggest changes
         uses: reviewdog/action-suggester@v1
@@ -59,7 +63,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: spotless
-          fail_on_error: true
+          level: error
 
   spotbugs:
     runs-on: arc-runner-set
