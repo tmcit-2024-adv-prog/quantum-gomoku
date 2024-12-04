@@ -1,6 +1,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces;
 
 import java.io.IOException;
+import java.io.Serializable;
 import javax.annotation.Nullable;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
@@ -16,11 +17,9 @@ public interface Receiver {
   /**
    * 相手から送られてきた{@link GameMessage}を取得する
    *
-   * <p>送られてきたデータがない場合はnullを返す
-   *
    * @return 相手から送られてきたデータ
    */
-  GameMessage receive() throws InterruptedException;
+  GameMessage<Serializable> receive() throws InterruptedException;
 
   /**
    * 相手から送られてきた{@link GameMessage}を取得する
@@ -33,12 +32,10 @@ public interface Receiver {
    * @return 相手から送られてきたデータ
    */
   @Nullable
-  GameMessage receive(long timeout) throws InterruptedException;
+  GameMessage<Serializable> receive(long timeout) throws InterruptedException;
 
   /**
    * 相手から送られてきた{@link GameState}を取得する
-   *
-   * <p>送られてきたデータがない場合はnullを返す
    *
    * @return 相手から送られてきたデータ
    */
