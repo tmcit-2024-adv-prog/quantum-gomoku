@@ -22,6 +22,15 @@ public class Player {
   }
 
   /**
+   * プレイヤーの色を設定する。
+   *
+   * @param color プレイヤーに設定する石の色
+   */
+  public void setColor(StoneColor color) {
+    this.color = color;
+  }
+
+  /**
    * プレイヤーが保有する石の色を返す。
    *
    * @return 対象のプレイヤーが保有する石の色
@@ -31,9 +40,9 @@ public class Player {
   }
 
   /**
-   * プレイヤー命を返す。
+   * プレイヤー名を返す。
    *
-   * @return 対象のプレイヤー命
+   * @return 対象のプレイヤー名
    */
   public String getName() {
     return name;
