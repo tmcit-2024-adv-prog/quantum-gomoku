@@ -12,6 +12,10 @@ repositories {
 dependencies {
     implementation(libs.guava)
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.6")
+	testImplementation(platform("org.junit:junit-bom:5.11.3"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.mockito:mockito-core:5.14.2")
 }
 
 testing {
@@ -43,6 +47,7 @@ spotless {
         cleanthat()
         formatAnnotations()
         googleJavaFormat()
+        indentWithSpaces(2)
         importOrder("java|javax", "com.acme", "", "\\#com.acme", "\\#")
     }
 }
@@ -61,6 +66,7 @@ tasks {
         jvmArgs = listOf("-Duser.language=ja")
     }
     test {
+	    useJUnitPlatform()
         finalizedBy(jacocoTestReport)
     }
     jacocoTestReport {
