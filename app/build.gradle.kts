@@ -91,6 +91,7 @@ spotless {
         cleanthat()
         formatAnnotations()
         googleJavaFormat()
+        indentWithSpaces(2)
         importOrder("java|javax", "com.acme", "", "\\#com.acme", "\\#")
     }
 }
