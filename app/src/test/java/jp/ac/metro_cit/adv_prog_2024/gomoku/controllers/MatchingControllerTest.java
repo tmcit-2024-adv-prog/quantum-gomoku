@@ -175,7 +175,7 @@ public class MatchingControllerTest {
     // 相手からはOfferメッセージとAckメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
-            new GameMessage<>(new String("non-matching message")),
+            new GameMessage<>("non-matching message"),
             new GameMessage<>(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             new GameMessage<>(new MatchingMessage(MatchingMessageType.ACK)));
     Player dummyLocalPlayer = new Player();
