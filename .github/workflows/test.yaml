@@ -12,6 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions: 
+      checks: write
       contents: read
       pull-requests: write
     steps:
@@ -45,10 +46,10 @@ jobs:
 
       - name: Test
         run: ./gradlew jacocoTestReport
+        continue-on-error: true
 
       - name: Report test results
         uses: mikepenz/action-junit-report@v4
-        if: success() || failure()
         with:
           report_paths: "**/build/test-results/test/TEST-*.xml"
 
