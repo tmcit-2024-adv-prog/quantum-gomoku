@@ -2,6 +2,7 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocket;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocketProps;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,7 @@ public class CommunicationTest {
     // 通信を確立する前にstartReceiveを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(
-        IllegalStateException.class,
-        () -> {
-          socket.send(new GameState("data"));
-        });
+    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
   }
 
   /** センダー側で正しくタイムアウトが発生することと接続前にデータの受信を開始した際にエラーが発生することを確認する */
@@ -39,11 +36,7 @@ public class CommunicationTest {
     // 通信の待受時にエラーが発生しないことを確認
     Assertions.assertDoesNotThrow(socket::initSender);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(
-        IllegalStateException.class,
-        () -> {
-          socket.send(new GameState("data"));
-        });
+    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
   }
 
   /** レシーバー側で接続前にデータの受信を開始した際にエラーが発生することを確認する */
@@ -56,16 +49,12 @@ public class CommunicationTest {
     // 通信が確立していない場合にstartReceiveを実行するとIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(
-        IllegalStateException.class,
-        () -> {
-          socket.send(new GameState("data"));
-        });
+    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
   }
 
   /** センダー・レシーバー間でデータのやり取りが行えることを確認する */
   @Test
-  void initCommunication() {
+  void initCommunication() throws InterruptedException {
     TCPSocketProps senderProps = new TCPSocketProps(null, 5003);
     TCPSocket sender = new TCPSocket(senderProps);
     Assertions.assertDoesNotThrow(sender::initSender);
@@ -75,41 +64,33 @@ public class CommunicationTest {
     System.out.println("Init Receiver");
     Assertions.assertDoesNotThrow(receiver::initReceiver);
     System.out.println("Waiting for connection");
-    Assertions.assertDoesNotThrow(
-        () -> {
-          Thread.sleep(3000);
-        });
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(3000));
+
     System.out.println("Start Receive");
     Assertions.assertDoesNotThrow(receiver::startReceive);
     Assertions.assertDoesNotThrow(sender::startReceive);
 
     System.out.println("Check sender -> receiver");
-    Assertions.assertDoesNotThrow(
-        () -> {
-          sender.send(new GameState("Hello"));
-        });
+    Assertions.assertDoesNotThrow(() -> sender.send(new GameState("Hello")));
+    Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
-    Assertions.assertDoesNotThrow(
-        () -> {
-          Thread.sleep(1000);
-        });
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-    Assertions.assertEquals("Hello", receiver.getLatestStatus().data());
+    Assertions.assertEquals("Hello", receiver.receiveState().data());
+    Assertions.assertEquals("Hello", receiver.receive().message());
+    Assertions.assertNull((receiver.receive(3000)));
 
     System.out.println("Check receiver -> sender");
-    Assertions.assertDoesNotThrow(
-        () -> {
-          receiver.send(new GameState("Hello"));
-        });
+    Assertions.assertDoesNotThrow(() -> receiver.send(new GameState("Hello")));
+    Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
-    Assertions.assertDoesNotThrow(
-        () -> {
-          Thread.sleep(1000);
-        });
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-    Assertions.assertEquals("Hello", sender.getLatestStatus().data());
+    Assertions.assertEquals("Hello", sender.receiveState().data());
+    Assertions.assertEquals("Hello", sender.receive().message());
+    Assertions.assertNull((sender.receive(3000)));
 
     System.out.println("Disconnect");
     Assertions.assertDoesNotThrow(receiver::disconnect);
