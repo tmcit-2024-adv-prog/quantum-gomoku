@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import javax.lang.model.type.NullType;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.MatchingFailedException;
@@ -24,7 +26,7 @@ public class MatchingController {
   private Player localPlayer;
   private Duration retryInterval = Duration.ofSeconds(1);
   private int retryLimit = 10;
-  private Duration timeout = Duration.ofSeconds(10);
+  private Duration timeout = this.retryInterval.multipliedBy(this.retryLimit);
 
   /**
    * コンストラクタ
@@ -32,9 +34,9 @@ public class MatchingController {
    * @param localPlayer このプログラムが実行される端末のプレイヤー
    * @param sender 送信インターフェースを実装したクラス
    * @param receiver 受信インターフェースを実装したクラス
-   * @param retryInterval Discoverメッセージの再送間隔
-   * @param retryLimit Discoverメッセージの再送回数
-   * @param timeout マッチングのタイムアウト時間
+   * @param retryInterval Discoverメッセージの再送間隔 デフォルトは1秒
+   * @param retryLimit Discoverメッセージの再送回数 デフォルトは10回
+   * @param timeout マッチングのタイムアウト時間 デフォルトはretryInterval * retryLimit
    */
   public MatchingController(
       Player localPlayer,
@@ -63,12 +65,14 @@ public class MatchingController {
             () -> {
               Optional<Player> receivedPlayer = Optional.empty();
               MatchingMessageType phase = MatchingMessageType.DISCOVER;
-              while (true) {
+              int retryCount = 0;
+              while (retryCount < this.retryLimit) {
                 GameMessage<Serializable> receivedMsg;
                 try {
                   receivedMsg = receiver.receive();
                 } catch (InterruptedException e) {
                   e.printStackTrace();
+                  retryCount += 1;
                   continue;
                 }
                 MatchingMessage receivedMatchingMsg;
@@ -78,7 +82,6 @@ public class MatchingController {
                   continue;
                 }
 
-                System.out.println(receivedMatchingMsg.type());
                 switch (receivedMatchingMsg.type()) {
                   case DISCOVER:
                     if (phase == MatchingMessageType.DISCOVER) {
@@ -88,6 +91,7 @@ public class MatchingController {
                                 new MatchingMessage(MatchingMessageType.OFFER, this.localPlayer)));
                       } catch (IOException e) {
                         e.printStackTrace();
+                        retryCount += 1;
                         continue;
                       }
 
@@ -106,6 +110,7 @@ public class MatchingController {
                                     MatchingMessageType.REQUEST, this.localPlayer)));
                       } catch (IOException e) {
                         e.printStackTrace();
+                        retryCount += 1;
                         continue;
                       }
                       receivedPlayer = Optional.of(receivedMatchingMsg.player());
@@ -116,12 +121,14 @@ public class MatchingController {
 
                   case REQUEST:
                     if (phase == MatchingMessageType.OFFER
-                        && receivedMatchingMsg.player() != null) {
+                        && receivedMatchingMsg.player() != null
+                        && receivedMatchingMsg.player() != this.localPlayer) {
                       try {
                         this.sender.send(
                             new GameMessage<>(new MatchingMessage(MatchingMessageType.ACK)));
                       } catch (IOException e) {
                         e.printStackTrace();
+                        retryCount += 1;
                         continue;
                       }
 
@@ -139,6 +146,8 @@ public class MatchingController {
                     break;
                 }
               }
+
+              throw new RuntimeException(new MatchingFailedException());
             });
     CompletableFuture<NullType> sendFuture =
         CompletableFuture.supplyAsync(
@@ -161,10 +170,21 @@ public class MatchingController {
 
               throw new RuntimeException(new MatchingTimeoutException());
             });
-    CompletableFuture.anyOf(receiveFuture, sendFuture)
-        .orTimeout(this.timeout.toMillis(), TimeUnit.MILLISECONDS)
-        .join();
-
+    try {
+      CompletableFuture.anyOf(receiveFuture, sendFuture)
+          .orTimeout(this.timeout.toMillis(), TimeUnit.MILLISECONDS)
+          .join();
+    } catch (CancellationException e) {
+      throw new MatchingFailedException();
+    } catch (CompletionException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof TimeoutException) {
+        throw new MatchingTimeoutException();
+      } else {
+        e.printStackTrace();
+        throw new MatchingFailedException();
+      }
+    }
     // タイムアウト処理
     try {
       Object result = receiveFuture.get();
@@ -173,19 +193,8 @@ public class MatchingController {
       } else {
         throw new MatchingFailedException();
       }
-    } catch (ExecutionException e) {
-      Throwable cause = e.getCause();
-      if (cause instanceof RuntimeException) {
-        cause = cause.getCause();
-      }
-      if (cause instanceof MatchingTimeoutException) {
-        throw (MatchingTimeoutException) cause;
-      } else if (cause instanceof MatchingFailedException) {
-        throw (MatchingFailedException) cause;
-      } else {
-        throw new MatchingFailedException();
-      }
-    } catch (InterruptedException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       throw new MatchingFailedException();
     }
   }
