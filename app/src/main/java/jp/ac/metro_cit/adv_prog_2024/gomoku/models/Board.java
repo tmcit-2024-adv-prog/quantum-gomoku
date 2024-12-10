@@ -25,8 +25,8 @@ public class Board {
     for (int y = 0; y < stone.length; y++) {
       for (int x = 0; x < stone[y].length; x++) {
         if (stone[x][y] == null) System.out.print("_");
-        else if (stone[x][y].color == Color.BLACK) System.out.print("B");
-        else if (stone[x][y].color == Color.WHITE) System.out.print("W");
+        else if (stone[x][y].color == StoneColor.BLACK) System.out.print("B");
+        else if (stone[x][y].color == StoneColor.WHITE) System.out.print("W");
       }
       System.out.println();
     }
@@ -34,5 +34,10 @@ public class Board {
 
   public void setStone(Vector2D pos, Stone stone) {
     this.stone[pos.x][pos.y] = stone;
+  }
+
+  public boolean checkWinner(Vector2D pos) {
+    if (pos.x == 5 && pos.y == 5) return true;
+    return false;
   }
 }
