@@ -1,7 +1,5 @@
-package jp.ac.metro_cit.adv_prog_2024.gomoku;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.communications;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocket;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocketProps;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import org.junit.jupiter.api.Assertions;
@@ -72,24 +70,24 @@ public class CommunicationTest {
 
     System.out.println("Check sender -> receiver");
     Assertions.assertDoesNotThrow(() -> sender.send(new GameState("Hello")));
-    Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage("Hello")));
+    Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage<String>("Hello")));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
     Assertions.assertEquals("Hello", receiver.receiveState().data());
-    Assertions.assertEquals("Hello", receiver.receive().message());
+    Assertions.assertEquals("Hello", receiver.receive().data());
     Assertions.assertNull((receiver.receive(3000)));
 
     System.out.println("Check receiver -> sender");
     Assertions.assertDoesNotThrow(() -> receiver.send(new GameState("Hello")));
-    Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage("Hello")));
+    Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage<String>("Hello")));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
     Assertions.assertEquals("Hello", sender.receiveState().data());
-    Assertions.assertEquals("Hello", sender.receive().message());
+    Assertions.assertEquals("Hello", sender.receive().data());
     Assertions.assertNull((sender.receive(3000)));
 
     System.out.println("Disconnect");
