@@ -1,19 +1,16 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
-/**
- * Represents the different phases of a Gomoku game. Each phase indicates the current state of the
- * game.
- */
+/** 試合の状態を表す列挙型 */
 public enum GamePhase {
-  /** The game has not started yet. */
+  /** 試合開始前 */
   BEFORE_START,
 
-  /** It is Black's turn to play. */
+  /** 黒の手番 */
   BLACK_TURN,
 
-  /** It is White's turn to play. */
+  /** 白の手番 */
   WHITE_TURN,
 
-  /** The game has ended. */
+  /** 試合終了 */
   FINISHED,
 }

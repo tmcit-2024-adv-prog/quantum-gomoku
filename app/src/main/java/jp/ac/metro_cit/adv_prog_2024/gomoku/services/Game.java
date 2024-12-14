@@ -29,12 +29,12 @@ public class Game {
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public Game(Player blackPlayer, Player whitePlayer, Board board) {
     this.phase = GamePhase.BEFORE_START;
-    this.blackPlayer = new Player(null, blackPlayer.getName());
-    this.whitePlayer = new Player(null, whitePlayer.getName());
+    this.blackPlayer = blackPlayer;
+    this.whitePlayer = whitePlayer;
     this.blackPlayer.setColor(StoneColor.BLACK);
     this.whitePlayer.setColor(StoneColor.WHITE);
     this.currentPlayer = this.blackPlayer;
-    this.board = new Board(board.getSize());
+    this.board = board;
   }
 
   /** ゲームを開始 */
@@ -119,7 +119,7 @@ public class Game {
    * @param pos 石を設置する位置
    */
   public void putStone(StoneColor color, Vector2D pos)
-      throws GamePhaseException, GamePlayerException {
+      throws GamePhaseException, GamePlayerException, Exception {
     if (color != currentPlayer.getColor()) {
       throw new GamePlayerException("It is not your turn.");
     }
@@ -127,7 +127,11 @@ public class Game {
       throw new GamePhaseException("The game has not started or finished.");
     }
 
-    board.putStone(pos, new Stone(color, pos)); // try catchで正常に置けたかどうかを判定したい
+    try {
+      board.putStone(pos, new Stone(color, pos));
+    } catch (Exception e) {
+      throw new Exception("The Stone cannot puttted.");
+    }
 
     if (board.checkWinner(pos)) {
       finishGame(currentPlayer.getColor());

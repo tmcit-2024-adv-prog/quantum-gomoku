@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class GameTest {
   @Test
@@ -40,7 +41,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[正常系]次のフェーズに移行すると、現在のプレイヤーが変わる")
-  void NextPhase() throws GamePhaseException, GamePlayerException {
+  void NextPhase() throws GamePhaseException, GamePlayerException, Exception {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -69,7 +70,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[正常系]石が5個そろうとゲームが終了する")
-  void CheckWinner() throws GamePhaseException, GamePlayerException {
+  void CheckWinner() throws GamePhaseException, GamePlayerException, Exception {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -111,6 +112,7 @@ public class GameTest {
     try {
       game.startGame();
       game.startGame();
+      fail();
     } catch (Exception e) {
       assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }
@@ -131,28 +133,38 @@ public class GameTest {
     game.surrender(StoneColor.BLACK);
     try {
       game.surrender(StoneColor.BLACK);
+      fail();
     } catch (Exception e) {
       assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }
   }
 
   @Test
-  @DisplayName("[異常系]ゲーム開始前、終了後に、石を置こうとすると例外が発生する")
-  void PutStoneAfterEnd() throws GamePhaseException {
+  @DisplayName("[異常系]ゲーム開始前に石を置こうとすると例外が発生する")
+  void PutStoneBeforeStart() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
     try {
       game.putStone(StoneColor.BLACK, new Vector2D(0, 0));
+      fail();
     } catch (Exception e) {
       assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }
+  }
+
+  @Test
+  @DisplayName("[異常系]ゲームが終了後に、石を置こうとすると例外が発生する")
+  void PutStoneAfterFinish() throws GamePhaseException {
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
     game.startGame();
     game.surrender(StoneColor.BLACK);
 
     try {
       game.putStone(StoneColor.BLACK, new Vector2D(0, 0));
+      fail();
     } catch (Exception e) {
       assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }
@@ -160,15 +172,16 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]石の設置でエラーが発生した場合、それを返す")
-  void PutStoneError() throws GamePhaseException {
+  void PutStoneError() throws GamePhaseException, GamePlayerException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
     game.startGame();
     try {
       game.putStone(StoneColor.BLACK, new Vector2D(-10, 20));
+      fail();
     } catch (Exception e) {
-      assertTrue(e instanceof GamePlayerException, "GamePlayerException is thrown");
+      // Boardクラスで何かしらのエラーが発生
     }
   }
 
@@ -181,6 +194,7 @@ public class GameTest {
     game.startGame();
     try {
       game.getWinnerPlayer();
+      fail();
     } catch (Exception e) {
       assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }

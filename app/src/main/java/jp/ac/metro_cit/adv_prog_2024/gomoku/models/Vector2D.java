@@ -1,21 +1,18 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
-/**
- * Represents a two-dimensional vector or point with integer coordinates. This class is immutable,
- * meaning its x and y values cannot be changed once set.
- */
+/** 整数の2次元座標を表現するクラス。不変であり、変更は不可 */
 public class Vector2D {
-  /** The x-coordinate of the vector. */
+  /** x座標 */
   public final int x;
 
-  /** The y-coordinate of the vector. */
+  /** y座標 */
   public final int y;
 
   /**
-   * Constructs a new {@code Vector2D} instance with the specified coordinates.
+   * 2次元ベクトルを生成
    *
-   * @param x the x-coordinate of the vector
-   * @param y the y-coordinate of the vector
+   * @param x x座標
+   * @param y y座標
    */
   public Vector2D(int x, int y) {
     this.x = x;
