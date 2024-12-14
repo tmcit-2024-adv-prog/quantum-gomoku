@@ -1,5 +1,8 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
@@ -7,10 +10,7 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 
-/**
- * Represents the core logic of a Gomoku game. This class manages the game phase, players, board
- * state, and game flow.
- */
+/** 試合を管理するクラス. */
 public class Game {
   private GamePhase phase;
   private Player blackPlayer;
@@ -19,97 +19,102 @@ public class Game {
   private Board board;
 
   /**
-   * Creates a new Game instance with specified players and board.
+   * 試合のインスタンスを生成.
    *
-   * @param blackPlayer the player assigned to black stones
-   * @param whitePlayer the player assigned to white stones
-   * @param board the board to be used in the game
+   * @param blackPlayer 黒の碁石を置くプレイヤー
+   * @param whitePlayer 白の碁石を置くプレイヤー
+   * @param board 盤面
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public Game(Player blackPlayer, Player whitePlayer, Board board) {
     this.phase = GamePhase.BEFORE_START;
-    this.blackPlayer = new Player(blackPlayer.getColor(), blackPlayer.getName());
-    this.whitePlayer = new Player(whitePlayer.getColor(), whitePlayer.getName());
+    this.blackPlayer = new Player(null, blackPlayer.getName());
+    this.whitePlayer = new Player(null, whitePlayer.getName());
+    this.blackPlayer.setColor(StoneColor.BLACK);
+    this.whitePlayer.setColor(StoneColor.WHITE);
+    this.currentPlayer = this.blackPlayer;
     this.board = new Board(board.getSize());
   }
 
-  /** Starts the game and setting the first turn. */
-  public void startGame() {
-    blackPlayer = new Player(StoneColor.BLACK, blackPlayer.getName());
-    whitePlayer = new Player(StoneColor.WHITE, whitePlayer.getName());
-    currentPlayer = blackPlayer;
+  /** ゲームを開始 */
+  public void startGame() throws GamePhaseException {
+    if (phase != GamePhase.BEFORE_START) {
+      throw new GamePhaseException("The game has already started.");
+    }
     phase = GamePhase.BLACK_TURN;
   }
 
-  /** Ends the game and transitions the phase to FINISHED. */
-  public void endGame(StoneColor color) {
+  /**
+   * 試合を投了し、ゲームを終了
+   *
+   * @param color 投了するプレイヤーの色
+   */
+  public void surrender(StoneColor color) throws GamePhaseException {
+    if (phase == GamePhase.FINISHED || phase == GamePhase.BEFORE_START) {
+      throw new GamePhaseException("The game has not started or finished.");
+    }
+    finishGame(color);
+  }
+
+  /** ゲームを終了する */
+  void finishGame(StoneColor color) {
     phase = GamePhase.FINISHED;
   }
 
-  /** the game phase to the next player's turn. Toggles between black and white turns. */
+  /** 相手のターンに移行 */
   void nextPhase() {
-    if (phase == GamePhase.FINISHED) {
-      return;
-    }
     if (currentPlayer == blackPlayer) {
       currentPlayer = whitePlayer;
+      phase = GamePhase.WHITE_TURN;
     } else {
       currentPlayer = blackPlayer;
+      phase = GamePhase.BLACK_TURN;
     }
-
-    phase =
-        (currentPlayer.getColor() == StoneColor.BLACK)
-            ? GamePhase.BLACK_TURN
-            : GamePhase.WHITE_TURN;
   }
 
   /**
-   * Retrieves the current game phase.
+   * 現在の試合フェーズを取得.
    *
-   * @return the current phase of the game
+   * @return 現在の試合フェーズ
    */
   public GamePhase getPhase() {
     return phase;
   }
 
   /**
-   * return current player of game.
+   * 現在のプレイヤーを取得.
    *
-   * @return a copy of the current player
+   * @return 現在のプレイヤー
    */
   public Player getCurrentPlayer() {
     return new Player(currentPlayer.getColor(), currentPlayer.getName());
   }
 
   /**
-   * Places a stone of the specified color at the given position on the board.
+   * 碁盤に石を設置する.
    *
-   * @param color the color of the stone to place
-   * @param pos the position to place the stone
-   * @return true if the stone was placed successfully, false if the position is already occupied
+   * @param color 石の色
+   * @param pos 石を設置する位置
    */
-  public boolean putStone(StoneColor color, Vector2D pos) {
-    if (board.getStone(pos) != null) {
-      return false;
+  public void putStone(StoneColor color, Vector2D pos)
+      throws GamePhaseException, GamePlayerException {
+    if (color != currentPlayer.getColor()) {
+      throw new GamePlayerException("It is not your turn.");
     }
-    Stone stone = new Stone(color, pos);
-    board.setStone(pos, stone);
-    if (!checkWinner(pos)) {
+    if (phase == GamePhase.BEFORE_START || phase == GamePhase.FINISHED) {
+      throw new GamePhaseException("The game has not started or finished.");
+    }
+
+    try {
+      board.putStone(pos, new Stone(color, pos));
+    } catch (Exception e) {
+      throw e;
+    }
+
+    if (board.checkWinner(pos)) {
+      finishGame(currentPlayer.getColor());
+    } else {
       nextPhase();
     }
-    return true;
-  }
-
-  /**
-   * Checks if the last placed stone results in a victory condition. A player wins if five stones of
-   * the same color are aligned in a row, column, or diagonal.
-   *
-   * @param pos the position of the last placed stone
-   */
-  boolean checkWinner(Vector2D pos) {
-    if (board.checkWinner(pos)) {
-      endGame(currentPlayer.getColor());
-      return true;
-    }
-    return false;
   }
 }
