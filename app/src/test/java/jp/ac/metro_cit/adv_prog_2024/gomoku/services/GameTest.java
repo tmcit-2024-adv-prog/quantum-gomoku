@@ -146,22 +146,6 @@ public class GameTest {
   }
 
   @Test
-  @DisplayName("[異常系]相手のターン中に石を置こうとすると例外が発生する")
-  void PutStoneInOpponentTurn() throws GamePhaseException, GamePlayerException {
-    Game game =
-        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
-
-    game.startGame();
-    game.putStone(StoneColor.BLACK, new Vector2D(0, 0));
-
-    try {
-      game.putStone(StoneColor.BLACK, new Vector2D(1, 1));
-    } catch (Exception e) {
-      assertTrue(e instanceof Exception, "GamePhaseException is thrown");
-    }
-  }
-
-  @Test
   @DisplayName("[異常系]石の設置でエラーが発生した場合、それを返す")
   void PutStoneError() throws GamePhaseException {
     Game game =

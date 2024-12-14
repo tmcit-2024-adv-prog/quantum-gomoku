@@ -105,11 +105,7 @@ public class Game {
       throw new GamePhaseException("The game has not started or finished.");
     }
 
-    try {
-      board.putStone(pos, new Stone(color, pos));
-    } catch (Exception e) {
-      throw e;
-    }
+    board.putStone(pos, new Stone(color, pos)); // try catchで正常に置けたかどうかを判定したい
 
     if (board.checkWinner(pos)) {
       finishGame(currentPlayer.getColor());
