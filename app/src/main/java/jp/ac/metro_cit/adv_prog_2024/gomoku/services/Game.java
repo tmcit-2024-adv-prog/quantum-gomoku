@@ -16,6 +16,7 @@ public class Game {
   private Player blackPlayer;
   private Player whitePlayer;
   private Player currentPlayer;
+  private Player winnerPlayer = null;
   private Board board;
 
   /**
@@ -53,11 +54,20 @@ public class Game {
     if (phase == GamePhase.FINISHED || phase == GamePhase.BEFORE_START) {
       throw new GamePhaseException("The game has not started or finished.");
     }
-    finishGame(color);
+    finishGame(color == StoneColor.BLACK ? StoneColor.WHITE : StoneColor.BLACK);
   }
 
-  /** ゲームを終了する */
+  /**
+   * ゲームを終了する
+   *
+   * @param color 勝利したプレイヤーの色
+   */
   void finishGame(StoneColor color) {
+    if (color == StoneColor.BLACK) {
+      winnerPlayer = blackPlayer;
+    } else {
+      winnerPlayer = whitePlayer;
+    }
     phase = GamePhase.FINISHED;
   }
 
@@ -79,6 +89,18 @@ public class Game {
    */
   public GamePhase getPhase() {
     return phase;
+  }
+
+  /**
+   * 勝者のプレイヤーを取得.
+   *
+   * @return 勝者のプレイヤー
+   */
+  public Player getWinnerPlayer() throws GamePhaseException {
+    if (phase != GamePhase.FINISHED) {
+      throw new GamePhaseException("The game has not finished.");
+    }
+    return new Player(winnerPlayer.getColor(), winnerPlayer.getName());
   }
 
   /**

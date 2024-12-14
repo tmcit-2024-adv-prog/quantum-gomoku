@@ -90,6 +90,19 @@ public class GameTest {
   }
 
   @Test
+  @DisplayName("[正常系]ゲームが終了した後、勝者を取得すると、勝者が取得できる")
+  void GetWinner() throws GamePhaseException {
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
+
+    // ゲームを開始
+    game.startGame();
+    game.surrender(StoneColor.BLACK);
+    assertTrue(
+        game.getWinnerPlayer().getColor() == StoneColor.WHITE, "Winner is WHITE"); // 勝者はWHITE
+  }
+
+  @Test
   @DisplayName("[異常系]ゲーム開始後に、再度ゲームを開始しようとすると例外が発生する")
   void StartGameTwice() {
     Game game =
@@ -156,6 +169,20 @@ public class GameTest {
       game.putStone(StoneColor.BLACK, new Vector2D(-10, 20));
     } catch (Exception e) {
       assertTrue(e instanceof GamePlayerException, "GamePlayerException is thrown");
+    }
+  }
+
+  @Test
+  @DisplayName("[異常系]ゲームが終了していない状態で、勝者を取得しようとすると例外が発生する")
+  void GetWinnerBeforeEnd() throws GamePhaseException {
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
+
+    game.startGame();
+    try {
+      game.getWinnerPlayer();
+    } catch (Exception e) {
+      assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }
   }
 }
