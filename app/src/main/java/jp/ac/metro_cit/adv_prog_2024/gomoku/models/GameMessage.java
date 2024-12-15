@@ -7,4 +7,4 @@ import java.io.Serializable;
  *
  * @author A. Kokubo
  */
-public record GameMessage<T extends Serializable>(T data) implements Serializable {}
+public record GameMessage(Serializable data) implements Serializable {}
