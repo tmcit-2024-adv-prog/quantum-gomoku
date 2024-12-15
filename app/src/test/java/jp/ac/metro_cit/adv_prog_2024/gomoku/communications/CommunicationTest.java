@@ -97,7 +97,7 @@ public class CommunicationTest {
 
     System.out.println("Check sender -> receiver");
     Assertions.assertDoesNotThrow(() -> sender.send(new GameState("Hello")));
-    Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage<String>("Hello")));
+    Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
@@ -108,7 +108,7 @@ public class CommunicationTest {
 
     System.out.println("Check receiver -> sender");
     Assertions.assertDoesNotThrow(() -> receiver.send(new GameState("Hello")));
-    Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage<String>("Hello")));
+    Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
