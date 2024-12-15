@@ -53,14 +53,13 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 public class TCPSocket implements Sender, Receiver {
 
   private final TCPSocketProps props;
+  // スレッドセーフなQueueで送られてきたデータを保持する
+  private final LinkedBlockingQueue<GameState> gameStates = new LinkedBlockingQueue<>();
+  private final LinkedBlockingQueue<GameMessage> messages = new LinkedBlockingQueue<>();
   private ServerSocket serverSocket = null;
   private Socket socket = null;
   private ObjectOutputStream oos = null;
   private ObjectInputStream ois = null;
-
-  // スレッドセーフなQueueで送られてきたデータを保持する
-  private final LinkedBlockingQueue<GameState> gameStates = new LinkedBlockingQueue<>();
-  private final LinkedBlockingQueue<GameMessage> messages = new LinkedBlockingQueue<>();
 
   public TCPSocket(TCPSocketProps props) {
     // 渡された引数がTCPSocket用のものであるかを検証
@@ -200,6 +199,11 @@ public class TCPSocket implements Sender, Receiver {
       oos.writeObject(message);
       oos.flush();
     }
+  }
+
+  @Override
+  public void broadcast(GameMessage message) throws IOException {
+    throw new IOException();
   }
 
   @Override

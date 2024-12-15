@@ -4,5 +4,5 @@ public enum MatchingMessageType {
   DISCOVER,
   OFFER,
   REQUEST,
-  ACK,
+  ACK;
 }
