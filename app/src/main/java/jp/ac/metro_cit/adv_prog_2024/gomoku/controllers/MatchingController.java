@@ -1,9 +1,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -21,12 +19,13 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.MatchingMessageType;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 
 public class MatchingController {
-  private Sender<MatchingMessage> sender;
-  private Receiver receiver;
-  private Player localPlayer;
-  private Duration retryInterval = Duration.ofSeconds(1);
-  private int retryLimit = 10;
-  private Duration timeout = this.retryInterval.multipliedBy(this.retryLimit);
+
+  private final Sender sender;
+  private final Receiver receiver;
+  private final Player localPlayer;
+  private final Duration retryInterval;
+  private final int retryLimit;
+  private final Duration timeout;
 
   /**
    * コンストラクタ
@@ -38,19 +37,19 @@ public class MatchingController {
    * @param retryLimit Discoverメッセージの再送回数 デフォルトは10回
    * @param timeout マッチングのタイムアウト時間 デフォルトはretryInterval * retryLimit
    */
-  public MatchingController(
+  protected MatchingController(
       Player localPlayer,
-      Sender<MatchingMessage> sender,
+      Sender sender,
       Receiver receiver,
-      Optional<Duration> retryInterval,
-      Optional<Integer> retryLimit,
-      Optional<Duration> timeout) {
+      Duration retryInterval,
+      int retryLimit,
+      Duration timeout) {
     this.localPlayer = localPlayer;
     this.sender = sender;
     this.receiver = receiver;
-    retryInterval.ifPresent(value -> this.retryInterval = value);
-    retryLimit.ifPresent(value -> this.retryLimit = value);
-    timeout.ifPresent(value -> this.timeout = value);
+    this.retryInterval = retryInterval;
+    this.retryLimit = retryLimit;
+    this.timeout = timeout;
   }
 
   /**
@@ -63,11 +62,11 @@ public class MatchingController {
     CompletableFuture<Player> receiveFuture =
         CompletableFuture.supplyAsync(
             () -> {
-              Optional<Player> receivedPlayer = Optional.empty();
+              Player receivedPlayer = null;
               MatchingMessageType phase = MatchingMessageType.DISCOVER;
               int retryCount = 0;
               while (retryCount < this.retryLimit) {
-                GameMessage<Serializable> receivedMsg;
+                GameMessage receivedMsg;
                 try {
                   receivedMsg = receiver.receive();
                 } catch (InterruptedException e) {
@@ -82,68 +81,67 @@ public class MatchingController {
                   continue;
                 }
 
+                MatchingMessage sendMsg;
                 switch (receivedMatchingMsg.type()) {
                   case DISCOVER:
                     if (phase == MatchingMessageType.DISCOVER) {
-                      try {
-                        this.sender.send(
-                            new GameMessage<>(
-                                new MatchingMessage(MatchingMessageType.OFFER, this.localPlayer)));
-                      } catch (IOException e) {
-                        e.printStackTrace();
-                        retryCount += 1;
-                        continue;
-                      }
-
-                      phase = MatchingMessageType.OFFER;
+                      sendMsg = new MatchingMessage(MatchingMessageType.OFFER, this.localPlayer);
+                      break;
                     }
-                    break;
+                    continue;
 
                   case OFFER:
                     if (phase == MatchingMessageType.DISCOVER
                         && receivedMatchingMsg.player() != null
                         && receivedMatchingMsg.player() != this.localPlayer) {
-                      try {
-                        this.sender.send(
-                            new GameMessage<>(
-                                new MatchingMessage(
-                                    MatchingMessageType.REQUEST, this.localPlayer)));
-                      } catch (IOException e) {
-                        e.printStackTrace();
-                        retryCount += 1;
-                        continue;
-                      }
-                      receivedPlayer = Optional.of(receivedMatchingMsg.player());
-
-                      phase = MatchingMessageType.REQUEST;
+                      sendMsg = new MatchingMessage(MatchingMessageType.REQUEST, this.localPlayer);
+                      break;
                     }
-                    break;
+                    continue;
 
                   case REQUEST:
                     if (phase == MatchingMessageType.OFFER
                         && receivedMatchingMsg.player() != null
                         && receivedMatchingMsg.player() != this.localPlayer) {
-                      try {
-                        this.sender.send(
-                            new GameMessage<>(new MatchingMessage(MatchingMessageType.ACK)));
-                      } catch (IOException e) {
-                        e.printStackTrace();
-                        retryCount += 1;
-                        continue;
-                      }
-
-                      return receivedMatchingMsg.player();
+                      sendMsg = new MatchingMessage(MatchingMessageType.ACK);
+                      break;
                     }
-                    break;
+                    continue;
 
                   case ACK:
-                    if (phase == MatchingMessageType.REQUEST && receivedPlayer.isPresent()) {
-                      return receivedPlayer.get();
+                    if (phase == MatchingMessageType.REQUEST) {
+                      return receivedPlayer;
                     }
-                    break;
+                    continue;
 
                   default:
-                    break;
+                    // ここに到達することはない
+                    throw new RuntimeException(new MatchingFailedException());
+                }
+
+                try {
+                  this.sender.send(new GameMessage(sendMsg));
+                  switch (sendMsg.type()) {
+                    case OFFER:
+                      phase = MatchingMessageType.OFFER;
+                      break;
+
+                    case REQUEST:
+                      phase = MatchingMessageType.REQUEST;
+                      receivedPlayer = receivedMatchingMsg.player();
+                      break;
+
+                    case ACK:
+                      return receivedMatchingMsg.player();
+
+                    default:
+                      // ここに到達することはない
+                      throw new RuntimeException(new MatchingFailedException());
+                  }
+                } catch (IOException e) {
+                  e.printStackTrace();
+                  retryCount += 1;
+                  continue;
                 }
               }
 
@@ -155,8 +153,8 @@ public class MatchingController {
               int retryCount = 0;
               while (retryCount < this.retryLimit) {
                 try {
-                  this.sender.send(
-                      new GameMessage<>(new MatchingMessage(MatchingMessageType.DISCOVER)));
+                  this.sender.broadcast(
+                      new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)));
                 } catch (IOException e) {
                   e.printStackTrace();
                 }
@@ -170,6 +168,8 @@ public class MatchingController {
 
               throw new RuntimeException(new MatchingTimeoutException());
             });
+
+    // タイムアウト処理
     try {
       CompletableFuture.anyOf(receiveFuture, sendFuture)
           .orTimeout(this.timeout.toMillis(), TimeUnit.MILLISECONDS)
@@ -178,21 +178,21 @@ public class MatchingController {
       throw new MatchingFailedException();
     } catch (CompletionException e) {
       Throwable cause = e.getCause();
+      while (cause instanceof RuntimeException && cause.getCause() != null) {
+        cause = cause.getCause();
+      }
       if (cause instanceof TimeoutException) {
         throw new MatchingTimeoutException();
+      } else if (cause instanceof MatchingTimeoutException) {
+        throw (MatchingTimeoutException) cause;
       } else {
         e.printStackTrace();
         throw new MatchingFailedException();
       }
     }
-    // タイムアウト処理
     try {
-      Object result = receiveFuture.get();
-      if (result instanceof Player) {
-        return (Player) result;
-      } else {
-        throw new MatchingFailedException();
-      }
+      Player result = receiveFuture.get();
+      return result;
     } catch (Exception e) {
       e.printStackTrace();
       throw new MatchingFailedException();
