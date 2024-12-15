@@ -166,7 +166,9 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     Player dummyLocalPlayer = new Player();
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+            .setTimeout(Duration.ofDays(1))
+            .build();
 
     // マッチングを開始すると
     Player result = matchingController.match();
@@ -192,7 +194,9 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     Player dummyLocalPlayer = new Player();
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+            .setTimeout(Duration.ofDays(1))
+            .build();
 
     // マッチングを開始すると
     Player result = matchingController.match();
@@ -218,7 +222,9 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+            .setTimeout(Duration.ofDays(1))
+            .build();
 
     // マッチングを開始すると
     Player result = matchingController.match();
@@ -245,7 +251,9 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     Player dummyLocalPlayer = new Player();
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+            .setTimeout(Duration.ofDays(1))
+            .build();
 
     // マッチングを開始すると
     Player result = matchingController.match();
@@ -272,7 +280,9 @@ public class MatchingControllerTest {
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+            .setTimeout(Duration.ofDays(1))
+            .build();
 
     // マッチングを開始すると
     Player result = matchingController.match();
