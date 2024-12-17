@@ -26,4 +26,6 @@ public interface Sender {
   void send(GameState gameState) throws IOException;
 
   void send(GameMessage message) throws IOException;
+
+  void broadcast(GameMessage message) throws IOException;
 }
