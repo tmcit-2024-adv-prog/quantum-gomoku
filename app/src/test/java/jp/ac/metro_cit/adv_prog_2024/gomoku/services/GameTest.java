@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class GameTest {
   @Test
   @DisplayName("[正常系]初期化後、ゲームクラスはnullではなく、フェーズはSETUPである")
-  void InitGameClass() {
+  void initGameClass() {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -27,7 +27,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[正常系]ゲームを開始すると、現在のプレイヤーはnullではなく、BLACKである")
-  void StartGame() throws GamePhaseException {
+  void startGame() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -41,7 +41,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[正常系]次のフェーズに移行すると、現在のプレイヤーが変わる")
-  void NextPhase() throws GamePhaseException, GamePlayerException, Exception {
+  void nextPhase() throws GamePhaseException, GamePlayerException, Exception {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -58,7 +58,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[正常系]ゲームを終了すると、フェーズはFINISHEDである")
-  void EndGame() throws GamePhaseException {
+  void endGame() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -70,7 +70,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[正常系]石が5個そろうとゲームが終了する")
-  void CheckWinner() throws GamePhaseException, GamePlayerException, Exception {
+  void checkWinner() throws GamePhaseException, GamePlayerException, Exception {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -86,13 +86,13 @@ public class GameTest {
     game.putStone(StoneColor.WHITE, new Vector2D(3, 0));
     game.putStone(StoneColor.BLACK, new Vector2D(4, 1));
     game.putStone(StoneColor.WHITE, new Vector2D(4, 0));
-    game.putStone(StoneColor.BLACK, new Vector2D(5, 5)); // 現状Board.CheckWinnerは(5,5)に石を置くとtrueを返す
+    game.putStone(StoneColor.BLACK, new Vector2D(5, 1));
     assertTrue(game.getPhase() == GamePhase.FINISHED, "Game phase is FINISHED"); // ゲームは終了している
   }
 
   @Test
   @DisplayName("[正常系]ゲームが終了した後、勝者を取得すると、勝者が取得できる")
-  void GetWinner() throws GamePhaseException {
+  void getWinner() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -105,7 +105,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]ゲーム開始後に、再度ゲームを開始しようとすると例外が発生する")
-  void StartGameTwice() {
+  void startGameTwice() {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -120,7 +120,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]ゲームが開始、又は終了後に投了すると例外が発生する")
-  void SurrenderBeforeStart() throws GamePhaseException {
+  void surrenderBeforeStart() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -141,7 +141,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]ゲーム開始前に石を置こうとすると例外が発生する")
-  void PutStoneBeforeStart() throws GamePhaseException {
+  void putStoneBeforeStart() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -155,7 +155,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]ゲームが終了後に、石を置こうとすると例外が発生する")
-  void PutStoneAfterFinish() throws GamePhaseException {
+  void putStoneAfterFinish() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -172,7 +172,7 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]石の設置でエラーが発生した場合、それを返す")
-  void PutStoneError() throws GamePhaseException, GamePlayerException {
+  void putStoneError() throws GamePhaseException, GamePlayerException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 
@@ -186,8 +186,24 @@ public class GameTest {
   }
 
   @Test
+  @DisplayName("[異常系]相手のターン中に石を置くと例外が発生する")
+  void notYourTurnError() throws GamePhaseException, GamePlayerException, Exception {
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
+
+    game.startGame();
+    game.putStone(StoneColor.BLACK, new Vector2D(0, 0));
+    try {
+      game.putStone(StoneColor.BLACK, new Vector2D(1, 0));
+      fail();
+    } catch (Exception e) {
+      assertTrue(e instanceof GamePlayerException, "GamePlayerException is thrown");
+    }
+  }
+
+  @Test
   @DisplayName("[異常系]ゲームが終了していない状態で、勝者を取得しようとすると例外が発生する")
-  void GetWinnerBeforeEnd() throws GamePhaseException {
+  void getWinnerBeforeEnd() throws GamePhaseException {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
 

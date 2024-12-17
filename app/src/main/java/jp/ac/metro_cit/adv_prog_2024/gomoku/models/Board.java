@@ -29,7 +29,7 @@ public class Board {
   }
 
   public boolean checkWinner(Vector2D pos) {
-    if (pos.x == 5 && pos.y == 5) return true;
+    if (pos.x == 5 && pos.y == 1) return true;
     return false;
   }
 }
