@@ -121,7 +121,7 @@ public class GameCommunicationController {
   // 通信をするときのレシーバーの起動処理
   /** startReciveメソッド　リモートと通信をするときに立ち上げるメソッド */
   private void startRecive() {
-    this.receiver.startRecive();
+    this.receiver.startReceive();
   }
 
   // private Color decideColor() {
