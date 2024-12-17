@@ -32,13 +32,13 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     // 相手からはOfferメッセージとAckメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
 
@@ -55,13 +55,13 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     // 相手からはDiscoverメッセージとRequestメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
             new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
 
@@ -78,7 +78,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     // 相手からOfferメッセージとAckメッセージ以外のメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -90,7 +90,7 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)),
             // 期待されるメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
 
@@ -107,7 +107,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     when(mockReceiver.receive())
         .thenReturn(
             // 期待されるメッセージ
@@ -118,7 +118,7 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)),
             // 期待されるメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
 
@@ -137,7 +137,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     // Receiverからのメッセージの取得時にInterruptedExceptionが発生するとき
     when(mockReceiver.receive()).thenThrow(InterruptedException.class);
     MatchingController matchingController =
@@ -155,7 +155,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     // Receiverからのメッセージの取得時にMatchingMessage以外のメッセージが受信されるとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -164,7 +164,7 @@ public class MatchingControllerTest {
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
             .setTimeout(Duration.ofDays(1))
@@ -183,7 +183,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     // Offerメッセージに相手プレイヤーが含まれていないとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -192,7 +192,7 @@ public class MatchingControllerTest {
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
             .setTimeout(Duration.ofDays(1))
@@ -211,8 +211,8 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player();
-    Player dummyRemotePlayer = new Player();
+    Player dummyLocalPlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("local");
     // Offerメッセージに自分自身が含まれているとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -239,7 +239,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player();
+    Player dummyRemotePlayer = new Player("remote");
     // Requestメッセージに相手プレイヤーが含まれていないとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -249,7 +249,7 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST)),
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
         new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
             .setTimeout(Duration.ofDays(1))
@@ -268,8 +268,8 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player();
-    Player dummyRemotePlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
+    Player dummyRemotePlayer = new Player("remote");
     // Requestメッセージに自分自身が含まれているとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -297,7 +297,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     // sender.send()が失敗するとき
     doAnswer(
             invocation -> {
@@ -325,7 +325,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("local");
     // sender.broadcast()が失敗するとき
     doAnswer(
             invocation -> {
@@ -353,7 +353,7 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player();
+    Player dummyLocalPlayer = new Player("remote");
     // receiver.receive()はDiscoverを返さない
     when(mockReceiver.receive())
         .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.OFFER)));
