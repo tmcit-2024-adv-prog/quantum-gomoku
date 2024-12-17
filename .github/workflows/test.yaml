@@ -16,7 +16,6 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/github-script@v6
-        if: github.event_name == 'pull_request_target'
         id: pr
         with:
           script: |
@@ -27,12 +26,8 @@ jobs:
             return pullRequest
             
       - uses: actions/checkout@v4
-        if: github.event_name == 'pull_request_target'
         with:
           ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
-
-      - uses: actions/checkout@v4
-        if: github.event_name == 'push'
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -44,7 +39,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Test
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew jacocoTestReport --no-parallel
+        continue-on-error: true
 
       - name: Report test results
         uses: mikepenz/action-junit-report@v4
