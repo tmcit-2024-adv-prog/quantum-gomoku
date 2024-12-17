@@ -74,6 +74,8 @@ public class MatchingController {
                   retryCount += 1;
                   continue;
                 }
+
+                // メッセージがMatchingMessageでない場合は無視
                 MatchingMessage receivedMatchingMsg;
                 if (receivedMsg.data() instanceof MatchingMessage) {
                   receivedMatchingMsg = (MatchingMessage) receivedMsg.data();
@@ -81,9 +83,11 @@ public class MatchingController {
                   continue;
                 }
 
+                // メッセージの種類に応じて処理を分岐
                 MatchingMessage sendMsg;
                 switch (receivedMatchingMsg.type()) {
                   case DISCOVER:
+                    // Discoverメッセージを受信した場合はOfferメッセージを返す
                     if (phase == MatchingMessageType.DISCOVER) {
                       sendMsg = new MatchingMessage(MatchingMessageType.OFFER, this.localPlayer);
                       break;
@@ -91,6 +95,8 @@ public class MatchingController {
                     continue;
 
                   case OFFER:
+                    // Offerメッセージを受信した場合はRequestメッセージを返す
+                    // 相手プレイヤーがnull、または自分自身の場合は無視
                     if (phase == MatchingMessageType.DISCOVER
                         && receivedMatchingMsg.player() != null
                         && receivedMatchingMsg.player() != this.localPlayer) {
@@ -100,6 +106,8 @@ public class MatchingController {
                     continue;
 
                   case REQUEST:
+                    // Requestメッセージを受信した場合はAckメッセージを返す
+                    // 相手プレイヤーがnull、または自分自身の場合は無視
                     if (phase == MatchingMessageType.OFFER
                         && receivedMatchingMsg.player() != null
                         && receivedMatchingMsg.player() != this.localPlayer) {
@@ -109,6 +117,7 @@ public class MatchingController {
                     continue;
 
                   case ACK:
+                    // Ackメッセージを受信した場合は相手プレイヤーを返す
                     if (phase == MatchingMessageType.REQUEST) {
                       return receivedPlayer;
                     }
@@ -119,29 +128,33 @@ public class MatchingController {
                     throw new RuntimeException(new MatchingFailedException());
                 }
 
+                // メッセージを送信
                 try {
                   this.sender.send(new GameMessage(sendMsg));
-                  switch (sendMsg.type()) {
-                    case OFFER:
-                      phase = MatchingMessageType.OFFER;
-                      break;
-
-                    case REQUEST:
-                      phase = MatchingMessageType.REQUEST;
-                      receivedPlayer = receivedMatchingMsg.player();
-                      break;
-
-                    case ACK:
-                      return receivedMatchingMsg.player();
-
-                    default:
-                      // ここに到達することはない
-                      throw new RuntimeException(new MatchingFailedException());
-                  }
                 } catch (IOException e) {
                   e.printStackTrace();
                   retryCount += 1;
                   continue;
+                }
+                switch (sendMsg.type()) {
+                  case OFFER:
+                    // Offerメッセージを送信した場合はOFFERフェーズに移行
+                    phase = MatchingMessageType.OFFER;
+                    break;
+
+                  case REQUEST:
+                    // Requestメッセージを送信した場合はREQUESTフェーズに移行
+                    phase = MatchingMessageType.REQUEST;
+                    receivedPlayer = receivedMatchingMsg.player();
+                    break;
+
+                  case ACK:
+                    // Ackメッセージを送信した場合はRequestメッセージを受信した相手プレイヤーを返す
+                    return receivedMatchingMsg.player();
+
+                  default:
+                    // ここに到達することはない
+                    throw new RuntimeException(new MatchingFailedException());
                 }
               }
 
@@ -153,12 +166,14 @@ public class MatchingController {
               int retryCount = 0;
               while (retryCount < this.retryLimit) {
                 try {
+                  // Discoverメッセージを送信
                   this.sender.broadcast(
                       new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)));
                 } catch (IOException e) {
                   e.printStackTrace();
                 }
                 try {
+                  // retryIntervalで設定された時間待機
                   Thread.sleep(this.retryInterval.toMillis());
                 } catch (InterruptedException e) {
                   e.printStackTrace();
