@@ -1,9 +1,9 @@
-package jp.ac.metro_cit.adv_prog_2024.gomoku.ui.userConponents;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.ui.user_components;
 
 import java.awt.Dimension;
 import javax.swing.JButton;
 
-public class Button {
+public class UserButton {
 
   public static JButton create(String title) {
     JButton btn = new JButton(title);
