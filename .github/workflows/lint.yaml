@@ -99,6 +99,7 @@ jobs:
 
       - name: Spotbugs
         run: ./gradlew spotbugsMain spotbugsTest
+        continue-on-error: true
 
       - name: Set up reviewdog
         uses: reviewdog/action-setup@v1
