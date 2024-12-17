@@ -12,6 +12,7 @@ jobs:
   test:
     runs-on: arc-runner-set
     permissions: 
+      checks: write
       contents: read
       pull-requests: write
     steps:
