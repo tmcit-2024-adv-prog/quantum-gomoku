@@ -6,11 +6,11 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 
 public class Game {
   public void putStone(Color color, int x, int y) throws PutStoneException {
-    // ここに処理を書く
+    System.out.println("putStone");
   }
 
   public void surrender() {
-    // ここに処理を書く
+    System.out.println("surrender");
   }
 
   public GameState gameState() {
@@ -19,5 +19,7 @@ public class Game {
 
   private GameState gameState;
 
-  public void setGameState(GameState state) {}
+  public void setGameState(GameState state) {
+    this.gameState = state;
+  }
 }
