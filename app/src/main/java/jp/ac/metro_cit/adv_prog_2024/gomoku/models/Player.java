@@ -50,4 +50,3 @@ public class Player implements Serializable {
     return Objects.hash(this.name, this.color);
   }
 }
-

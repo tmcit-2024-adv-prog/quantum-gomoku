@@ -4,6 +4,7 @@ import java.time.Duration;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
@@ -25,6 +26,7 @@ public class MatchingControllerBuilder {
    * @param sender 送信インターフェースを実装したクラス
    * @param receiver 受信インターフェースを実装したクラス
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public MatchingControllerBuilder(Player localPlayer, Sender sender, Receiver receiver) {
     this.localPlayer = localPlayer;
     this.sender = sender;
