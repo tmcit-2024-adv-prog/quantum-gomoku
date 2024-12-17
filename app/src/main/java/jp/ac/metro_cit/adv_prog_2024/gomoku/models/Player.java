@@ -7,17 +7,15 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
  * @version 1.0
  */
 public class Player {
-  private StoneColor color;
+  private StoneColor color = null;
   private String name;
 
   /**
    * 引数(型)
    *
-   * @param color プレイヤーが保有する石の色(enum)
    * @param name プレイヤー名(String)
    */
-  public Player(StoneColor color, String name) {
-    this.color = color;
+  public Player(String name) {
     this.name = name;
   }
 
@@ -25,8 +23,12 @@ public class Player {
    * プレイヤーの色を設定する。
    *
    * @param color プレイヤーに設定する石の色
+   * @throws IllegalStateException 色が既に設定されている場合
    */
   public void setColor(StoneColor color) {
+    if (this.color != null) {
+      throw new IllegalStateException("既に色が与えられているため、上書きできません。");
+    }
     this.color = color;
   }
 
