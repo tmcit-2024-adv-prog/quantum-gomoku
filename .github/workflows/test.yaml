@@ -10,8 +10,9 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions: 
+      checks: write
       contents: read
       pull-requests: write
     steps:

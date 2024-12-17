@@ -14,7 +14,7 @@ on:
 
 jobs:
   spotless:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: read
       checks: write
@@ -62,7 +62,7 @@ jobs:
           fail_on_error: true
 
   spotbugs:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: read
       checks: write
