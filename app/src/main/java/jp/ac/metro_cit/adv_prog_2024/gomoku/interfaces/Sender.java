@@ -26,4 +26,11 @@ public interface Sender {
   void send(GameState gameState) throws IOException;
 
   void send(GameMessage message) throws IOException;
+
+  /**
+   * データをブロードキャストで送信する
+   *
+   * @param message 送信するデータ
+   */
+  void broadcast(GameMessage message, int target) throws IOException;
 }
