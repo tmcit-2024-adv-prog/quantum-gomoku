@@ -149,6 +149,5 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
     Assertions.assertEquals("Broadcasting", receiver.receive().message());
-
   }
 }

@@ -12,4 +12,5 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.SocketProps;
  * @param subPort broadcastを受信するためのポート
  * @author A. Kokubo
  */
-public record TransportSocketProps(@Nullable String address, int port, int subPort) implements SocketProps {}
+public record TransportSocketProps(@Nullable String address, int port, int subPort)
+    implements SocketProps {}

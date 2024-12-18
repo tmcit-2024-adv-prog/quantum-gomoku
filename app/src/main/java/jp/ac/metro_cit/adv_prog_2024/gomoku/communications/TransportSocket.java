@@ -156,26 +156,26 @@ public class TransportSocket implements Sender, Receiver {
   public void startReceiveBroadcast() {
     // UDPの通信(ブロードキャスト)を待ち受ける
     new Thread(
-        () -> {
-          byte[] buffer = new byte[PACKET_BUFFER_SIZE];
-          DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-          try {
-            while (!this.receiverDatagramSocket.isClosed()) {
-              this.receiverDatagramSocket.receive(packet);
-              ByteArrayInputStream bis = new ByteArrayInputStream(packet.getData());
-              ObjectInputStream ois = new ObjectInputStream(bis);
-              Serializable next = (Serializable) ois.readObject();
-              if (next instanceof BroadcastWrapper nextMessage) {
-                messages.add(nextMessage.message());
-              } else if (next instanceof GameMessage nextGameMessage) {
-                messages.add(nextGameMessage);
+            () -> {
+              byte[] buffer = new byte[PACKET_BUFFER_SIZE];
+              DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+              try {
+                while (!this.receiverDatagramSocket.isClosed()) {
+                  this.receiverDatagramSocket.receive(packet);
+                  ByteArrayInputStream bis = new ByteArrayInputStream(packet.getData());
+                  ObjectInputStream ois = new ObjectInputStream(bis);
+                  Serializable next = (Serializable) ois.readObject();
+                  if (next instanceof BroadcastWrapper nextMessage) {
+                    messages.add(nextMessage.message());
+                  } else if (next instanceof GameMessage nextGameMessage) {
+                    messages.add(nextGameMessage);
+                  }
+                }
+              } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
               }
-            }
-          } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-          }
-        }
-    ).start();
+            })
+        .start();
   }
 
   @Override
@@ -263,7 +263,9 @@ public class TransportSocket implements Sender, Receiver {
     ObjectOutputStream out = new ObjectOutputStream(bos);
     BroadcastWrapper wrapper = new BroadcastWrapper(this.props.subPort(), message);
     out.writeObject(wrapper);
-    DatagramPacket datagramPacket = new DatagramPacket(bos.toByteArray(), bos.size(), InetAddress.getByName("255.255.255.255"), target);
+    DatagramPacket datagramPacket =
+        new DatagramPacket(
+            bos.toByteArray(), bos.size(), InetAddress.getByName("255.255.255.255"), target);
     serverDatagramSocket.send(datagramPacket);
   }
 
