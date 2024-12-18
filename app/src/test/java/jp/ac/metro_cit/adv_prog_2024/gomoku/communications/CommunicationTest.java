@@ -21,8 +21,8 @@ public class CommunicationTest {
   @Test
   @DisplayName("[異常系] レシーバー側のアドレスにnullを指定された際にエラーが発生")
   void initReceiverWithNullAddress() {
-    TCPSocketProps props = new TCPSocketProps(null, 5000);
-    TCPSocket socket = new TCPSocket(props);
+    TransportSocketProps props = new TransportSocketProps(null, 5000, 5000, 5000);
+    TransportSocket socket = new TransportSocket(props);
 
     // レシーバー側の初期化時にアドレスがnullを指定した場合にはIllegalArgumentExceptionが発生することを確認
     Assertions.assertThrows(IllegalArgumentException.class, socket::initReceiver);
@@ -37,8 +37,8 @@ public class CommunicationTest {
   @Test
   @DisplayName("[異常系] 通信を確立する前にデータの受信を開始した場合にエラーが発生")
   void callStartReceiveBeforeConnect() {
-    TCPSocketProps props = new TCPSocketProps(null, 5001);
-    TCPSocket socket = new TCPSocket(props);
+    TransportSocketProps props = new TransportSocketProps(null, 5001, 5001, 5001);
+    TransportSocket socket = new TransportSocket(props);
 
     // 通信を確立する前にstartReceiveを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
@@ -48,8 +48,8 @@ public class CommunicationTest {
   @Test
   @DisplayName("[異常系] 通信を確立する前にデータを送信した際にエラーが発生")
   void callSendBeforeConnect() {
-    TCPSocketProps props = new TCPSocketProps(null, 5002);
-    TCPSocket socket = new TCPSocket(props);
+    TransportSocketProps props = new TransportSocketProps(null, 5002, 5002, 5002);
+    TransportSocket socket = new TransportSocket(props);
 
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(
@@ -60,8 +60,8 @@ public class CommunicationTest {
   @Test
   @DisplayName("[正常系] センダー側の初期化が正常に行えることを検証")
   void initSender() {
-    TCPSocketProps props = new TCPSocketProps(null, 5003);
-    TCPSocket socket = new TCPSocket(props);
+    TransportSocketProps props = new TransportSocketProps(null, 5003, 5003, 5003);
+    TransportSocket socket = new TransportSocket(props);
     // 通信の待受時にエラーが発生しないことを確認
     Assertions.assertDoesNotThrow(socket::initSender);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
@@ -73,8 +73,8 @@ public class CommunicationTest {
   @Test
   @DisplayName("[正常系] レシーバー側の初期化が正常に行えることを検証")
   void initReceiver() {
-    TCPSocketProps props = new TCPSocketProps("127.0.0.1", 5004);
-    TCPSocket socket = new TCPSocket(props);
+    TransportSocketProps props = new TransportSocketProps("127.0.0.1", 5004, 5004, 5004);
+    TransportSocket socket = new TransportSocket(props);
     // 通信の開始時にエラーが発生しないことを確認する
     Assertions.assertDoesNotThrow(socket::initReceiver);
     // 通信が確立していない場合にstartReceiveを実行するとIllegalStateExceptionが発生することを確認
@@ -86,14 +86,14 @@ public class CommunicationTest {
 
   /** センダー・レシーバー間でデータのやり取りが行えることを確認する */
   @Test
-  @DisplayName("[正常系] 通信の確率後に通信が行えることを検証")
+  @DisplayName("[正常系] 通信の確立後に通信が行えることを検証")
   void initCommunication() throws InterruptedException {
-    TCPSocketProps senderProps = new TCPSocketProps(null, 5005);
-    TCPSocket sender = new TCPSocket(senderProps);
+    TransportSocketProps senderProps = new TransportSocketProps(null, 5005, 5005, 5015);
+    TransportSocket sender = new TransportSocket(senderProps);
     Assertions.assertDoesNotThrow(sender::initSender);
 
-    TCPSocketProps receiverProps = new TCPSocketProps("127.0.0.1", 5005);
-    TCPSocket receiver = new TCPSocket(receiverProps);
+    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5005, 5015, 5005);
+    TransportSocket receiver = new TransportSocket(receiverProps);
     System.out.println("Init Receiver");
     Assertions.assertDoesNotThrow(receiver::initReceiver);
     System.out.println("Waiting for connection");
@@ -130,5 +130,43 @@ public class CommunicationTest {
 
     System.out.println("Disconnect");
     Assertions.assertDoesNotThrow(receiver::disconnect);
+  }
+
+  /** ブロードキャストが行えることを検証する */
+  @Test
+  @DisplayName("[正常系] ブロードキャストを用いたデータの送受信が行えることを確認")
+  void initBroadcast() throws InterruptedException {
+    TransportSocketProps senderProps = new TransportSocketProps(null, 5006, 5008, 5007);
+    TransportSocket sender = new TransportSocket(senderProps);
+    Assertions.assertDoesNotThrow(sender::initSender);
+
+    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5006, 5007, 5007);
+    TransportSocket receiver = new TransportSocket(receiverProps);
+    System.out.println("Init Receiver");
+    Assertions.assertDoesNotThrow(receiver::initReceiver);
+
+    System.out.println("Waiting for initializing receiver");
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+
+    Assertions.assertDoesNotThrow(receiver::startReceive);
+    Assertions.assertDoesNotThrow(receiver::startReceiveBroadcast);
+    Assertions.assertDoesNotThrow(sender::startReceiveBroadcast);
+
+    System.out.println("Send broadcast message");
+    Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting")));
+
+    System.out.println("Waiting for receive");
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+
+    Assertions.assertDoesNotThrow(
+        () -> {
+          GameMessage message = receiver.receive();
+          receiver.reply(message, new GameMessage("Reply"));
+        });
+
+    System.out.println("Waiting for receive");
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+
+    Assertions.assertEquals("Reply", sender.receive().data());
   }
 }
