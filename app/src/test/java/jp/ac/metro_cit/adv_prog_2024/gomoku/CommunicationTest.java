@@ -86,7 +86,7 @@ public class CommunicationTest {
     TransportSocket sender = new TransportSocket(senderProps);
     Assertions.assertDoesNotThrow(sender::initSender);
 
-    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5005, 5005);
+    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5005, 5015);
     TransportSocket receiver = new TransportSocket(receiverProps);
     System.out.println("Init Receiver");
     Assertions.assertDoesNotThrow(receiver::initReceiver);
@@ -127,11 +127,11 @@ public class CommunicationTest {
   @Test
   @DisplayName("[正常系] ブロードキャストを用いたデータの送受信が行えることを確認")
   void initBroadcast() throws InterruptedException {
-    TransportSocketProps senderProps = new TransportSocketProps(null, 5005, 5007);
+    TransportSocketProps senderProps = new TransportSocketProps(null, 5006, 5008);
     TransportSocket sender = new TransportSocket(senderProps);
     Assertions.assertDoesNotThrow(sender::initSender);
 
-    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5005, 5006);
+    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5006, 5007);
     TransportSocket receiver = new TransportSocket(receiverProps);
     System.out.println("Init Receiver");
     Assertions.assertDoesNotThrow(receiver::initReceiver);
@@ -143,7 +143,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(receiver::startReceiveBroadcast);
 
     System.out.println("Send broadcast message");
-    Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting"), 5006));
+    Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting"), 5007));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
