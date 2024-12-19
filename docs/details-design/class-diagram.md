@@ -1,6 +1,6 @@
 ## 落書き
 
-![image](./imgs/class-draft.png)
+![image](../imgs/class-draft.png)
 
 ## クラス図
 
