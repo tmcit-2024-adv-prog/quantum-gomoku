@@ -139,4 +139,14 @@ public class Game {
       nextPhase();
     }
   }
+
+  public GameState into(StoneColor localPlayerColor) {
+    if (localPlayerColor == StoneColor.BLACK) {
+      return new GameState(
+          this.phase, this.blackPlayer, this.whitePlayer, this.winnerPlayer, this.board.getBoard());
+    } else {
+      return new GameState(
+          this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer, this.board.getBoard());
+    }
+  }
 }
