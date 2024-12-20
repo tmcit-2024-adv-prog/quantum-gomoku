@@ -218,4 +218,10 @@ public class TCPSocket implements Sender, Receiver {
     // gameStatesのQueueから先頭の要素を取得し削除
     return gameStates.take();
   }
+
+  @Override
+  public void startRecive() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'startRecive'");
+  }
 }

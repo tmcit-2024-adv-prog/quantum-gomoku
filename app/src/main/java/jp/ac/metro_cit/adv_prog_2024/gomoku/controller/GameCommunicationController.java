@@ -6,13 +6,15 @@
  */
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controller;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Color;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.services.Game;
 
 public class GameCommunicationController {
@@ -70,10 +72,10 @@ public class GameCommunicationController {
    * @return 更新されたgameState
    * @throws PutStoneException 石を設置しようとしたときに異常が発生したときに返される
    */
-  public GameState putStone(Color color, int x, int y) throws PutStoneException {
+  public GameState putStone(StoneColor color, Vector2D pos) throws PutStoneException {
     try {
-      this.game.putStone(color, x, y);
-      return this.game.gameState();
+      this.game.putStone(color, pos);
+      return null;
     } catch (PutStoneException e) {
       throw e;
     } catch (Exception e) {
@@ -88,10 +90,11 @@ public class GameCommunicationController {
    * 相手に勝ちを通知するはず
    *
    * @return gameStateを返す
+   * @throws GamePhaseException
    */
-  public GameState surrender() {
-    this.game.surrender();
-    return this.game.gameState();
+  public void surrender(StoneColor color) throws GamePhaseException {
+    this.game.surrender(color);
+    // return this.game.gameState();
   }
 
   // ゲーム状態の取得関数
@@ -103,7 +106,9 @@ public class GameCommunicationController {
    * @return 現在のgameState
    */
   public GameState getGameStatus() {
-    return this.game.gameState();
+    System.out.println("getGameStatus");
+    // return this.game.gameState();
+    return null;
   }
 
   // ゲーム状態のセット関数
@@ -112,10 +117,16 @@ public class GameCommunicationController {
   /**
    * setGameStateメソッド　gameStateを更新する成功すると特に何も返されない
    *
-   * @param state 更新したいstate(enum)
+   * @param state 更新したいGameState
    */
-  public void setGameState(GameState state) {
-    this.game.setGameState(state);
+  public void setGamePhase(GameState state) {
+    // stateからgameを更新
+    //     GamePhase phase,
+    // Player blackPlayer,
+    // Player whitePlayer,
+    // @Nullable Player winner,
+    // HashMap<Vector2D, Stone> board)
+
   }
 
   // 通信をするときのレシーバーの起動処理
