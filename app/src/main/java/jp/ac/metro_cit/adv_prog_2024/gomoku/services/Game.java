@@ -3,7 +3,6 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Into;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
@@ -13,7 +12,7 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 
 /** 試合を管理するクラス. */
-public class Game implements Into<GameState> {
+public class Game {
   private GamePhase phase;
   private Player blackPlayer;
   private Player whitePlayer;
@@ -142,9 +141,13 @@ public class Game implements Into<GameState> {
     }
   }
 
-  @Override
-  public GameState into() {
-    
-    return new GameState(this.phase, , , this.winnerPlayer, board.getBoard());
+  public GameState into(StoneColor localPlayerColor) {
+    if (localPlayerColor == StoneColor.BLACK) {
+      return new GameState(
+          this.phase, this.blackPlayer, this.whitePlayer, this.winnerPlayer, this.board.getBoard());
+    } else {
+      return new GameState(
+          this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer, this.board.getBoard());
+    }
   }
 }

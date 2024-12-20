@@ -1,5 +1,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
+import java.util.HashMap;
+
 public class Board {
   Stone[][] board;
 
@@ -31,5 +33,9 @@ public class Board {
   public boolean checkWinner(Vector2D pos) {
     if (pos.x == 5 && pos.y == 1) return true;
     return false;
+  }
+
+  public HashMap<Vector2D, Stone> getBoard() {
+    return new HashMap<Vector2D, Stone>();
   }
 }
