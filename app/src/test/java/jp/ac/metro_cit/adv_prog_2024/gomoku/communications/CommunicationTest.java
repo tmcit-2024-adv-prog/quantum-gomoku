@@ -1,9 +1,11 @@
-package jp.ac.metro_cit.adv_prog_2024.gomoku;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.communications;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocket;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TCPSocketProps;
+import java.util.HashMap;
+
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,8 @@ public class CommunicationTest {
     // 通信を確立する前にstartReceiveを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
+    Assertions.assertThrows(
+        IllegalStateException.class, () -> socket.send(new GameMessage("data")));
   }
 
   /** 通信の確立前にデータの受信を開始した場合に{@link IllegalStateException}が発生することを確認する */
@@ -49,7 +52,8 @@ public class CommunicationTest {
     TCPSocket socket = new TCPSocket(props);
 
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
+    Assertions.assertThrows(
+        IllegalStateException.class, () -> socket.send(new GameMessage("data")));
   }
 
   /** センダー側で正しくタイムアウトが発生することと接続前にデータの受信を開始した際に{@link IllegalStateException}が発生することを確認する */
@@ -61,7 +65,8 @@ public class CommunicationTest {
     // 通信の待受時にエラーが発生しないことを確認
     Assertions.assertDoesNotThrow(socket::initSender);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
+    Assertions.assertThrows(
+        IllegalStateException.class, () -> socket.send(new GameMessage("data")));
   }
 
   /** レシーバー側で接続前にデータの受信を開始した際にエラーが発生することを確認する */
@@ -75,7 +80,8 @@ public class CommunicationTest {
     // 通信が確立していない場合にstartReceiveを実行するとIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
     // 通信を確立する前にsendを呼び出した場合にIllegalStateExceptionが発生することを確認
-    Assertions.assertThrows(IllegalStateException.class, () -> socket.send(new GameState("data")));
+    Assertions.assertThrows(
+        IllegalStateException.class, () -> socket.send(new GameMessage("data")));
   }
 
   /** センダー・レシーバー間でデータのやり取りが行えることを確認する */
@@ -97,25 +103,28 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(receiver::startReceive);
     Assertions.assertDoesNotThrow(sender::startReceive);
 
+    GameState dummyState =
+        new GameState(
+            GamePhase.BEFORE_START, new Player("Alice"), new Player("Bob"), null, new HashMap<>());
     System.out.println("Check sender -> receiver");
-    Assertions.assertDoesNotThrow(() -> sender.send(new GameState("Hello")));
+    Assertions.assertDoesNotThrow(() -> sender.send(dummyState));
     Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-    Assertions.assertEquals("Hello", receiver.receiveState().data());
+    Assertions.assertEquals(dummyState, receiver.receiveState());
     Assertions.assertEquals("Hello", receiver.receive().message());
     Assertions.assertNull((receiver.receive(3000)));
 
     System.out.println("Check receiver -> sender");
-    Assertions.assertDoesNotThrow(() -> receiver.send(new GameState("Hello")));
+    Assertions.assertDoesNotThrow(() -> receiver.send(dummyState));
     Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-    Assertions.assertEquals("Hello", sender.receiveState().data());
+    Assertions.assertEquals(dummyState, sender.receiveState());
     Assertions.assertEquals("Hello", sender.receive().message());
     Assertions.assertNull((sender.receive(3000)));
 
