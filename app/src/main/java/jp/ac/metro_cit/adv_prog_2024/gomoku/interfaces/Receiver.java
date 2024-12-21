@@ -16,8 +16,6 @@ public interface Receiver {
   /**
    * 相手から送られてきた{@link GameMessage}を取得する
    *
-   * <p>送られてきたデータがない場合はnullを返す
-   *
    * @return 相手から送られてきたデータ
    */
   GameMessage receive() throws InterruptedException;
@@ -37,8 +35,6 @@ public interface Receiver {
 
   /**
    * 相手から送られてきた{@link GameState}を取得する
-   *
-   * <p>送られてきたデータがない場合はnullを返す
    *
    * @return 相手から送られてきたデータ
    */
