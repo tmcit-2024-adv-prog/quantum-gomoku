@@ -1,18 +1,25 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
+import java.util.HashMap;
+
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GameTest {
   @Test
@@ -214,5 +221,55 @@ public class GameTest {
     } catch (Exception e) {
       assertTrue(e instanceof GamePhaseException, "GamePhaseException is thrown");
     }
+  }
+
+  @Test
+  @DisplayName(
+      "[異常系] localPlayerの色として黒を指定したときに、intoメソッドでGameクラスからGameStateクラスへの変換が可能で、localPlayerの色が黒である")
+  void intoGameStateOnLocalPlayerIsBlack() {
+    // モックを作成する
+    Board board = mock(Board.class);
+    HashMap<Vector2D, Stone> map = new HashMap<>();
+    Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
+    map.put(stone.getPos(), stone);
+    when(board.getBoard()).thenReturn(map);
+
+    // Gameクラスの実体が存在するとき
+    Player blackPlayer = new Player("player1");
+    blackPlayer.setColor(StoneColor.BLACK);
+    Player whitePlayer = new Player("player2");
+    whitePlayer.setColor(StoneColor.WHITE);
+    Game game = new Game(blackPlayer, whitePlayer, board);
+    // 期待されるGameState
+    GameState expected = new GameState(GamePhase.BEFORE_START, blackPlayer, whitePlayer, null, map);
+    // intoメソッドを実行
+    GameState result = game.into(StoneColor.BLACK);
+
+    assertEquals(expected, result);
+  }
+
+  @Test
+  @DisplayName(
+      "[異常系] localPlayerの色として白を指定したときに、intoメソッドでGameクラスからGameStateクラスへの変換が可能で、localPlayerの色が白である")
+  void intoGameStateOnLocalPlayerIsWhite() {
+    // モックを作成する
+    Board board = mock(Board.class);
+    HashMap<Vector2D, Stone> map = new HashMap<>();
+    Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
+    map.put(stone.getPos(), stone);
+    when(board.getBoard()).thenReturn(map);
+
+    // Gameクラスの実体が存在するとき
+    Player blackPlayer = new Player("player1");
+    blackPlayer.setColor(StoneColor.BLACK);
+    Player whitePlayer = new Player("player2");
+    whitePlayer.setColor(StoneColor.WHITE);
+    Game game = new Game(blackPlayer, whitePlayer, board);
+    // 期待されるGameState
+    GameState expected = new GameState(GamePhase.BEFORE_START, whitePlayer, blackPlayer, null, map);
+    // intoメソッドを実行
+    GameState result = game.into(StoneColor.WHITE);
+
+    assertEquals(expected, result);
   }
 }
