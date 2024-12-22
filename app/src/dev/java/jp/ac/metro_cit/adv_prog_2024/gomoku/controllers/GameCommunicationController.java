@@ -83,12 +83,13 @@ public class GameCommunicationController {
     this.turnCount += 1;
     this.phase = color == StoneColor.BLACK ? GamePhase.WHITE_TURN : GamePhase.BLACK_TURN;
 
-    if (this.turnCount < 8) {
-      this.winner = null;
-    } else if (this.localPlayer.getColor() == StoneColor.BLACK) {
-      this.winner = this.localPlayer;
-    } else {
-      this.winner = this.remotePlayer;
+    if (this.turnCount > 8) {
+      if (this.localPlayer.getColor() == StoneColor.BLACK) {
+        this.winner = this.localPlayer;
+      } else {
+        this.winner = this.remotePlayer;
+      }
+      this.phase = GamePhase.FINISHED;
     }
 
     return new GameState(this.phase, this.localPlayer, this.remotePlayer, this.winner, this.board);
@@ -101,6 +102,9 @@ public class GameCommunicationController {
    * @return gameStateを返す
    */
   public GameState surrender() {
+    this.phase = GamePhase.FINISHED;
+    this.winner = this.remotePlayer;
+
     return new GameState(
         GamePhase.FINISHED, this.localPlayer, this.remotePlayer, this.remotePlayer, this.board);
   }
@@ -124,6 +128,7 @@ public class GameCommunicationController {
     this.winner = state.winner();
     this.board = state.board();
 
+    // gameStatusCallbackが設定されていない場合にsetGameStateを実行することはシステムロジック上はありえない
     if (this.gameStatusCallback != null) {
       this.gameStatusCallback.onGameStateChanged(
           new GameState(this.phase, this.localPlayer, this.remotePlayer, this.winner, this.board));

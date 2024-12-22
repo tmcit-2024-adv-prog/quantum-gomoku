@@ -11,6 +11,11 @@ public class Player implements Serializable {
     this.name = name;
   }
 
+  public Player(String name, StoneColor color) {
+    this(name);
+    this.color = color;
+  }
+
   public Player(StoneColor color, String name) {
     this.color = color;
     this.name = name;
