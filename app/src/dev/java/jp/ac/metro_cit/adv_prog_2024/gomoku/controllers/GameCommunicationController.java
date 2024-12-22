@@ -101,6 +101,7 @@ public class GameCommunicationController {
    *
    * @return gameStateを返す
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public GameState surrender() {
     this.phase = GamePhase.FINISHED;
     this.winner = this.remotePlayer;
