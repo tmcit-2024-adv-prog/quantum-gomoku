@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * 試合の状態を表すクラス.
  *
@@ -13,6 +15,7 @@ import javax.annotation.Nullable;
  * @param winner 勝利したプレイヤー
  * @param board 盤面
  */
+@SuppressFBWarnings(value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
 public record GameState(
     GamePhase phase,
     Player localPlayer,
