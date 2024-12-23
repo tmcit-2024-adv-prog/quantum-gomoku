@@ -59,13 +59,12 @@ public class GameCommunicationController {
    * putStoneメソッド　色と座標を受け取って石の設置を盤に反映
    *
    * @param color 色のenum
-   * @param x x座標
-   * @param y y座標
+   * @param pos 石を設置する座標
    * @return 更新されたgameState
    * @throws PutStoneException 石を設置しようとしたときに異常が発生したときに返される
    */
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
-  public GameState putStone(StoneColor color, int x, int y) throws PutStoneException {
+  public GameState putStone(StoneColor color, Vector2D dummyPos) throws PutStoneException {
     if (color == StoneColor.BLACK && this.phase != GamePhase.BLACK_TURN) {
       throw new PutStoneException();
     } else if (color == StoneColor.WHITE && this.phase != GamePhase.WHITE_TURN) {

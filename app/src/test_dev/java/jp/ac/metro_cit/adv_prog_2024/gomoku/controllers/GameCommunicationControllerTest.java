@@ -85,7 +85,7 @@ public class GameCommunicationControllerTest {
     // 黒の石を設置する
     gcc.setGameStateCallback(gameStatusCallback);
     gcc.startGame();
-    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 0, 0));
+    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
 
     // GameStateが返されることを確認
     assertEquals(expected, result);
@@ -113,7 +113,7 @@ public class GameCommunicationControllerTest {
     gcc.setGameState(new GameState(GamePhase.BLACK_TURN, localPlayer, remotePlayer, null, board));
 
     // 白の石を設置しようとする
-    assertThrows(PutStoneException.class, () -> gcc.putStone(StoneColor.WHITE, 0, 0));
+    assertThrows(PutStoneException.class, () -> gcc.putStone(StoneColor.WHITE, new Vector2D(0, 0)));
   }
 
   @Test
@@ -145,7 +145,8 @@ public class GameCommunicationControllerTest {
     board.put(stone.getPos(), stone);
     gcc.setGameState(new GameState(GamePhase.WHITE_TURN, localPlayer, remotePlayer, null, board));
     // 白の石を設置する
-    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 18, 18));
+    GameState result =
+        assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
 
     // GameStateが返されることを確認
     assertEquals(expected, result);
@@ -173,7 +174,7 @@ public class GameCommunicationControllerTest {
     gcc.setGameState(new GameState(GamePhase.WHITE_TURN, localPlayer, remotePlayer, null, board));
 
     // 黒の石を設置しようとする
-    assertThrows(PutStoneException.class, () -> gcc.putStone(StoneColor.BLACK, 0, 0));
+    assertThrows(PutStoneException.class, () -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
   }
 
   @Test
@@ -204,15 +205,15 @@ public class GameCommunicationControllerTest {
     gcc.setGameStateCallback(gameStatusCallback);
     gcc.startGame();
     // 黒の石を5回設置する
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 0, 0));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 18, 18));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 1, 1));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 17, 17));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 2, 2));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 16, 16));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 3, 3));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 15, 15));
-    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 4, 4));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(1, 1)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(17, 17)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(2, 2)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(16, 16)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(3, 3)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(15, 15)));
+    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(4, 4)));
 
     // GameStateが返されることを確認
     assertEquals(expected, result);
@@ -246,15 +247,15 @@ public class GameCommunicationControllerTest {
     gcc.setGameStateCallback(gameStatusCallback);
     gcc.startGame();
     // 黒の石を5回設置する
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 0, 0));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 18, 18));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 1, 1));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 17, 17));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 2, 2));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 16, 16));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 3, 3));
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, 15, 15));
-    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, 4, 4));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(1, 1)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(17, 17)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(2, 2)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(16, 16)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(3, 3)));
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(15, 15)));
+    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(4, 4)));
 
     // GameStateが返される
     assertEquals(expected, result);

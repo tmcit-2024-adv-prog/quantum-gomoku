@@ -66,7 +66,7 @@
   - 1(UI)で呼び出される
   - GameStateCallbackが設定されていない場合は例外を投げる
 
-- putStone(color: Color, x: int, y: int): GameState throws PutStoneException
+- putStone(color: Color, pos: Vector2D): GameState throws PutStoneException
   - 石を置く
   - 石を配置したあとの試合の状況を返す
   - おけなっかたらPutStoneExceptionを投げる
