@@ -4,7 +4,7 @@
  * @author yanbaru1331
  * @version 1.0.0
  */
-package jp.ac.metro_cit.adv_prog_2024.gomoku.controller;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
