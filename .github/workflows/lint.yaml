@@ -12,6 +12,10 @@ on:
       - main
       - release/*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   spotless:
     runs-on: arc-runner-set
