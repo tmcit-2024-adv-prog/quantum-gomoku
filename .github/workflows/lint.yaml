@@ -12,9 +12,13 @@ on:
       - main
       - release/*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   spotless:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: read
       checks: write
@@ -62,7 +66,7 @@ jobs:
           fail_on_error: true
 
   spotbugs:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: read
       checks: write
@@ -99,6 +103,7 @@ jobs:
 
       - name: Spotbugs
         run: ./gradlew spotbugsMain spotbugsTest
+        continue-on-error: true
 
       - name: Set up reviewdog
         uses: reviewdog/action-setup@v1

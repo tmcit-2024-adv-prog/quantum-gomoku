@@ -19,7 +19,7 @@
 
 開発環境の構築手順は以下のリンクを参照してください。
 
-[開発環境構築手順](./docs/setup-development-environment.md)
+[開発環境構築手順](./docs/dev-env/setup-development-environment.md)
 
 ## ディレクトリ構成
 
