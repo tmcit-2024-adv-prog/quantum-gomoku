@@ -54,8 +54,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: check
+        if: github.event_name == 'pull_request_target'
+        run: ./gradlew spotlessApply
+        continue-on-error: true
+
+      - name: check
         if: github.event_name == 'push'
-        run: ./gradlew check
+        run: ./gradlew spotlessCheck
 
       - name: Suggest changes
         uses: reviewdog/action-suggester@v1
@@ -102,7 +107,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Spotbugs
-        run: ./gradlew spotbugsMain spotbugsTest
+        run: ./gradlew spotbugsMain spotbugsTest spotbugsDev spotbugsTestDev
         continue-on-error: true
 
       - name: Set up reviewdog

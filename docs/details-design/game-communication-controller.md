@@ -47,26 +47,26 @@
 
 ## メンバ変数
 
-- 試合
-- これを操作しているプレイヤー
-- 相手プレイヤー
-- Sender
-- Receiver
-- UIに対して試合の状態を送るためのコールバック
+- 試合 (game)
+- これを操作しているプレイヤー (localPlayer)
+- 相手プレイヤー (remotePlayer)
+- Sender (sender)
+- Receiver (receiver)
+- UIに対して試合の状態を送るためのコールバック (gameStateCallback)
 
 ## パブリックメソッド
 
 これは外からアクセス可能なメソッド
-  
-- CreatePlayer(name: String): Player
-  - これを操作しているプレイヤーを定義する
-  - 2でUIから呼び出される
 
-- CreateRemotePlayer(name: String): Player
-  - 相手プレイヤーを定義する
-  - 5でReceiverから呼び出される
+- GameCommunicationController(Player localPlayer, Player remotePlayer, Sender sender, Receiver receiver, GameStateCallback gameStateCallback)
+  - コンストラクタ
 
-- PutStone(color: Color, x: int, y: int): GameState throws PutStoneException
+- startGame(): GameState
+  - ゲームを開始する
+  - 1(UI)で呼び出される
+  - GameStateCallbackが設定されていない場合は例外を投げる
+
+- putStone(color: Color, pos: Vector2D): GameState throws PutStoneException
   - 石を置く
   - 石を配置したあとの試合の状況を返す
   - おけなっかたらPutStoneExceptionを投げる
@@ -74,7 +74,7 @@
 
 - surrender(): void
   - ばいばい
-  - 12でUIから呼び出される
+  - 降参時に呼び出される
   
 - getGameState(): GameState
   - 現在の試合の状態を取得する
@@ -84,19 +84,12 @@
   - 現在の試合の状態を設定する
   - 任意のタイミングでReceiverから呼び出される
   - Receiverはこのメソッドを利用して受け取ったデータを試合に反映する
+
+- setGameStateCallback(GameStateCallback callback): void
+  - UIに対して試合の状態を送るためのコールバックを設定する
+  - 1の前にUIから呼び出される
   
 ## プライベートメソッド
-
-これは外からアクセスできないメソッド
-
-- StartListen(): void
-  - Recieverを用いて待ち受けを開始する
-  - 3で呼び出される
-
-- DecideColor(): Color
-  - これはサーバ側で呼び出される
-  - 石の色を決める
-  - 6で呼び出される
 
 ## 備考
 
