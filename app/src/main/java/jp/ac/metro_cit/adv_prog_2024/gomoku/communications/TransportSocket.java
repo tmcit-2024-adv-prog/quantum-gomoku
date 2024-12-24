@@ -13,6 +13,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +23,7 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.BroadcastWrapper;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.TransportTarget;
 
 /**
  * トランスポート層のプロトコルで通信を行うためのクラス
@@ -64,8 +67,9 @@ public class TransportSocket implements Sender, Receiver {
   private Socket socket = null;
   private ObjectOutputStream oos = null;
   private ObjectInputStream ois = null;
-  private DatagramSocket serverDatagramSocket = null;
+  private final DatagramSocket serverDatagramSocket;
   private DatagramSocket receiverDatagramSocket = null;
+  private final HashMap<GameMessage, TransportTarget> messageCache = new HashMap<>();
 
   // スレッドセーフなQueueで送られてきたデータを保持する
   private final LinkedBlockingQueue<GameState> gameStates = new LinkedBlockingQueue<>();
@@ -73,6 +77,14 @@ public class TransportSocket implements Sender, Receiver {
 
   public TransportSocket(TransportSocketProps props) {
     this.props = props;
+
+    // ブロードキャスト送信用のUDPソケットを作成
+    try {
+      this.serverDatagramSocket = new DatagramSocket();
+      this.serverDatagramSocket.setBroadcast(true);
+    } catch (SocketException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -91,10 +103,6 @@ public class TransportSocket implements Sender, Receiver {
       this.receiverDatagramSocket = new DatagramSocket(subPort, InetAddress.getByName(address));
     }
     this.receiverDatagramSocket.setBroadcast(true);
-
-    // ブロードキャスト送信用のUDPソケットを作成
-    this.serverDatagramSocket = new DatagramSocket();
-    this.serverDatagramSocket.setBroadcast(true);
 
     // タイムアウトを30秒に設定
     // 30秒間コネクションがなかった場合はエラーを投げる
@@ -165,8 +173,9 @@ public class TransportSocket implements Sender, Receiver {
                   ByteArrayInputStream bis = new ByteArrayInputStream(packet.getData());
                   ObjectInputStream ois = new ObjectInputStream(bis);
                   Serializable next = (Serializable) ois.readObject();
-                  if (next instanceof BroadcastWrapper nextMessage) {
-                    messages.add(nextMessage.message());
+                  if (next instanceof BroadcastWrapper(int replyPort, GameMessage message)) {
+                    messages.add(message);
+                    messageCache.put(message, new TransportTarget(packet.getAddress(), replyPort));
                   } else if (next instanceof GameMessage nextGameMessage) {
                     messages.add(nextGameMessage);
                   }
