@@ -203,7 +203,8 @@ public class TCPSocket implements Sender, Receiver {
 
   @Override
   public void broadcast(GameMessage message) throws IOException {
-    throw new IOException();
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'reply'");
   }
 
   @Override
@@ -221,5 +222,11 @@ public class TCPSocket implements Sender, Receiver {
   public GameState receiveState() throws InterruptedException {
     // gameStatesのQueueから先頭の要素を取得し削除
     return gameStates.take();
+  }
+
+  @Override
+  public void reply(GameMessage receivedMessage, GameMessage replyMessage) throws IOException {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'reply'");
   }
 }

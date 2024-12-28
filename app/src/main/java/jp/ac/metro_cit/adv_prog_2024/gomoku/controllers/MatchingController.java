@@ -130,7 +130,7 @@ public class MatchingController {
 
                 // メッセージを送信
                 try {
-                  this.sender.send(new GameMessage(sendMsg));
+                  this.sender.reply(receivedMsg, new GameMessage(sendMsg));
                 } catch (IOException e) {
                   e.printStackTrace();
                   retryCount += 1;

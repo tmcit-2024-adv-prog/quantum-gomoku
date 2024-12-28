@@ -27,5 +27,18 @@ public interface Sender {
 
   void send(GameMessage message) throws IOException;
 
+  /**
+   * データをブロードキャストで送信する
+   *
+   * @param message 送信するデータ
+   */
   void broadcast(GameMessage message) throws IOException;
+
+  /**
+   * 送られてきたブロードキャストメッセージに返信する
+   *
+   * @param receivedMessage 返信対象の{@link GameMessage}
+   * @param replyMessage 相手へ送信する{@link GameMessage}
+   */
+  void reply(GameMessage receivedMessage, GameMessage replyMessage) throws IOException;
 }

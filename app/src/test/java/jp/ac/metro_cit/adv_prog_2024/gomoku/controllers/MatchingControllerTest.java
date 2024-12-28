@@ -292,19 +292,19 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] retryLimit回以上sender.send()がIOExceptionを投げた場合はMatchingFailedExceptionが発生する")
+  @DisplayName("[異常系] retryLimit回以上sender.reply()がIOExceptionを投げた場合はMatchingFailedExceptionが発生する")
   public void testThrowMatchingFailedExceptionWhenSenderSendFailed() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
     Player dummyLocalPlayer = new Player("local");
-    // sender.send()が失敗するとき
+    // sender.reply()が失敗するとき
     doAnswer(
             invocation -> {
               throw new IOException();
             })
         .when(mockSender)
-        .send(any(GameMessage.class));
+        .reply(any(GameMessage.class), any(GameMessage.class));
     // receiover.receive()はDiscoverを返す
     when(mockReceiver.receive())
         .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)));
@@ -315,7 +315,7 @@ public class MatchingControllerTest {
 
     // マッチングを開始するとMatchingFailedExceptionが発生する
     assertThrows(MatchingFailedException.class, matchingController::match);
-    verify(mockSender, times(3)).send(any(GameMessage.class));
+    verify(mockSender, times(3)).reply(any(GameMessage.class), any(GameMessage.class));
   }
 
   @Test
