@@ -114,7 +114,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
     Assertions.assertEquals(dummyState, receiver.receiveState());
-    Assertions.assertEquals("Hello", receiver.receive().message());
+    Assertions.assertEquals("Hello", receiver.receive().data());
     Assertions.assertNull((receiver.receive(3000)));
 
     System.out.println("Check receiver -> sender");
@@ -125,7 +125,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
     Assertions.assertEquals(dummyState, sender.receiveState());
-    Assertions.assertEquals("Hello", sender.receive().message());
+    Assertions.assertEquals("Hello", sender.receive().data());
     Assertions.assertNull((sender.receive(3000)));
 
     System.out.println("Disconnect");
