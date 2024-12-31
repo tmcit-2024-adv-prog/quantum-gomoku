@@ -1,12 +1,14 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import javax.lang.model.type.NullType;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.MatchingFailedException;
@@ -17,12 +19,13 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.MatchingMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.MatchingMessageType;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.utils.Pair;
 
 public class MatchingController {
-
   private final Sender sender;
   private final Receiver receiver;
-  private final Player localPlayer;
+  private final Supplier<Integer> getRandomInt;
   private final Duration retryInterval;
   private final int retryLimit;
   private final Duration timeout;
@@ -30,7 +33,6 @@ public class MatchingController {
   /**
    * コンストラクタ
    *
-   * @param localPlayer このプログラムが実行される端末のプレイヤー
    * @param sender 送信インターフェースを実装したクラス
    * @param receiver 受信インターフェースを実装したクラス
    * @param retryInterval Discoverメッセージの再送間隔 デフォルトは1秒
@@ -38,15 +40,15 @@ public class MatchingController {
    * @param timeout マッチングのタイムアウト時間 デフォルトはretryInterval * retryLimit
    */
   protected MatchingController(
-      Player localPlayer,
       Sender sender,
       Receiver receiver,
+      Supplier<Integer> getRandomInt,
       Duration retryInterval,
       int retryLimit,
       Duration timeout) {
-    this.localPlayer = localPlayer;
     this.sender = sender;
     this.receiver = receiver;
+    this.getRandomInt = getRandomInt;
     this.retryInterval = retryInterval;
     this.retryLimit = retryLimit;
     this.timeout = timeout;
@@ -55,14 +57,18 @@ public class MatchingController {
   /**
    * マッチングする
    *
-   * @return マッチングに成功した場合は相手プレイヤーの情報を返す
+   * @param localPlayerNmae ローカルプレイヤーの名前
+   * @return マッチングに成功した場合は自身と相手プレイヤーを返す <localPlayer, remotePlayer>
+   * @throws MatchingTimeoutException マッチングがタイムアウトした場合
+   * @throws MatchingFailedException マッチングに失敗した場合
    */
-  public Player match() throws MatchingTimeoutException, MatchingFailedException {
+  public Pair<Player, Player> match(String localPlayerNmae) throws MatchingTimeoutException, MatchingFailedException {
+    Player localPlayer = new Player(localPlayerNmae);
     // マッチングメッセージを受信して相手プレイヤーを取得
     CompletableFuture<Player> receiveFuture =
         CompletableFuture.supplyAsync(
             () -> {
-              Player receivedPlayer = null;
+              Player remotePlayer = null;
               MatchingMessageType phase = MatchingMessageType.DISCOVER;
               int retryCount = 0;
               while (retryCount < this.retryLimit) {
@@ -85,11 +91,20 @@ public class MatchingController {
 
                 // メッセージの種類に応じて処理を分岐
                 MatchingMessage sendMsg;
+                Serializable receivedData = receivedMatchingMsg.data();
                 switch (receivedMatchingMsg.type()) {
                   case DISCOVER:
                     // Discoverメッセージを受信した場合はOfferメッセージを返す
-                    if (phase == MatchingMessageType.DISCOVER) {
-                      sendMsg = new MatchingMessage(MatchingMessageType.OFFER, this.localPlayer);
+                    // データがnull、またはIntegerでない場合は無視
+                    if (phase == MatchingMessageType.DISCOVER
+                        && receivedData != null
+                        && receivedData instanceof Integer) {
+                      // 相手から受信した乱数値と自身の乱数値を比較して色を決定
+                      localPlayer.setColor(
+                          this.getRandomInt.get() > (Integer) receivedData
+                              ? StoneColor.BLACK
+                              : StoneColor.WHITE);
+                      sendMsg = new MatchingMessage(MatchingMessageType.OFFER, localPlayer);
                       break;
                     }
                     continue;
@@ -98,9 +113,17 @@ public class MatchingController {
                     // Offerメッセージを受信した場合はRequestメッセージを返す
                     // 相手プレイヤーがnull、または自分自身の場合は無視
                     if (phase == MatchingMessageType.DISCOVER
-                        && receivedMatchingMsg.player() != null
-                        && receivedMatchingMsg.player() != this.localPlayer) {
-                      sendMsg = new MatchingMessage(MatchingMessageType.REQUEST, this.localPlayer);
+                        && receivedData != null
+                        && receivedData instanceof Player
+                        && receivedData != localPlayer) {
+                      Player receivedPlayer = (Player) receivedData;
+                      if (receivedPlayer.getColor() == null
+                          || receivedPlayer.getColor() == localPlayer.getColor()) {
+                        continue;
+                      }
+                      remotePlayer = receivedPlayer;
+                      localPlayer.setColor(receivedPlayer.getColor().opposite());
+                      sendMsg = new MatchingMessage(MatchingMessageType.REQUEST, localPlayer);
                       break;
                     }
                     continue;
@@ -109,8 +132,15 @@ public class MatchingController {
                     // Requestメッセージを受信した場合はAckメッセージを返す
                     // 相手プレイヤーがnull、または自分自身の場合は無視
                     if (phase == MatchingMessageType.OFFER
-                        && receivedMatchingMsg.player() != null
-                        && receivedMatchingMsg.player() != this.localPlayer) {
+                        && receivedData != null
+                        && receivedData instanceof Player
+                        && receivedData != localPlayer) {
+                      Player receivedPlayer = (Player) receivedData;
+                      if (receivedPlayer.getColor() == null
+                          || receivedPlayer.getColor() == localPlayer.getColor()) {
+                        continue;
+                      }
+                      remotePlayer = receivedPlayer;
                       sendMsg = new MatchingMessage(MatchingMessageType.ACK);
                       break;
                     }
@@ -119,7 +149,7 @@ public class MatchingController {
                   case ACK:
                     // Ackメッセージを受信した場合は相手プレイヤーを返す
                     if (phase == MatchingMessageType.REQUEST) {
-                      return receivedPlayer;
+                      return remotePlayer;
                     }
                     continue;
 
@@ -145,12 +175,11 @@ public class MatchingController {
                   case REQUEST:
                     // Requestメッセージを送信した場合はREQUESTフェーズに移行
                     phase = MatchingMessageType.REQUEST;
-                    receivedPlayer = receivedMatchingMsg.player();
                     break;
 
                   case ACK:
                     // Ackメッセージを送信した場合はRequestメッセージを受信した相手プレイヤーを返す
-                    return receivedMatchingMsg.player();
+                    return remotePlayer;
 
                   default:
                     // ここに到達することはない
@@ -168,7 +197,9 @@ public class MatchingController {
                 try {
                   // Discoverメッセージを送信
                   this.sender.broadcast(
-                      new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)));
+                      new GameMessage(
+                          new MatchingMessage(
+                              MatchingMessageType.DISCOVER, this.getRandomInt.get())));
                 } catch (IOException e) {
                   e.printStackTrace();
                 }
@@ -206,8 +237,8 @@ public class MatchingController {
       }
     }
     try {
-      Player result = receiveFuture.get();
-      return result;
+      Player remotePlayer = receiveFuture.get();
+      return Pair.of(localPlayer, remotePlayer);
     } catch (Exception e) {
       e.printStackTrace();
       throw new MatchingFailedException();

@@ -6,18 +6,18 @@ import javax.annotation.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressFBWarnings(value = {"EI_EXPOSE_REP"})
-public record MatchingMessage(MatchingMessageType type, @Nullable Player player)
+public record MatchingMessage(MatchingMessageType type, @Nullable Serializable data)
     implements Serializable {
   /**
    * コンストラクタ
    *
    * @param type メッセージの種類
-   * @param player プレイヤー情報
+   * @param data メッセージのデータ
    */
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
-  public MatchingMessage(MatchingMessageType type, Player player) {
+  public MatchingMessage(MatchingMessageType type, Serializable data) {
     this.type = type;
-    this.player = player;
+    this.data = data;
   }
 
   /**

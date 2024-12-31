@@ -1,20 +1,19 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 
 /** MatchingControllerのビルダークラス */
 public class MatchingControllerBuilder {
-
-  private final Player localPlayer;
   private final Sender sender;
   private final Receiver receiver;
+  private final Supplier<Integer> getRandomInt;
   private Duration retryInterval = Duration.ofSeconds(1);
   private int retryCount = 10;
   @Nullable private Duration timeout = null;
@@ -22,15 +21,15 @@ public class MatchingControllerBuilder {
   /**
    * コンストラクタ
    *
-   * @param localPlayer このプログラムが実行される端末のプレイヤー
    * @param sender 送信インターフェースを実装したクラス
    * @param receiver 受信インターフェースを実装したクラス
    */
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
-  public MatchingControllerBuilder(Player localPlayer, Sender sender, Receiver receiver) {
-    this.localPlayer = localPlayer;
+  public MatchingControllerBuilder(
+      Sender sender, Receiver receiver, Supplier<Integer> getRandomInt) {
     this.sender = sender;
     this.receiver = receiver;
+    this.getRandomInt = getRandomInt;
   }
 
   /**
@@ -76,9 +75,9 @@ public class MatchingControllerBuilder {
    */
   public MatchingController build() {
     return new MatchingController(
-        this.localPlayer,
         this.sender,
         this.receiver,
+        this.getRandomInt,
         this.retryInterval,
         this.retryCount,
         this.timeout == null ? this.retryInterval.multipliedBy(this.retryCount) : this.timeout);

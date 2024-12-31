@@ -11,6 +11,8 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.MatchingMessage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.MatchingMessageType;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.utils.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,21 +34,25 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // 相手からはOfferメッセージとAckメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
-    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
 
     // マッチングを開始すると
-    Player result = matchingController.match();
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
 
     // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -55,21 +61,25 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // 相手からはDiscoverメッセージとRequestメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
 
     // マッチングを開始すると
-    Player result = matchingController.match();
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
 
     // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -78,27 +88,31 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // 相手からOfferメッセージとAckメッセージ以外のメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
             // 期待されるメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             // 期待されないメッセージ
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             // 期待されないメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)),
             // 期待されるメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
-    Player dummyLocalPlayer = new Player("local");
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
 
     // マッチングを開始すると
-    Player result = matchingController.match();
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
 
     // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -107,26 +121,30 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     when(mockReceiver.receive())
         .thenReturn(
             // 期待されるメッセージ
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             // 期待されないメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             // 期待されないメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)),
             // 期待されるメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player("local");
-    MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver).build();
-
-    // マッチングを開始すると
-    Player result = matchingController.match();
-
-    // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+            MatchingController matchingController =
+                new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+        
+            // マッチングを開始すると
+            Pair<Player, Player> result = matchingController.match("local");
+            Player localPlayer = result.left();
+            Player remotePlayer = result.right();
+        
+            // 相手のプレイヤーが返ってくる
+            assertEquals(remotePlayer, dummyRemotePlayer);
+            // 自分自身が返ってくる
+            assertEquals(localPlayer.getName(), "local");
+            assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -137,16 +155,16 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player("local");
+
     // Receiverからのメッセージの取得時にInterruptedExceptionが発生するとき
     when(mockReceiver.receive()).thenThrow(InterruptedException.class);
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0)
             .setRetryCount(3)
             .build();
 
     // マッチングを開始するとMatchingFailedExceptionが発生する
-    assertThrows(MatchingFailedException.class, matchingController::match);
+    assertThrows(MatchingFailedException.class, () -> matchingController.match("local"));
   }
 
   @Test
@@ -155,26 +173,28 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // Receiverからのメッセージの取得時にMatchingMessage以外のメッセージが受信されるとき
     when(mockReceiver.receive())
         .thenReturn(
             // MatchingMessage以外のメッセージ
             new GameMessage("dummy"),
             // 正常なメッセージ
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player("local");
-    MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
-            .setTimeout(Duration.ofDays(1))
-            .build();
-
-    // マッチングを開始すると
-    Player result = matchingController.match();
-
-    // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+            MatchingController matchingController =
+                new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+        
+            // マッチングを開始すると
+            Pair<Player, Player> result = matchingController.match("local");
+            Player localPlayer = result.left();
+            Player remotePlayer = result.right();
+        
+            // 相手のプレイヤーが返ってくる
+            assertEquals(remotePlayer, dummyRemotePlayer);
+            // 自分自身が返ってくる
+            assertEquals(localPlayer.getName(), "local");
+            assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -183,26 +203,28 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // Offerメッセージに相手プレイヤーが含まれていないとき
     when(mockReceiver.receive())
         .thenReturn(
             // Offerメッセージに相手プレイヤーが含まれていない
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER)),
             // 正常なメッセージ
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player("local");
-    MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
-            .setTimeout(Duration.ofDays(1))
-            .build();
-
-    // マッチングを開始すると
-    Player result = matchingController.match();
-
-    // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+            MatchingController matchingController =
+                new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+        
+            // マッチングを開始すると
+            Pair<Player, Player> result = matchingController.match("local");
+            Player localPlayer = result.left();
+            Player remotePlayer = result.right();
+        
+            // 相手のプレイヤーが返ってくる
+            assertEquals(remotePlayer, dummyRemotePlayer);
+            // 自分自身が返ってくる
+            assertEquals(localPlayer.getName(), "local");
+            assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -211,8 +233,8 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player("remote");
-    Player dummyRemotePlayer = new Player("local");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
+    Player dummyLocalPlayer = new Player("local");
     // Offerメッセージに自分自身が含まれているとき
     when(mockReceiver.receive())
         .thenReturn(
@@ -221,16 +243,19 @@ public class MatchingControllerTest {
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
             new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
-    MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
-            .setTimeout(Duration.ofDays(1))
-            .build();
-
-    // マッチングを開始すると
-    Player result = matchingController.match();
-
-    // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+            MatchingController matchingController =
+                new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+        
+            // マッチングを開始すると
+            Pair<Player, Player> result = matchingController.match("local");
+            Player localPlayer = result.left();
+            Player remotePlayer = result.right();
+        
+            // 相手のプレイヤーが返ってくる
+            assertEquals(remotePlayer, dummyRemotePlayer);
+            // 自分自身が返ってくる
+            assertEquals(localPlayer.getName(), "local");
+            assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -239,27 +264,29 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // Requestメッセージに相手プレイヤーが含まれていないとき
     when(mockReceiver.receive())
         .thenReturn(
             // 正常なメッセージ
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             // Requestメッセージに相手プレイヤーが含まれていない
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST)),
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    Player dummyLocalPlayer = new Player("local");
-    MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
-            .setTimeout(Duration.ofDays(1))
-            .build();
-
-    // マッチングを開始すると
-    Player result = matchingController.match();
-
-    // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+            MatchingController matchingController =
+                new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+        
+            // マッチングを開始すると
+            Pair<Player, Player> result = matchingController.match("local");
+            Player localPlayer = result.left();
+            Player remotePlayer = result.right();
+        
+            // 相手のプレイヤーが返ってくる
+            assertEquals(remotePlayer, dummyRemotePlayer);
+            // 自分自身が返ってくる
+            assertEquals(localPlayer.getName(), "local");
+            assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -269,26 +296,29 @@ public class MatchingControllerTest {
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
     Player dummyLocalPlayer = new Player("local");
-    Player dummyRemotePlayer = new Player("remote");
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // Requestメッセージに自分自身が含まれているとき
     when(mockReceiver.receive())
         .thenReturn(
             // 正常なメッセージ
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             // Requestメッセージに自分自身が含まれている
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyLocalPlayer)),
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
-    MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
-            .setTimeout(Duration.ofDays(1))
-            .build();
-
-    // マッチングを開始すると
-    Player result = matchingController.match();
-
-    // 相手のプレイヤーが返ってくる
-    assertEquals(result, dummyRemotePlayer);
+            MatchingController matchingController =
+                new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+        
+            // マッチングを開始すると
+            Pair<Player, Player> result = matchingController.match("local");
+            Player localPlayer = result.left();
+            Player remotePlayer = result.right();
+        
+            // 相手のプレイヤーが返ってくる
+            assertEquals(remotePlayer, dummyRemotePlayer);
+            // 自分自身が返ってくる
+            assertEquals(localPlayer.getName(), "local");
+            assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
   }
 
   @Test
@@ -297,7 +327,6 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player("local");
     // sender.reply()が失敗するとき
     doAnswer(
             invocation -> {
@@ -307,14 +336,14 @@ public class MatchingControllerTest {
         .reply(any(GameMessage.class), any(GameMessage.class));
     // receiover.receive()はDiscoverを返す
     when(mockReceiver.receive())
-        .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)));
+        .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)));
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0)
             .setRetryCount(3)
             .build();
 
     // マッチングを開始するとMatchingFailedExceptionが発生する
-    assertThrows(MatchingFailedException.class, matchingController::match);
+    assertThrows(MatchingFailedException.class, () -> matchingController.match("local"));
     verify(mockSender, times(3)).reply(any(GameMessage.class), any(GameMessage.class));
   }
 
@@ -325,7 +354,6 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player("local");
     // sender.broadcast()が失敗するとき
     doAnswer(
             invocation -> {
@@ -335,15 +363,15 @@ public class MatchingControllerTest {
         .broadcast(any(GameMessage.class));
     // receiver.receive()はDiscoverを返す
     when(mockReceiver.receive())
-        .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)));
+        .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)));
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0)
             .setRetryCount(3)
             .setTimeout(Duration.ofDays(1))
             .build();
 
     // マッチングを開始するとMatchingTimeoutExceptionが発生する
-    assertThrows(MatchingTimeoutException.class, matchingController::match);
+    assertThrows(MatchingTimeoutException.class, () -> matchingController.match("local"));
     verify(mockSender, times(3)).broadcast(any(GameMessage.class));
   }
 
@@ -353,16 +381,15 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player("remote");
     // receiver.receive()はDiscoverを返さない
     when(mockReceiver.receive())
         .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.OFFER)));
     MatchingController matchingController =
-        new MatchingControllerBuilder(dummyLocalPlayer, mockSender, mockReceiver)
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0)
             .setTimeout(Duration.ofSeconds(0))
             .build();
 
     // マッチングを開始するとMatchingTimeoutExceptionが発生する
-    assertThrows(MatchingTimeoutException.class, matchingController::match);
+    assertThrows(MatchingTimeoutException.class, () -> matchingController.match("local"));
   }
 }
