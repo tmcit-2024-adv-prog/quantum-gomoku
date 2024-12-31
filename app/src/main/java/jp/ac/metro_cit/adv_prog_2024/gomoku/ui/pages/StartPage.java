@@ -76,7 +76,7 @@ public class StartPage extends JPanel {
     @Override
     public void actionPerformed(ActionEvent e) {
       String mySideName = mySideNameInputField.getText();
-      parentFrame.setMySideName(mySideName);
+      parentFrame.setLocalPlayerName(mySideName);
       parentFrame.showMatchingPage();
     }
   }

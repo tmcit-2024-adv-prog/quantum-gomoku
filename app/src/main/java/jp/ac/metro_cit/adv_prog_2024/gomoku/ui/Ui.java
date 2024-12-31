@@ -3,6 +3,8 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.ui;
 import java.awt.Color;
 import javax.swing.JFrame;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controller.GameCommunicationController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.pages.GamePage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.pages.MatchingPage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.pages.StartPage;
@@ -13,13 +15,18 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.pages.StartPage;
  * @author 葛野
  */
 public class Ui extends JFrame {
+  private String localPlayerName;
+  private Player localPlayer;
+  private Player remotePlayer;
+  private GameCommunicationController gameCommunicationController;
 
-  public static void openStartWindow() {
-    Ui frame = new Ui("五目並べ");
+  public static void openStartWindow(GameCommunicationController gameCommunicationController) {
+    Ui frame = new Ui("五目並べ", gameCommunicationController);
     frame.setVisible(true);
   }
 
-  Ui(String title) {
+  Ui(String title, GameCommunicationController gameCommunicationController) {
+    this.gameCommunicationController = gameCommunicationController;
     setTitle(title);
     setSize(1280, 1024);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,55 +51,33 @@ public class Ui extends JFrame {
   }
 
   public void showGamePage() {
-    GamePage GamePage = new GamePage(this);
-    setContentPane(GamePage);
+    GamePage gamePage = new GamePage(this, gameCommunicationController);
+    setContentPane(gamePage);
     revalidate();
     repaint();
   }
 
-  private String mySideName;
-
-  public void setMySideName(String mySideName) {
-    this.mySideName = mySideName;
+  public void setLocalPlayerName(String playerName) {
+    this.localPlayerName = playerName;
   }
 
-  public String getMySideName() {
-    return mySideName;
+  public String getLocalPlayerName() {
+    return localPlayerName;
   }
 
-  private String OpponentName;
-
-  public void setOpponentName(String OpponentName) {
-    this.OpponentName = OpponentName;
+  public void setLocalPlayer(Player localPlayer) {
+    this.localPlayer = localPlayer;
   }
 
-  public String getOpponentName() {
-    return OpponentName;
+  public void setRemotePlayer(Player remotePlayer) {
+    this.remotePlayer = remotePlayer;
   }
 
-  // ここ後で変える
-  private String currentTurn;
-
-  public void setCurrentTurn(String currentTurn) {
-    this.currentTurn = currentTurn;
+  public Player getLocalPlayer() {
+    return localPlayer;
   }
 
-  public enum GamePhase {
-    /** The game has not started yet. */
-    BEFORE_START,
-
-    /** It is Black's turn to play. */
-    BLACK_TURN,
-
-    /** It is White's turn to play. */
-    WHITE_TURN,
-
-    /** The game has ended. */
-    FINISHED,
-  }
-
-  public GamePhase getPhase() {
-    GamePhase phase = GamePhase.BLACK_TURN;
-    return phase;
+  public Player getRemotePlayer() {
+    return remotePlayer;
   }
 }
