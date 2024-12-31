@@ -43,7 +43,7 @@ public class GameCommunicationControllerTest {
     Player localPlayer = new Player("localPlayer");
     Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, receiver, sender);
+        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
     // 期待されるGameState
     GameState expected =
         new GameState(GamePhase.BLACK_TURN, localPlayer, remotePlayer, null, new HashMap<>());
@@ -89,11 +89,18 @@ public class GameCommunicationControllerTest {
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
-    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
-        new GameCommunicationController(localPlayer, remotePlayer, sender, receiver);
+        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
     // 期待されるGameState
     HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
     Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
@@ -117,12 +124,20 @@ public class GameCommunicationControllerTest {
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
-    // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
-    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
-    GameCommunicationController gcc =
-        new GameCommunicationController(localPlayer, remotePlayer, sender, receiver);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
 
+    // テスト対象のインスタンスを生成
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
+    GameCommunicationController gcc =
+        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+    
     gcc.setGameStateCallback(gameStatusCallback);
     gcc.startGame();
     // 黒のターンに設定する
@@ -142,11 +157,19 @@ public class GameCommunicationControllerTest {
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
-    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
-        new GameCommunicationController(localPlayer, remotePlayer, sender, receiver);
+        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+
     // 期待されるGameState
     HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
     Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
@@ -178,9 +201,17 @@ public class GameCommunicationControllerTest {
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
+
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
-    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
 
@@ -203,11 +234,20 @@ public class GameCommunicationControllerTest {
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
+
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
-    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+  
     // 期待されるGameState
     HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
     for (int i = 0; i < 5; i++) {
@@ -245,11 +285,21 @@ public class GameCommunicationControllerTest {
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
+
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer", StoneColor.WHITE);
-    Player remotePlayer = new Player("remotePlayer", StoneColor.BLACK);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+
+
     // 期待されるGameState
     HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
     for (int i = 0; i < 5; i++) {

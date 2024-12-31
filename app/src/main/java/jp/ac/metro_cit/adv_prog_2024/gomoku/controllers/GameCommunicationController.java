@@ -6,18 +6,14 @@
  */
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
-import java.util.HashMap;
-
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.services.Game;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 
 public class GameCommunicationController {
   // メンバ変数
@@ -28,9 +24,6 @@ public class GameCommunicationController {
   private Player remotePlayer;
   private Receiver receiver;
   private Sender sender;
-  private GameState gameState;
-  public GameStateCallback gameStatusCallback;
-
 
   // コンストラクタ
 
@@ -48,7 +41,8 @@ public class GameCommunicationController {
     this.receiver = receiver;
     this.sender = sender;
     this.game = game;
-    this.gameState = new GameState(GamePhase.BEFORE_START, localPlayer, remotePlayer, null, game.getBoard());
+    this.gameState =
+        new GameState(GamePhase.BEFORE_START, localPlayer, remotePlayer, null, game.getBoard());
 
     // this.setGameStateCallback();
   }
@@ -165,40 +159,39 @@ public class GameCommunicationController {
 
   /**
    * startGameメソッド　ゲームを開始する
+   *
    * @param locPlayer これを操作しているプレイヤー
    * @param remPlayer　相手のプレイヤー
    */
-  public GameState startGame(Player locPlayer , Player remPlayer) {
+  public GameState startGame(Player locPlayer, Player remPlayer) throws GamePhaseException {
     this.game = new Game(locPlayer, remPlayer, null);
     try {
-      this.game.startGame();
-      this.gameState
+      this.game = this.game.startGame(localPlayer, remotePlayer);
+      return new GameState(
+          this.game.getPhase(),
+          this.game.getCurrentPlayer(),
+          this.game.getRemotePlayer(),
+          this.game.getWinnerPlayer(),
+          this.game.getBoard());
     } catch (GamePhaseException e) {
-      e.printStackTrace();
+      throw e;
     }
   }
+
   // public GameState into(StoneColor localPlayerColor) {
   //   if (localPlayerColor == StoneColor.BLACK) {
   //     return new GameState(
-  //         this.phase, this.blackPlayer, this.whitePlayer, this.winnerPlayer, this.board.getBoard());
+  //         this.phase, this.blackPlayer, this.whitePlayer, this.winnerPlayer,
+  // this.board.getBoard());
   //   } else {
   //     return new GameState(
-  //         this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer, this.board.getBoard());
+  //         this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer,
+  // this.board.getBoard());
   //   }
   // }
 
-    // ゲッター
-    public GameState getGameState() {
-      return this.gameState;
-    }
-  
-    // セッター
-    public void setGameState(GameState state) {
-      this.gameState = state;
-    }
-
-public void setGameStateCallback(GameStateCallback gameStatusCallback2) {
-	void setGameState(GameState state);
-	throw new UnsupportedOperationException("Unimplemented method 'setGameStateCallback'");
-}
+  public void setGameStateCallback(GameState state) {
+    this.setGameState(state);
+    throw new UnsupportedOperationException("Unimplemented method 'setGameStateCallback'");
+  }
 }

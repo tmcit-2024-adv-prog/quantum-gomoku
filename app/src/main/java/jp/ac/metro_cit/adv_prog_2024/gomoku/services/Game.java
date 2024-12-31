@@ -153,6 +153,6 @@ public class Game {
   }
 
   public HashMap<Vector2D, Stone> getBoard() {
-    return this.board;
+    return this.board.getBoard();
   }
 }
