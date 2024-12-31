@@ -152,7 +152,7 @@ public class Game {
     }
   }
 
-  public static HashMap<Vector2D, Stone> getBoard() {
+  public HashMap<Vector2D, Stone> getBoard() {
     return this.board.getBoard();
   }
 }
