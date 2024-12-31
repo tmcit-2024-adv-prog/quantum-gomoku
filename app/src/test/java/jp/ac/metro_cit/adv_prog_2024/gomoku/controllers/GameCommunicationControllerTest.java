@@ -52,13 +52,13 @@ public class GameCommunicationControllerTest {
 
     // gameStateCallbackを設定
     gcc.setGameStateCallback(gameStatusCallback);
-    GameState result = null;
-    try {
-      result = gcc.startGame(localPlayer, remotePlayer);
-    } catch (GamePlayerException | GamePhaseException e) {
-      ((Throwable) e).printStackTrace();
-    }
-
+    // GameState result = null;
+    // try {
+    //   result = gcc.startGame(localPlayer, remotePlayer);
+    // } catch (GamePlayerException | GamePhaseException e) {
+    //   ((Throwable) e).printStackTrace();
+    // }
+    GameState result = gcc.startGame(localPlayer, remotePlayer);
     // GameStateが返されることを確認
     assertEquals(expected, result);
   }
@@ -406,7 +406,6 @@ public class GameCommunicationControllerTest {
 
     gcc.setGameStateCallback(gameStatusCallback);
     // gameStateCallbackを設定
-    gcc.setGameStateCallback(gameStatusCallback);
     GameState gameState = null;
     try {
       gameState = gcc.startGame(localPlayer, remotePlayer);
@@ -414,6 +413,9 @@ public class GameCommunicationControllerTest {
       e.printStackTrace();
     }
     // 相手側が勝利する
+
+    // 一回石をおいてみる
+    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
     GameState result = assertDoesNotThrow(() -> gcc.surrender(localPlayer.getColor()));
 
     // GameStateが返されることを確認
