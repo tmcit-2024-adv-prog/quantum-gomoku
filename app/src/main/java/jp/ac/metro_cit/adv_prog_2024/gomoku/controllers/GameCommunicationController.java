@@ -6,25 +6,52 @@
  */
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
+import java.util.HashMap;
+
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Color;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.services.Game;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 
 public class GameCommunicationController {
   // メンバ変数
   /** メンバ変数一覧 */
   private Game game;
 
-  private Player controlPlayer;
+  private Player localPlayer;
   private Player remotePlayer;
   private Receiver receiver;
   private Sender sender;
+  private GameState gameState;
   public GameStateCallback gameStatusCallback;
+
+
+  // コンストラクタ
+
+  /**
+   * GameCommunicationControllerコンストラクタ
+   *
+   * @param sender Sender
+   * @param receiver Receiver
+   */
+  public GameCommunicationController(
+      Game game, Player localPlayer, Player remotePlayer, Sender sender, Receiver receiver) {
+
+    this.localPlayer = localPlayer;
+    this.remotePlayer = remotePlayer;
+    this.receiver = receiver;
+    this.sender = sender;
+    this.game = game;
+    this.gameState = new GameState(GamePhase.BEFORE_START, localPlayer, remotePlayer, null, game.getBoard());
+
+    // this.setGameStateCallback();
+  }
 
   // パブリックメソッド
 
@@ -32,15 +59,15 @@ public class GameCommunicationController {
   // retrunはPlayerクラスのインスタンス
 
   /**
-   * createControlPlayerメソッド 名前を受け取ってこれを操作しているPlayerの実態を作成する
+   * createlocalPlayerメソッド 名前を受け取ってこれを操作しているPlayerの実態を作成する
    *
    * @param name String
    * @return Playerの実態
    */
-  public Player createControlPlayer(String name) {
-    this.controlPlayer = new Player(name);
+  public Player createlocalPlayer(String name) {
+    this.localPlayer = new Player(name);
 
-    return this.controlPlayer;
+    return this.localPlayer;
   }
 
   // 名前を受け取って対戦相手のPlayerの実態を作成
@@ -98,12 +125,14 @@ public class GameCommunicationController {
   // returnはGameStateクラスのインスタンス
 
   /**
-   * getGameStatusメソッド　gameStateを取得したい際に使用する
+   * getGameStateメソッド　gameStateを取得したい際に使用する
    *
    * @return 現在のgameState
    */
-  public GameState getGameStatus() {
-    return this.game.gameState();
+  public GameState getGameState() {
+    System.out.println("getGameState");
+    // return this.game.gameState();
+    return null;
   }
 
   // ゲーム状態のセット関数
@@ -115,7 +144,13 @@ public class GameCommunicationController {
    * @param state 更新したいstate(enum)
    */
   public void setGameState(GameState state) {
-    this.game.setGameState(state);
+    // stateからgameを更新
+    //     GamePhase phase,
+    // Player blackPlayer,
+    // Player whitePlayer,
+    // @Nullable Player winner,
+    // HashMap<Vector2D, Stone> board)
+
   }
 
   // 通信をするときのレシーバーの起動処理
@@ -125,6 +160,45 @@ public class GameCommunicationController {
   }
 
   // private Color decideColor() {
-
+  //   return this.localPlayer.setColoer(Color.BLACK);
   // }
+
+  /**
+   * startGameメソッド　ゲームを開始する
+   * @param locPlayer これを操作しているプレイヤー
+   * @param remPlayer　相手のプレイヤー
+   */
+  public GameState startGame(Player locPlayer , Player remPlayer) {
+    this.game = new Game(locPlayer, remPlayer, null);
+    try {
+      this.game.startGame();
+      this.gameState
+    } catch (GamePhaseException e) {
+      e.printStackTrace();
+    }
+  }
+  // public GameState into(StoneColor localPlayerColor) {
+  //   if (localPlayerColor == StoneColor.BLACK) {
+  //     return new GameState(
+  //         this.phase, this.blackPlayer, this.whitePlayer, this.winnerPlayer, this.board.getBoard());
+  //   } else {
+  //     return new GameState(
+  //         this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer, this.board.getBoard());
+  //   }
+  // }
+
+    // ゲッター
+    public GameState getGameState() {
+      return this.gameState;
+    }
+  
+    // セッター
+    public void setGameState(GameState state) {
+      this.gameState = state;
+    }
+
+public void setGameStateCallback(GameStateCallback gameStatusCallback2) {
+	void setGameState(GameState state);
+	throw new UnsupportedOperationException("Unimplemented method 'setGameStateCallback'");
+}
 }

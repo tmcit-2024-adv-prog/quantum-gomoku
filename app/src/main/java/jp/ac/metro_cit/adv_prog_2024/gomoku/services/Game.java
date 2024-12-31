@@ -1,5 +1,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
+import java.util.HashMap;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
@@ -148,5 +150,9 @@ public class Game {
       return new GameState(
           this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer, this.board.getBoard());
     }
+  }
+
+  public HashMap<Vector2D, Stone> getBoard() {
+    return this.board;
   }
 }
