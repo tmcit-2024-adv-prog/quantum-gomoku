@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GameCommunicationControllerTest {
   @Test
@@ -34,6 +35,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
     GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -97,6 +100,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -139,6 +144,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -179,6 +186,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -230,6 +239,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -270,6 +281,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -328,6 +341,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
@@ -387,6 +402,8 @@ public class GameCommunicationControllerTest {
     Receiver receiver = mock(Receiver.class);
         GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
+    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    when(Game.getBoard()).thenReturn(dummyBoard);
     doAnswer(
             invocation -> {
               return null;
