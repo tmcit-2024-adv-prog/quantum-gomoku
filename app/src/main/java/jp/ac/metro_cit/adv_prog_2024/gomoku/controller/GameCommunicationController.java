@@ -1,4 +1,4 @@
-package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
+package jp.ac.metro_cit.adv_prog_2024.gomoku.controller;
 
 import java.util.HashMap;
 import javax.annotation.Nullable;
@@ -16,8 +16,8 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 
 public class GameCommunicationController {
-  private final Player localPlayer;
-  private final Player remotePlayer;
+  private Player localPlayer;
+  private Player remotePlayer;
   @Nullable private GameStateCallback gameStatusCallback;
   private HashMap<Vector2D, Stone> board = new HashMap<>();
   private int turnCount = 0;
@@ -45,12 +45,14 @@ public class GameCommunicationController {
    * @return 試合開始時のGameState
    * @throws IllegalStateException gameStatusCallbackが設定されていない場合に返される
    */
-  public GameState startGame() throws IllegalStateException {
+  public GameState startGame(Player localPlayer, Player remotPlayer) throws IllegalStateException {
     if (this.gameStatusCallback == null) {
       throw new IllegalStateException("gameStatusCallback is not set");
     }
 
     this.phase = GamePhase.BLACK_TURN;
+    this.localPlayer = localPlayer;
+    this.remotePlayer = remotPlayer;
 
     return new GameState(this.phase, this.localPlayer, this.remotePlayer, this.winner, this.board);
   }

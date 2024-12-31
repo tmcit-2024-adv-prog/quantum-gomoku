@@ -2,6 +2,7 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import java.util.HashMap;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controller.GameCommunicationController;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;

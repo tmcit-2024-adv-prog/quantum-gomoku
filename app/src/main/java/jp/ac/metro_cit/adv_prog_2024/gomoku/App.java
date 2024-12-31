@@ -3,6 +3,7 @@
  */
 package jp.ac.metro_cit.adv_prog_2024.gomoku;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controller.GameCommunicationController;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.Ui;
 
 public class App {
@@ -11,7 +12,9 @@ public class App {
   }
 
   public static void main(String[] args) {
-    Ui.openStartWindow();
+    GameCommunicationController gameCommunicationController =
+        new GameCommunicationController(null, null, null, null);
+    Ui.openStartWindow(gameCommunicationController);
     System.out.println(new App().getGreeting());
   }
 }
