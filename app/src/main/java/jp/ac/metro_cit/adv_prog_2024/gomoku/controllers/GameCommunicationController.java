@@ -105,12 +105,7 @@ public class GameCommunicationController {
     try {
       this.game.putStone(color, pos);
       // ここに作り出したstateを返す
-      return new GameState(
-          this.game.getPhase(),
-          this.game.getCurrentPlayer(),
-          this.game.getRemotePlayer(),
-          this.game.getWinnerPlayer(),
-          this.game.getBoard());
+      return this.game.into(localPlayer.getColor());
     } catch (Exception e) {
       throw new PutStoneException(e);
     }
@@ -127,12 +122,7 @@ public class GameCommunicationController {
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public GameState surrender(StoneColor color) throws GamePhaseException {
     this.game.surrender(color);
-    return new GameState(
-        this.game.getPhase(),
-        this.game.getCurrentPlayer(),
-        this.game.getRemotePlayer(),
-        this.game.getWinnerPlayer(),
-        this.game.getBoard());
+    return this.game.into(localPlayer.getColor());
     // return this.game.gameState();
   }
 
@@ -195,12 +185,7 @@ public class GameCommunicationController {
     this.game = new Game(locPlayer, remPlayer, null);
     try {
       this.game = this.game.startGame(localPlayer, remotePlayer);
-      return new GameState(
-          this.game.getPhase(),
-          this.game.getCurrentPlayer(),
-          this.game.getRemotePlayer(),
-          this.game.getWinnerPlayer(),
-          this.game.getBoard());
+      return this.game.into(localPlayer.getColor());
     } catch (GamePhaseException e) {
       throw e;
     }
