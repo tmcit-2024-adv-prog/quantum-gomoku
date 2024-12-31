@@ -30,7 +30,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -50,7 +50,7 @@ public class GameCommunicationControllerTest {
 
     // gameStateCallbackを設定
     gcc.setGameStateCallback(gameStatusCallback);
-    GameState result = gcc.startGame();
+    GameState result = gcc.startGame(localPlayer, remotePlayer);
 
     // GameStateが返されることを確認
     assertEquals(expected, result);
@@ -78,7 +78,7 @@ public class GameCommunicationControllerTest {
 
     // gameStateCallbackを設定しない
     // IllegalStateExceptionがスローされることを確認
-    Throwable exception = assertThrows(IllegalStateException.class, () -> gcc.startGame());
+    Throwable exception = assertThrows(IllegalStateException.class, () -> gcc.startGame(localPlayer, remotePlayer));
     assertEquals("gameStatusCallback is not set", exception.getMessage());
   }
 
@@ -88,7 +88,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -110,7 +110,7 @@ public class GameCommunicationControllerTest {
 
     // 黒の石を設置する
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
 
     // GameStateが返されることを確認
@@ -123,7 +123,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -139,7 +139,7 @@ public class GameCommunicationControllerTest {
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
     
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // 黒のターンに設定する
     Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
     HashMap<Vector2D, Stone> board = new HashMap<>();
@@ -156,7 +156,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -180,7 +180,7 @@ public class GameCommunicationControllerTest {
         new GameState(GamePhase.BLACK_TURN, localPlayer, remotePlayer, null, expectedBoard);
 
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // 白のターンに設定する
     stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
     HashMap<Vector2D, Stone> board = new HashMap<>();
@@ -200,7 +200,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -216,7 +216,7 @@ public class GameCommunicationControllerTest {
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
 
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // 白のターンに設定する
     Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
     HashMap<Vector2D, Stone> board = new HashMap<>();
@@ -233,7 +233,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -262,7 +262,7 @@ public class GameCommunicationControllerTest {
         new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, localPlayer, expectedBoard);
 
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // 黒の石を5回設置する
     assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
     assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
@@ -284,7 +284,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -314,7 +314,7 @@ public class GameCommunicationControllerTest {
         new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer, expectedBoard);
 
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // 黒の石を5回設置する
     assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
     assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
@@ -336,7 +336,16 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
+
+
     // テスト対象のインスタンスを生成
     Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
     Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
@@ -347,9 +356,9 @@ public class GameCommunicationControllerTest {
         new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer, new HashMap<>());
 
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // 相手側が勝利する
-    GameState result = assertDoesNotThrow(() -> gcc.surrender());
+    GameState result = assertDoesNotThrow(() -> gcc.surrender(localPlayer.getColor()));
 
     // GameStateが返されることを確認
     assertEquals(expected, result);
@@ -358,10 +367,19 @@ public class GameCommunicationControllerTest {
   @Test
   @DisplayName("[正常系] setGameStateメソッドを実行するとGameStateが更新される。getGameStateメソッドで取得できる")
   public void testSetAndGetGameState() {
+
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameState gameStatusCallback = mock(GameState.class);
+    Game game = mock(Game.class);
+    doAnswer(
+            invocation -> {
+              return null;
+            })
+        .when(game)
+        .putStone(any(StoneColor.class), any(Vector2D.class));
+
     // テスト対象のインスタンスを生成
     Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
     Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
@@ -372,7 +390,7 @@ public class GameCommunicationControllerTest {
         new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer, new HashMap<>());
 
     gcc.setGameStateCallback(gameStatusCallback);
-    gcc.startGame();
+    gcc.startGame(localPlayer, remotePlayer);
     // GameStateを更新する
     gcc.setGameState(expected);
     GameState result = gcc.getGameState();

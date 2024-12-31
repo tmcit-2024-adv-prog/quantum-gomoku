@@ -7,6 +7,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
@@ -110,9 +111,15 @@ public class GameCommunicationController {
    *
    * @return gameStateを返す
    */
-  public GameState surrender() {
-    this.game.surrender();
-    return this.game.gameState();
+  public GameState surrender(StoneColor color) throws GamePhaseException {
+    this.game.surrender(color);
+    return new GameState(
+        this.game.getPhase(),
+        this.game.getCurrentPlayer(),
+        this.game.getRemotePlayer(),
+        this.game.getWinnerPlayer(),
+        this.game.getBoard());
+    // return this.game.gameState();
   }
 
   // ゲーム状態の取得関数
@@ -163,7 +170,8 @@ public class GameCommunicationController {
    * @param locPlayer これを操作しているプレイヤー
    * @param remPlayer　相手のプレイヤー
    */
-  public GameState startGame(Player locPlayer, Player remPlayer) throws GamePhaseException {
+  public GameState startGame(Player locPlayer, Player remPlayer)
+      throws GamePhaseException, GamePlayerException, Exception {
     this.game = new Game(locPlayer, remPlayer, null);
     try {
       this.game = this.game.startGame(localPlayer, remotePlayer);
