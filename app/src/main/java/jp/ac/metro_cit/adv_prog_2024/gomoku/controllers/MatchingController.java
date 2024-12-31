@@ -116,10 +116,9 @@ public class MatchingController {
                     if (phase == MatchingMessageType.DISCOVER
                         && receivedData != null
                         && receivedData instanceof Player
-                        && receivedData != localPlayer) {
+                        && !receivedData.equals(localPlayer)) {
                       Player receivedPlayer = (Player) receivedData;
-                      if (receivedPlayer.getColor() == null
-                          || receivedPlayer.getColor() == localPlayer.getColor()) {
+                      if (receivedPlayer.getColor() == null) {
                         continue;
                       }
                       remotePlayer = receivedPlayer;
@@ -135,7 +134,7 @@ public class MatchingController {
                     if (phase == MatchingMessageType.OFFER
                         && receivedData != null
                         && receivedData instanceof Player
-                        && receivedData != localPlayer) {
+                        && !receivedData.equals(localPlayer)) {
                       Player receivedPlayer = (Player) receivedData;
                       if (receivedPlayer.getColor() == null
                           || receivedPlayer.getColor() == localPlayer.getColor()) {

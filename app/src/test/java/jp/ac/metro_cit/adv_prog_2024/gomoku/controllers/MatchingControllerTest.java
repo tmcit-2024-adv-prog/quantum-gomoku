@@ -56,8 +56,35 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[正常系] 受動的にマッチングを開始した場合にマッチングが成功する")
-  public void testSuccessPassiveMatching() throws Throwable {
+  @DisplayName("[正常系] 受動的にマッチングを開始した場合にマッチングが成功する 自身の乱数値が相手より大きい場合は自身が黒になる")
+  public void testSuccessPassiveMatchingOnRandomValueGreaterThanRemote() throws Throwable {
+    // モックの作成
+    Sender mockSender = mock(Sender.class);
+    Receiver mockReceiver = mock(Receiver.class);
+    Player dummyRemotePlayer = new Player("remote", StoneColor.WHITE);
+    // 相手からはDiscoverメッセージとRequestメッセージが送信されるとき
+    when(mockReceiver.receive())
+        .thenReturn(
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 0)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
+    MatchingController matchingController =
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 1).build();
+
+    // マッチングを開始すると
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
+
+    // 相手のプレイヤーが返ってくる
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
+  }
+
+  @Test
+  @DisplayName("[正常系] 受動的にマッチングを開始した場合にマッチングが成功する 自身の乱数値が相手以下の場合は自身が白になる")
+  public void testSuccessPassiveMatchingOnRandomValueLessThanAndEqualRemote() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
@@ -65,7 +92,7 @@ public class MatchingControllerTest {
     // 相手からはDiscoverメッセージとRequestメッセージが送信されるとき
     when(mockReceiver.receive())
         .thenReturn(
-            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 0)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     MatchingController matchingController =
         new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
@@ -196,6 +223,38 @@ public class MatchingControllerTest {
   }
 
   @Test
+  @DisplayName("[異常系] Discoverメッセージに整数が含まれていない場合は無視される")
+  public void testIgnoreDiscoverMessageWithoutInteger() throws Throwable {
+    // モックの作成
+    Sender mockSender = mock(Sender.class);
+    Receiver mockReceiver = mock(Receiver.class);
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
+    // Offerメッセージに相手プレイヤーが含まれていないとき
+    when(mockReceiver.receive())
+        .thenReturn(
+            // Discoverメッセージがnull
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER)),
+            // OfferメッセージがIntegerでない
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, "dummy")),
+            // 正常なメッセージ
+            new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
+    MatchingController matchingController =
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+
+    // マッチングを開始すると
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
+
+    // 相手のプレイヤーが返ってくる
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
+  }
+
+  @Test
   @DisplayName("[異常系] Offerメッセージに相手プレイヤーが含まれていない場合は無視される")
   public void testIgnoreOfferMessageWithoutPlayer() throws Throwable {
     // モックの作成
@@ -205,8 +264,10 @@ public class MatchingControllerTest {
     // Offerメッセージに相手プレイヤーが含まれていないとき
     when(mockReceiver.receive())
         .thenReturn(
-            // Offerメッセージに相手プレイヤーが含まれていない
+            // Offerメッセージがnull
             new GameMessage(new MatchingMessage(MatchingMessageType.OFFER)),
+            // OfferメッセージがPlayerでない
+            new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, "dummy")),
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
@@ -257,6 +318,37 @@ public class MatchingControllerTest {
   }
 
   @Test
+  @DisplayName("[異常系] Offerメッセージの相手プレイヤーの色がnullの場合は無視される")
+  public void testIgnoreOfferMessageWithNullColor() throws Throwable {
+    // モックの作成
+    Sender mockSender = mock(Sender.class);
+    Receiver mockReceiver = mock(Receiver.class);
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
+    // Offerメッセージの相手プレイヤーの色がnullのとき
+    when(mockReceiver.receive())
+        .thenReturn(
+            // Offerメッセージの相手プレイヤーの色がnull
+            new GameMessage(
+                new MatchingMessage(MatchingMessageType.OFFER, new Player("remote", null))),
+            // 正常なメッセージ
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
+    MatchingController matchingController =
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+
+    // マッチングを開始すると
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
+
+    // 相手のプレイヤーが返ってくる
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
+  }
+
+  @Test
   @DisplayName("[異常系] Requestメッセージに相手プレイヤーが含まれていない場合は無視される")
   public void testIgnoreRequestMessageWithoutPlayer() throws Throwable {
     // モックの作成
@@ -270,6 +362,8 @@ public class MatchingControllerTest {
             new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             // Requestメッセージに相手プレイヤーが含まれていない
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST)),
+            // Requestメッセージに相手プレイヤーが含まれていない
+            new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, "dummy")),
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     MatchingController matchingController =
@@ -301,7 +395,74 @@ public class MatchingControllerTest {
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
             // Requestメッセージに自分自身が含まれている
-            new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyLocalPlayer)),
+            new GameMessage(
+                new MatchingMessage(
+                    MatchingMessageType.REQUEST, new Player("local", StoneColor.WHITE))),
+            // 正常なメッセージ
+            new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
+    MatchingController matchingController =
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+
+    // マッチングを開始すると
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
+
+    // 相手のプレイヤーが返ってくる
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
+  }
+
+  @Test
+  @DisplayName("[異常系] Requestメッセージの相手プレイヤーの色がnullの場合は無視される")
+  public void testIgnoreRequestMessageWithNullColor() throws Throwable {
+    // モックの作成
+    Sender mockSender = mock(Sender.class);
+    Receiver mockReceiver = mock(Receiver.class);
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
+    // Requestメッセージの相手プレイヤーの色がnullのとき
+    when(mockReceiver.receive())
+        .thenReturn(
+            // 正常なメッセージ
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
+            // Requestメッセージの相手プレイヤーの色がnull
+            new GameMessage(
+                new MatchingMessage(MatchingMessageType.REQUEST, new Player("remote", null))),
+            // 正常なメッセージ
+            new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
+    MatchingController matchingController =
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+
+    // マッチングを開始すると
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
+
+    // 相手のプレイヤーが返ってくる
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
+  }
+
+  @Test
+  @DisplayName("[異常系] Requestメッセージの相手プレイヤーの色が自身の色と同じ場合は無視される")
+  public void testIgnoreRequestMessageWithSameColor() throws Throwable {
+    // モックの作成
+    Sender mockSender = mock(Sender.class);
+    Receiver mockReceiver = mock(Receiver.class);
+    Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
+    // Requestメッセージの相手プレイヤーの色が自身の色と同じとき
+    when(mockReceiver.receive())
+        .thenReturn(
+            // 正常なメッセージ
+            new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)),
+            // Requestメッセージの相手プレイヤーの色が自身の色と同じ
+            new GameMessage(
+                new MatchingMessage(
+                    MatchingMessageType.REQUEST, new Player("remote", StoneColor.WHITE))),
             // 正常なメッセージ
             new GameMessage(new MatchingMessage(MatchingMessageType.REQUEST, dummyRemotePlayer)));
     MatchingController matchingController =
