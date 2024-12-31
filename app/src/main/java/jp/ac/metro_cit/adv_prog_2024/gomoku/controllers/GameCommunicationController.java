@@ -6,9 +6,11 @@
  */
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
@@ -25,6 +27,8 @@ public class GameCommunicationController {
   private Player remotePlayer;
   private Receiver receiver;
   private Sender sender;
+
+  @Nullable private GameStateCallback gameStatusCallback;
 
   // コンストラクタ
 
@@ -92,10 +96,17 @@ public class GameCommunicationController {
    * @return 更新されたgameState
    * @throws PutStoneException 石を設置しようとしたときに異常が発生したときに返される
    */
-  public GameState putStone(Color color, int x, int y) throws PutStoneException {
+  public GameState putStone(StoneColor color, Vector2D pos)
+      throws GamePhaseException, GamePlayerException, Exception {
     try {
-      this.game.putStone(color, x, y);
-      return this.game.gameState();
+      this.game.putStone(color, pos);
+      // ここに作り出したstateを返す
+      return new GameState(
+          this.game.getPhase(),
+          this.game.getCurrentPlayer(),
+          this.game.getRemotePlayer(),
+          this.game.getWinnerPlayer(),
+          this.game.getBoard());
     } catch (PutStoneException e) {
       throw e;
     } catch (Exception e) {
@@ -172,6 +183,9 @@ public class GameCommunicationController {
    */
   public GameState startGame(Player locPlayer, Player remPlayer)
       throws GamePhaseException, GamePlayerException, Exception {
+    if (this.gameStatusCallback == null) {
+      throw new IllegalStateException("gameStatusCallback is not set");
+    }
     this.game = new Game(locPlayer, remPlayer, null);
     try {
       this.game = this.game.startGame(localPlayer, remotePlayer);
@@ -198,8 +212,7 @@ public class GameCommunicationController {
   //   }
   // }
 
-  public void setGameStateCallback(GameState state) {
-    this.setGameState(state);
-    throw new UnsupportedOperationException("Unimplemented method 'setGameStateCallback'");
+  public void setGameStateCallback(GameStateCallback callback) {
+    this.gameStatusCallback = callback;
   }
 }
