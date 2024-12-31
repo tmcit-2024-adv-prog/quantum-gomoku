@@ -107,10 +107,8 @@ public class GameCommunicationController {
           this.game.getRemotePlayer(),
           this.game.getWinnerPlayer(),
           this.game.getBoard());
-    } catch (PutStoneException e) {
-      throw e;
     } catch (Exception e) {
-      throw new PutStoneException("石を置くことができませんでした");
+      throw new PutStoneException(e);
     }
   }
 
