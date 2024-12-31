@@ -62,7 +62,8 @@ public class MatchingController {
    * @throws MatchingTimeoutException マッチングがタイムアウトした場合
    * @throws MatchingFailedException マッチングに失敗した場合
    */
-  public Pair<Player, Player> match(String localPlayerNmae) throws MatchingTimeoutException, MatchingFailedException {
+  public Pair<Player, Player> match(String localPlayerNmae)
+      throws MatchingTimeoutException, MatchingFailedException {
     Player localPlayer = new Player(localPlayerNmae);
     // マッチングメッセージを受信して相手プレイヤーを取得
     CompletableFuture<Player> receiveFuture =
