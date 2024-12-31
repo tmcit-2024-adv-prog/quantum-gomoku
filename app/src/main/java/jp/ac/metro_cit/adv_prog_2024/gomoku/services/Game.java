@@ -6,6 +6,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.BoardFactory;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
@@ -37,6 +38,16 @@ public class Game {
     this.whitePlayer.setColor(StoneColor.WHITE);
     this.currentPlayer = this.blackPlayer;
     this.board = board;
+  }
+
+  /**
+   * 試合のインスタンスを生成.
+   *
+   * @param blackPlayer 黒の碁石を置くプレイヤー
+   * @param whitePlayer 白の碁石を置くプレイヤー
+   */
+  public Game(Player blackPlayer, Player whitePlayer) {
+    this(blackPlayer, whitePlayer, BoardFactory.create());
   }
 
   /** ゲームを開始 */
@@ -115,6 +126,35 @@ public class Game {
   }
 
   /**
+   * 　リモートプレイヤーを返す
+   *
+   * @return リモートプレイヤー
+   */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP"})
+  public Player getRemotePlayer() {
+    // 鬼のお手軽実装
+    if (currentPlayer == blackPlayer) {
+      return whitePlayer;
+    } else {
+      return blackPlayer;
+    }
+  }
+
+  /**
+   * 　リモートプレイヤーを返す
+   *
+   * @return リモートプレイヤー
+   */
+  public Player getRemotePlayer() {
+    // 鬼のお手軽実装
+    if (currentPlayer == blackPlayer) {
+      return whitePlayer;
+    } else {
+      return blackPlayer;
+    }
+  }
+
+  /**
    * 碁盤に石を設置する.
    *
    * @param color 石の色
@@ -132,7 +172,7 @@ public class Game {
     try {
       board.putStone(pos, new Stone(color, pos));
     } catch (Exception e) {
-      throw new Exception("The Stone cannot puttted.");
+      throw new Exception("The Stone cannot put.");
     }
 
     if (board.checkWinner(pos)) {
@@ -142,6 +182,36 @@ public class Game {
     }
   }
 
+  public HashMap<Vector2D, Stone> getBoard() {
+    return this.board.getBoard();
+  }
+
+  /**
+   * 黒のプレイヤーを取得.
+   *
+   * @return 黒のプレイヤー
+   */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP"})
+  public Player getBlackPlayer() {
+    return this.blackPlayer;
+  }
+
+  /**
+   * 白のプレイヤーを取得.
+   *
+   * @return 白のプレイヤー
+   */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP"})
+  public Player getWhitePlayer() {
+    return this.whitePlayer;
+  }
+
+  /**
+   * 現在の試合の状態をGameStateに変換する
+   *
+   * @param localPlayerColor ローカルプレイヤーの色
+   * @return 現在のゲーム状態
+   */
   public GameState into(StoneColor localPlayerColor) {
     if (localPlayerColor == StoneColor.BLACK) {
       return new GameState(
@@ -152,7 +222,35 @@ public class Game {
     }
   }
 
-  public HashMap<Vector2D, Stone> getBoard() {
-    return this.board.getBoard();
+  /**
+   * GameStateを現在の試合の状態に反映する
+   *
+   * @param state GameState
+   * @throws IllegalArgumentException GameStateに含まれるプレイヤーが異なる場合にスローされる
+   */
+  public void from(GameState state) throws IllegalArgumentException {
+    this.phase = state.phase();
+    this.winnerPlayer = state.winner();
+    Player blackPlayer;
+    Player whitePlayer;
+    if (state.localPlayer().getColor() == StoneColor.BLACK) {
+      blackPlayer = state.localPlayer();
+      whitePlayer = state.remotePlayer();
+    } else {
+      blackPlayer = state.remotePlayer();
+      whitePlayer = state.localPlayer();
+    }
+    if (!this.blackPlayer.equals(blackPlayer) || !this.whitePlayer.equals(whitePlayer)) {
+      throw new IllegalArgumentException("Players are different.");
+    }
+    for (Vector2D pos : state.board().keySet()) {
+      Stone stone = state.board().get(pos);
+      try {
+        this.board.putStone(pos, stone);
+      } catch (Exception e) {
+        // TODO: Boardが実装されたら適切に例外処理を行う{
+        e.printStackTrace();
+      }
+    }
   }
 }

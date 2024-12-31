@@ -18,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -179,16 +181,23 @@ public class GameTest {
 
   @Test
   @DisplayName("[異常系]石の設置でエラーが発生した場合、それを返す")
-  void putStoneError() throws GamePhaseException, GamePlayerException {
-    Game game =
-        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
-
-    game.startGame();
+  void putStoneError() throws Throwable {
+    Board board = mock(Board.class);
+    doAnswer(
+            invocation -> {
+              throw new Exception("Error");
+            })
+        .when(board)
+        .putStone(any(Vector2D.class), any(Stone.class));
+    Game game = new Game(new Player("player1"), new Player("player2"), board);
+    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
+    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    game.startGame(localPlayer, remotePlayer);
     try {
       game.putStone(StoneColor.BLACK, new Vector2D(-10, 20));
       fail();
     } catch (Exception e) {
-      // Boardクラスで何かしらのエラーが発生
+      assertEquals("The Stone cannot put.", e.getMessage());
     }
   }
 

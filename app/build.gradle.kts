@@ -18,43 +18,46 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.14.2")
 }
 
-sourceSets {
-    val main by getting {
-        java {
-            setSrcDirs(listOf("src/main/java"))
+val configFileDir = layout.buildDirectory.dir("generated/config")
+val configFileName = "BuildConfig.java"
+
+val env = project.findProperty("config.env") as? String ?: "prod"
+val customProperties = project.properties
+    .filterKeys { it.startsWith("config.") }
+    .toMutableMap()
+customProperties["config.env"] = env
+
+tasks.register("generateBuildConfig") {
+    val outputDir = configFileDir.get().asFile
+    val outputFile = File(outputDir, configFileName)
+
+    inputs.properties(customProperties)
+    outputs.file(outputFile)
+
+    doLast {
+        outputDir.mkdirs()
+
+        // プロパティをJavaコードとして出力
+        val propertiesCode = customProperties.entries.joinToString("\n") { (key, value) ->
+            val constantName = key.removePrefix("config.").uppercase()
+            "    public static final String $constantName = \"$value\";"
         }
-    }
-    val dev by creating {
-        java {
-            setSrcDirs(listOf("src/dev/java"))
-        }
-        compileClasspath += main.output
-        runtimeClasspath += main.output
-    }
-    val testDev by creating {
-        java {
-            setSrcDirs(listOf("src/test_dev/java"))
-        }
-        compileClasspath += main.output + dev.output
-        runtimeClasspath += main.output + dev.output
+
+        outputFile.writeText(
+            """
+            package jp.ac.metro_cit.adv_prog_2024.gomoku;
+
+            public class BuildConfig {
+            $propertiesCode
+            }
+            """.trimIndent()
+        )
     }
 }
 
-configurations {
-    val devImplementation by getting {
-        extendsFrom(configurations["implementation"])
-    }
-    val devCompileOnly by getting {
-        extendsFrom(configurations["compileOnly"])
-    }
-    val testDevImplementation by getting {
-        extendsFrom(configurations["testImplementation"])
-    }
-    val testDevCompileOnly by getting {
-        extendsFrom(configurations["testCompileOnly"])
-    }
-    val testDevRuntimeOnly by getting {
-        extendsFrom(configurations["testRuntimeOnly"])
+sourceSets {
+    named("main") {
+        java.srcDir(configFileDir)
     }
 }
 
@@ -84,6 +87,7 @@ val jar by tasks.getting(Jar::class) {
 
 spotless {
     java {
+        target("src/**/*.java")
         cleanthat()
         formatAnnotations()
         googleJavaFormat()
@@ -104,88 +108,8 @@ tasks {
         }
         jvmArgs = listOf("-Duser.language=ja")
     }
-    val buildDev by creating(Jar::class) {
-        dependsOn(distZip)
-        dependsOn(distTar)
-        archiveClassifier.set("dev")
-        from(sourceSets["main"].output)
-        from(sourceSets["dev"].output)
-        manifest {
-            attributes["Main-Class"] = application.mainClass
-        }
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-    val buildProd by creating(Jar::class) {
-        dependsOn(distZip)
-        dependsOn(distTar)
-        from(sourceSets["main"].output)
-        manifest {
-            attributes["Main-Class"] = application.mainClass
-        }
-    }
-    build {
-        group = "build"
-        description = "Builds the specified environment (e.g., -Penv=dev or default to prod)"
-
-        // 環境指定のプロパティを取得
-        val env = project.findProperty("env") as? String ?: "prod"
-
-        // 環境ごとにビルドタスクを設定
-        when (env) {
-            "dev" -> dependsOn(buildDev)
-            "prod" -> dependsOn(buildProd)
-            else -> throw GradleException("Invalid environment: $env. Use 'dev' or default to 'prod'.")
-        }
-    }
-    named<JavaExec>("run") {
-        group = "application"
-        description = "Runs the specified environment (e.g., -Penv=dev or default to prod)"
-
-        // 環境指定のプロパティを取得
-        val env = project.findProperty("env") as? String ?: "prod"
-
-        // 環境ごとにビルドタスクを設定
-        when (env) {
-            "dev" -> {
-                dependsOn(buildDev)
-                classpath = files(buildDev.archiveFile.get().asFile)
-            }
-            "prod" -> {
-                dependsOn(buildProd)
-                classpath = files(buildProd.archiveFile.get().asFile)
-            }
-            else -> throw GradleException("Invalid environment: $env. Use 'dev' or default to 'prod'.")
-        }
-
-        mainClass.set(application.mainClass)
-    }
-    val testDev by creating(Test::class) {
-        group = "verification"
-        description = "Runs the tests for the development environment"
-        testClassesDirs = sourceSets["testDev"].output.classesDirs
-        classpath = sourceSets["testDev"].runtimeClasspath
-    }
-    val testProd by creating(Test::class) {
-        group = "verification"
-        description = "Runs the tests for the production environment"
-        testClassesDirs = sourceSets["main"].output.classesDirs
-        classpath = sourceSets["main"].runtimeClasspath
-    }
     test {
-        group = "verification"
-        description = "Runs the tests for the specified environment (e.g., -Penv=dev or default to prod)"
-
-        // 環境指定のプロパティを取得
-        val env = project.findProperty("env") as? String ?: "prod"
-
-        // 環境ごとにビルドタスクを設定
         useJUnitPlatform()
-        when (env) {
-            "dev" -> dependsOn(testDev)
-            "prod" -> dependsOn(testProd)
-            else -> throw GradleException("Invalid environment: $env. Use 'dev' or default to 'prod'.")
-        }
-
         finalizedBy(jacocoTestReport)
     }
     jacocoTestReport {
@@ -193,5 +117,11 @@ tasks {
         reports {
             xml.required = true
         }
+    }
+    named("compileJava") {
+        dependsOn("generateBuildConfig")
+    }
+    named("spotlessJava") {
+        dependsOn("generateBuildConfig")
     }
 }

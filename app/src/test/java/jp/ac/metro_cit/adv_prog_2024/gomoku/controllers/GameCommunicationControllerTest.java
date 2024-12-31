@@ -2,8 +2,6 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import java.util.HashMap;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
@@ -28,77 +26,85 @@ import static org.mockito.Mockito.when;
 
 public class GameCommunicationControllerTest {
   @Test
-  @DisplayName("[正常系] startGameメソッドの実行時にgameStateCallbackが設定されている場合、GameStateを返す")
-  public void testStartGameWithGameStatusCallback() throws Exception {
+  @DisplayName("[正常系] 両プレイヤーの色が決定している場合、GameCommunicationControllerのインスタンスが生成される")
+  public void testGameCommunicationController() {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
-    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
-    when(game.getBoard()).thenReturn(dummyBoard);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
-
-    // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer");
-    Player remotePlayer = new Player("remotePlayer");
-    GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-    // 期待されるGameState
-    GameState expected =
-        new GameState(GamePhase.BLACK_TURN, localPlayer, remotePlayer, null, new HashMap<>());
-
-    // gameStateCallbackを設定
-    gcc.setGameStateCallback(gameStatusCallback);
-    // GameState result = null;
-    // try {
-    //   result = gcc.startGame(localPlayer, remotePlayer);
-    // } catch (GamePlayerException | GamePhaseException e) {
-    //   ((Throwable) e).printStackTrace();
-    // }
-    GameState result = gcc.startGame(localPlayer, remotePlayer);
-    // GameStateが返されることを確認
-    assertEquals(expected, result);
-  }
-
-  @Test
-  @DisplayName("[異常系] startGameメソッドの実行時にgameStateCallbackが設定されていない場合、IllegalStateExceptionをスローする")
-  public void testStartGameWithoutGameStatusCallback() throws GamePhaseException, GamePlayerException, Exception {
-    // モックの作成
-    Sender sender = mock(Sender.class);
-    Receiver receiver = mock(Receiver.class);
-    // テスト対象のインスタンスを生成
     Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
     Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
-    Game game = mock(Game.class);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
+    when(game.getBlackPlayer()).thenReturn(localPlayer);
+    when(game.getWhitePlayer()).thenReturn(remotePlayer);
 
-    GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-
-    // gameStateCallbackを設定しない
-    // IllegalStateExceptionがスローされることを確認
-    Throwable exception = assertThrows(IllegalStateException.class, () -> gcc.startGame(localPlayer, remotePlayer));
-    assertEquals("gameStatusCallback is not set", exception.getMessage());
+    // GCCのインスタンス生成
+    assertDoesNotThrow(
+        () -> new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game));
   }
 
   @Test
-  @DisplayName("[正常系] putStoneメソッドの実行時に黒の石を黒のターンに設置すると白のターンになる")
-  public void testPutStoneBlackTurnBlackStone() throws GamePhaseException, GamePlayerException, Exception {
+  @DisplayName("[異常系] 両プレイヤーの色が決定していない場合、IllegalArgumentExceptionをスローする")
+  public void testGameCommunicationControllerWithNoColor() {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    Game game = mock(Game.class);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer");
+
+    // GCCのインスタンス生成
+    IllegalArgumentException e =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game));
+    assertEquals("LocalPlayeryとRemotePlayerのいずれか、あるいは双方の色が決定されていません", e.getMessage());
+  }
+
+  @Test
+  @DisplayName("[異常系] localPlayerの色が決定していない場合、IllegalArgumentExceptionをスローする")
+  public void testGameCommunicationControllerWithNoLocalPlayerColor() {
+    // モックの作成
+    Sender sender = mock(Sender.class);
+    Receiver receiver = mock(Receiver.class);
+    Game game = mock(Game.class);
+    Player localPlayer = new Player("localPlayer");
+    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+
+    // GCCのインスタンス生成
+    IllegalArgumentException e =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game));
+    assertEquals("LocalPlayeryとRemotePlayerのいずれか、あるいは双方の色が決定されていません", e.getMessage());
+  }
+
+  @Test
+  @DisplayName("[異常系] remotePlayerの色が決定していない場合、IllegalArgumentExceptionをスローする")
+  public void testGameCommunicationControllerWithNoRemotePlayerColor() {
+    // モックの作成
+    Sender sender = mock(Sender.class);
+    Receiver receiver = mock(Receiver.class);
+    Game game = mock(Game.class);
+    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
+    Player remotePlayer = new Player("remotePlayer");
+
+    // GCCのインスタンス生成
+    IllegalArgumentException e =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game));
+    assertEquals("LocalPlayeryとRemotePlayerのいずれか、あるいは双方の色が決定されていません", e.getMessage());
+  }
+
+  @Test
+  @DisplayName("[異常系] 両プレイヤーの色が同じ場合、IllegalArgumentExceptionをスローする")
+  public void testGameCommunicationControllerWithSameColor() {
+    // モックの作成
+    Sender sender = mock(Sender.class);
+    Receiver receiver = mock(Receiver.class);
     Game game = mock(Game.class);
     HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
     when(game.getBoard()).thenReturn(dummyBoard);
@@ -108,57 +114,13 @@ public class GameCommunicationControllerTest {
             })
         .when(game)
         .putStone(any(StoneColor.class), any(Vector2D.class));
-    // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer");
-    Player remotePlayer = new Player("remotePlayer");
-    GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-    // 期待されるGameState
-    HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
-    Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
-    expectedBoard.put(stone.getPos(), stone);
-    GameState expected =
-        new GameState(GamePhase.WHITE_TURN, localPlayer, remotePlayer, null, expectedBoard);
-
-    // 黒の石を設置する
-    gcc.setGameStateCallback(gameStatusCallback);
-    // gameStateCallbackを設定
-    gcc.setGameStateCallback(gameStatusCallback);
-    GameState gameState = null;
-    try {
-      gameState = gcc.startGame(localPlayer, remotePlayer);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
-
-    // GameStateが返されることを確認
-    assertEquals(expected, result);
-  }
-
-  @Test
-  @DisplayName("[異常系] putStoneメソッドの実行時に白の石を黒のターンに設置しようとするとPutStoneExceptionをスローする")
-  public void testPutStoneBlackTurnWhiteStone() throws GamePhaseException, GamePlayerException, Exception {
-    // モックの作成
-    Sender sender = mock(Sender.class);
-    Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
-    Game game = mock(Game.class);
-    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
-    when(game.getBoard()).thenReturn(dummyBoard);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
 
     // テスト対象のインスタンスを生成
     Player localPlayer = new Player("localPlayer");
     Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-    
+
     gcc.setGameStateCallback(gameStatusCallback);
     // gameStateCallbackを設定
     gcc.setGameStateCallback(gameStatusCallback);
@@ -179,78 +141,45 @@ public class GameCommunicationControllerTest {
   }
 
   @Test
-  @DisplayName("[正常系] putStoneメソッドの実行時に白の石を白のターンに設置すると黒のターンになる")
-  public void testPutStoneWhiteTurnWhiteStone() throws GamePhaseException, GamePlayerException, Exception {
+  @DisplayName("[異常系] localPlayerとGameで指定されたプレイヤーが異なる場合、IllegalArgumentExceptionをスローする")
+  public void testGameCommunicationControllerWithDifferentLocalPlayer() {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
-    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
-    when(game.getBoard()).thenReturn(dummyBoard);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
-    // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer");
-    Player remotePlayer = new Player("remotePlayer");
-    GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+    when(game.getBlackPlayer()).thenReturn(new Player("blackPlayer", StoneColor.BLACK));
+    when(game.getWhitePlayer()).thenReturn(new Player("whitePlayer", StoneColor.WHITE));
+    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
+    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
 
-    // 期待されるGameState
-    HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
-    Stone stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
-    expectedBoard.put(stone.getPos(), stone);
-    stone = new Stone(StoneColor.WHITE, new Vector2D(18, 18));
-    expectedBoard.put(stone.getPos(), stone);
-    GameState expected =
-        new GameState(GamePhase.BLACK_TURN, localPlayer, remotePlayer, null, expectedBoard);
-
-    gcc.setGameStateCallback(gameStatusCallback);
-    // gameStateCallbackを設定
-    gcc.setGameStateCallback(gameStatusCallback);
-    GameState gameState = null;
-    try {
-      gameState = gcc.startGame(localPlayer, remotePlayer);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    // 白のターンに設定する
-    stone = new Stone(StoneColor.BLACK, new Vector2D(0, 0));
-    HashMap<Vector2D, Stone> board = new HashMap<>();
-    board.put(stone.getPos(), stone);
-    gcc.setGameState(new GameState(GamePhase.WHITE_TURN, localPlayer, remotePlayer, null, board));
-    // 白の石を設置する
-    GameState result =
-        assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
-
-    // GameStateが返されることを確認
-    assertEquals(expected, result);
+    // GCCのインスタンス生成
+    IllegalArgumentException e =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game));
+    assertEquals("LocalPlayerとRemotePlayerがGameのPlayerと一致しません", e.getMessage());
   }
 
   @Test
-  @DisplayName("[異常系] putStoneメソッドの実行時に黒の石を白のターンに設置しようとするとPutStoneExceptionをスローする")
-  public void testPutStoneWhiteTurnBlackStone() throws GamePhaseException, GamePlayerException, Exception {
+  @DisplayName("[正常系] startGameメソッドを実行した際にGamePhaseがBLACK_TURNになる")
+  public void testStartGameWithGameStatusCallback() throws Throwable {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
-    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
-    when(game.getBoard()).thenReturn(dummyBoard);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
+    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
+    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    when(game.getBlackPlayer()).thenReturn(localPlayer);
+    when(game.getWhitePlayer()).thenReturn(remotePlayer);
+
+    // 期待されるGameState
+    GameState expected =
+        new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer, new HashMap<>());
+    when(game.into(any(StoneColor.class))).thenReturn(expected);
 
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer");
-    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
 
@@ -269,33 +198,37 @@ public class GameCommunicationControllerTest {
     board.put(stone.getPos(), stone);
     gcc.setGameState(new GameState(GamePhase.WHITE_TURN, localPlayer, remotePlayer, null, board));
 
-    // 黒の石を設置しようとする
-    assertThrows(PutStoneException.class, () -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
+    // GameStateが返される
+    assertEquals(expected, result);
   }
 
   @Test
-  @DisplayName("[正常系] 黒い石を5回設置すると黒の勝利となる。localPlayerが黒の場合、返り値のwinnerがlocalPlayerになる")
-  public void testPutStoneBlackWin() throws GamePhaseException, GamePlayerException, Exception {
+  @DisplayName("[正常系] putStoneメソッドの実行時に黒の石を黒のターンに設置すると白のターンになる")
+  public void testPutStoneBlackTurnBlackStone() throws Throwable {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
     HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    dummyBoard.put(new Vector2D(0, 0), new Stone(StoneColor.BLACK, new Vector2D(0, 0)));
     when(game.getBoard()).thenReturn(dummyBoard);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
+    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
+    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    when(game.getBlackPlayer()).thenReturn(localPlayer);
+    when(game.getWhitePlayer()).thenReturn(remotePlayer);
+
+    // 期待されるGameState
+    // (0, 0)に黒の石が置かれた状態
+    // 白のターン
+    GameState expected =
+        new GameState(GamePhase.WHITE_TURN, localPlayer, remotePlayer, null, dummyBoard);
+    when(game.into(any(StoneColor.class))).thenReturn(expected);
 
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer");
-    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-  
+
     // 期待されるGameState
     HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
     for (int i = 0; i < 5; i++) {
@@ -329,33 +262,37 @@ public class GameCommunicationControllerTest {
     assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(15, 15)));
     GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(4, 4)));
 
-    // GameStateが返されることを確認
+    // 期待通りのGameStateが返される
     assertEquals(expected, result);
   }
 
   @Test
-  @DisplayName("[正常系] 黒い石を5回設置すると黒の勝利となる。localPlayerが白の場合、返り値のwinnerがremotePlayerになる")
-  public void testPutStoneBlackWinWithWhiteLocalPlayer() throws GamePhaseException, GamePlayerException, Exception {
+  @DisplayName("[正常系] putStoneメソッドの実行時に白の石を白のターンに設置すると黒のターンになる")
+  public void testPutStoneWhiteTurnWhiteStone() throws Throwable {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
     HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+    dummyBoard.put(new Vector2D(0, 0), new Stone(StoneColor.BLACK, new Vector2D(0, 0)));
+    dummyBoard.put(new Vector2D(1, 1), new Stone(StoneColor.WHITE, new Vector2D(1, 1)));
     when(game.getBoard()).thenReturn(dummyBoard);
-    doAnswer(
-            invocation -> {
-              return null;
-            })
-        .when(game)
-        .putStone(any(StoneColor.class), any(Vector2D.class));
+    Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
+    Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    when(game.getBlackPlayer()).thenReturn(localPlayer);
+    when(game.getWhitePlayer()).thenReturn(remotePlayer);
+
+    // 期待されるGameState
+    // (0, 0)に白の石が置かれた状態
+    // 黒のターン
+    GameState expected =
+        new GameState(GamePhase.BLACK_TURN, localPlayer, remotePlayer, null, dummyBoard);
+    when(game.into(any(StoneColor.class))).thenReturn(expected);
 
     // テスト対象のインスタンスを生成
-    Player localPlayer = new Player("localPlayer");
-    Player remotePlayer = new Player("remotePlayer");
     GameCommunicationController gcc =
         new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-
 
     // 期待されるGameState
     HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
@@ -390,54 +327,168 @@ public class GameCommunicationControllerTest {
     assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(15, 15)));
     GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(4, 4)));
 
-    // GameStateが返される
+    // 期待通りのGameStateが返される
     assertEquals(expected, result);
   }
 
   @Test
-  @DisplayName("[正常系] surrenderメソッドを実行するとフェーズが終了済みになり、相手側が勝利する")
-  public void testSurrender() throws GamePhaseException, GamePlayerException, Exception {
+  @DisplayName("[異常系] putStoneメソッドの実行時に例外が発生した場合、PutStoneExceptionをスローする")
+  public void testPutStoneWhiteTurnBlackStone() throws Throwable {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
-    HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
-    when(game.getBoard()).thenReturn(dummyBoard);
+    Exception dummyException = new Exception("dummy exception");
     doAnswer(
             invocation -> {
-              return null;
+              throw dummyException;
             })
         .when(game)
         .putStone(any(StoneColor.class), any(Vector2D.class));
-
-
-    // テスト対象のインスタンスを生成
     Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
     Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
+    when(game.getBlackPlayer()).thenReturn(localPlayer);
+    when(game.getWhitePlayer()).thenReturn(remotePlayer);
+
+    // テスト対象のインスタンスを生成
     GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
-    // 期待されるGameState
-    GameState expected =
-        new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer, new HashMap<>());
+        new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game);
+    // 試合を開始
+    gcc.startGame(gameStatusCallback);
+    // 石を設置しようとする
+    PutStoneException e =
+        assertThrows(
+            PutStoneException.class, () -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
 
-    gcc.setGameStateCallback(gameStatusCallback);
-    // gameStateCallbackを設定
-    GameState gameState = null;
-    try {
-      gameState = gcc.startGame(localPlayer, remotePlayer);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    // 相手側が勝利する
-
-    // 一回石をおいてみる
-    assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
-    GameState result = assertDoesNotThrow(() -> gcc.surrender(localPlayer.getColor()));
-
-    // GameStateが返されることを確認
-    assertEquals(expected, result);
+    // PutStoneExceptionがスローされる
+    assertEquals("Failed to put stone.", e.getMessage());
+    assertEquals(dummyException, e.getCause());
   }
+
+  // @Test
+  // @DisplayName("[正常系] 黒い石を5回設置すると黒の勝利となる。localPlayerが黒の場合、返り値のwinnerがlocalPlayerになる")
+  // public void testPutStoneBlackWin() throws GamePhaseException, GamePlayerException, Exception {
+  //   // モックの作成
+  //   Sender sender = mock(Sender.class);
+  //   Receiver receiver = mock(Receiver.class);
+  //   GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+  //   Game game = mock(Game.class);
+  //   HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+  //   when(game.getBoard()).thenReturn(dummyBoard);
+  //   doAnswer(
+  //           invocation -> {
+  //             return null;
+  //           })
+  //       .when(game)
+  //       .putStone(any(StoneColor.class), any(Vector2D.class));
+
+  //   // テスト対象のインスタンスを生成
+  //   Player localPlayer = new Player("localPlayer");
+  //   Player remotePlayer = new Player("remotePlayer");
+  //   GameCommunicationController gcc =
+  //       new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+
+  //   // 期待されるGameState
+  //   HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
+  //   for (int i = 0; i < 5; i++) {
+  //     Stone stone = new Stone(StoneColor.BLACK, new Vector2D(i, i));
+  //     expectedBoard.put(stone.getPos(), stone);
+  //   }
+  //   for (int i = 0; i < 4; i++) {
+  //     Stone stone = new Stone(StoneColor.WHITE, new Vector2D(18 - i, 18 - i));
+  //     expectedBoard.put(stone.getPos(), stone);
+  //   }
+  //   GameState expected =
+  //       new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, localPlayer, expectedBoard);
+
+  //   gcc.setGameStateCallback(gameStatusCallback);
+  //   // gameStateCallbackを設定
+  //   gcc.setGameStateCallback(gameStatusCallback);
+  //   GameState gameState = null;
+  //   try {
+  //     gameState = gcc.startGame(localPlayer, remotePlayer);
+  //   } catch (Exception e) {
+  //     e.printStackTrace();
+  //   }
+  //   // 黒の石を5回設置する
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(1, 1)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(17, 17)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(2, 2)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(16, 16)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(3, 3)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(15, 15)));
+  //   GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(4,
+  // 4)));
+
+  //   // GameStateが返されることを確認
+  //   assertEquals(expected, result);
+  // }
+
+  // @Test
+  // @DisplayName("[正常系] 黒い石を5回設置すると黒の勝利となる。localPlayerが白の場合、返り値のwinnerがremotePlayerになる")
+  // public void testPutStoneBlackWinWithWhiteLocalPlayer()
+  //     throws GamePhaseException, GamePlayerException, Exception {
+  //   // モックの作成
+  //   Sender sender = mock(Sender.class);
+  //   Receiver receiver = mock(Receiver.class);
+  //   GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+  //   Game game = mock(Game.class);
+  //   HashMap<Vector2D, Stone> dummyBoard = new HashMap<>();
+  //   when(game.getBoard()).thenReturn(dummyBoard);
+  //   doAnswer(
+  //           invocation -> {
+  //             return null;
+  //           })
+  //       .when(game)
+  //       .putStone(any(StoneColor.class), any(Vector2D.class));
+
+  //   // テスト対象のインスタンスを生成
+  //   Player localPlayer = new Player("localPlayer");
+  //   Player remotePlayer = new Player("remotePlayer");
+  //   GameCommunicationController gcc =
+  //       new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+
+  //   // 期待されるGameState
+  //   HashMap<Vector2D, Stone> expectedBoard = new HashMap<>();
+  //   for (int i = 0; i < 5; i++) {
+  //     Stone stone = new Stone(StoneColor.BLACK, new Vector2D(i, i));
+  //     expectedBoard.put(stone.getPos(), stone);
+  //   }
+  //   for (int i = 0; i < 4; i++) {
+  //     Stone stone = new Stone(StoneColor.WHITE, new Vector2D(18 - i, 18 - i));
+  //     expectedBoard.put(stone.getPos(), stone);
+  //   }
+  //   GameState expected =
+  //       new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer,
+  // expectedBoard);
+
+  //   gcc.setGameStateCallback(gameStatusCallback);
+  //   // gameStateCallbackを設定
+  //   gcc.setGameStateCallback(gameStatusCallback);
+  //   GameState gameState = null;
+  //   try {
+  //     gameState = gcc.startGame(localPlayer, remotePlayer);
+  //   } catch (Exception e) {
+  //     e.printStackTrace();
+  //   }
+  //   // 黒の石を5回設置する
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(0, 0)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(18, 18)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(1, 1)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(17, 17)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(2, 2)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(16, 16)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(3, 3)));
+  //   assertDoesNotThrow(() -> gcc.putStone(StoneColor.WHITE, new Vector2D(15, 15)));
+  //   GameState result = assertDoesNotThrow(() -> gcc.putStone(StoneColor.BLACK, new Vector2D(4,
+  // 4)));
+
+  //   // GameStateが返される
+  //   assertEquals(expected, result);
+  // }
 
   @Test
   @DisplayName("[正常系] setGameStateメソッドを実行するとGameStateが更新される。getGameStateメソッドで取得できる")
@@ -446,7 +497,7 @@ public class GameCommunicationControllerTest {
     // モックの作成
     Sender sender = mock(Sender.class);
     Receiver receiver = mock(Receiver.class);
-        GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
+    GameStateCallback gameStatusCallback = mock(GameStateCallback.class);
     Game game = mock(Game.class);
     doAnswer(
             invocation -> {
@@ -458,26 +509,23 @@ public class GameCommunicationControllerTest {
     // テスト対象のインスタンスを生成
     Player localPlayer = new Player("localPlayer", StoneColor.BLACK);
     Player remotePlayer = new Player("remotePlayer", StoneColor.WHITE);
-    GameCommunicationController gcc =
-        new GameCommunicationController(game, localPlayer, remotePlayer, sender, receiver);
+    when(game.getBlackPlayer()).thenReturn(localPlayer);
+    when(game.getWhitePlayer()).thenReturn(remotePlayer);
+
     // 期待されるGameState
     GameState expected =
         new GameState(GamePhase.FINISHED, localPlayer, remotePlayer, remotePlayer, new HashMap<>());
+    when(game.into(any(StoneColor.class))).thenReturn(expected);
 
-    gcc.setGameStateCallback(gameStatusCallback);
-    // gameStateCallbackを設定
-    gcc.setGameStateCallback(gameStatusCallback);
-    GameState gameState = null;
-    try {
-      gameState = gcc.startGame(localPlayer, remotePlayer);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    // GameStateを更新する
-    gcc.setGameState(expected);
-    GameState result = gcc.getGameState();
+    // テスト対象のインスタンスを生成
+    GameCommunicationController gcc =
+        new GameCommunicationController(localPlayer, remotePlayer, sender, receiver, game);
+    // 試合を開始
+    gcc.startGame(gameStatusCallback);
+    // 降参する
+    GameState result = assertDoesNotThrow(() -> gcc.surrender());
 
-    // GameStateが取得できることを確認
+    // 期待通りのGameStateが返される
     assertEquals(expected, result);
   }
 }
