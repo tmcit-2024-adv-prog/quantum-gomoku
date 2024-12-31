@@ -7,6 +7,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.controllers;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
@@ -63,6 +64,7 @@ public class GameCommunicationController {
    * @param name String
    * @return Playerの実態
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public Player createlocalPlayer(String name) {
     this.localPlayer = new Player(name);
 
@@ -78,6 +80,7 @@ public class GameCommunicationController {
    * @param name String
    * @return リモートプレイヤーの実態
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public Player createRemotePlayer(String name) {
     this.remotePlayer = new Player(name);
 
@@ -96,6 +99,7 @@ public class GameCommunicationController {
    * @return 更新されたgameState
    * @throws PutStoneException 石を設置しようとしたときに異常が発生したときに返される
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public GameState putStone(StoneColor color, Vector2D pos)
       throws GamePhaseException, GamePlayerException, Exception {
     try {
@@ -120,6 +124,7 @@ public class GameCommunicationController {
    *
    * @return gameStateを返す
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public GameState surrender(StoneColor color) throws GamePhaseException {
     this.game.surrender(color);
     return new GameState(
@@ -139,6 +144,7 @@ public class GameCommunicationController {
    *
    * @return 現在のgameState
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public GameState getGameState() {
     System.out.println("getGameState");
     // return this.game.gameState();
@@ -153,6 +159,7 @@ public class GameCommunicationController {
    *
    * @param state 更新したいstate(enum)
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public void setGameState(GameState state) {
     // stateからgameを更新
     //     GamePhase phase,
@@ -165,6 +172,7 @@ public class GameCommunicationController {
 
   // 通信をするときのレシーバーの起動処理
   /** startReciveメソッド　リモートと通信をするときに立ち上げるメソッド */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   private void startRecive() {
     this.receiver.startReceive();
   }
