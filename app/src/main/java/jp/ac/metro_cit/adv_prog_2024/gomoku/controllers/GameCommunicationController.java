@@ -23,11 +23,11 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.services.Game;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.services.GameFactory;
 
 public class GameCommunicationController implements IGameCommunicationController {
-  private Game game;
-  private Player localPlayer;
-  private Player remotePlayer;
-  private Receiver receiver;
-  private Sender sender;
+  public final Player localPlayer;
+  public final Player remotePlayer;
+  private final Game game;
+  private final Receiver receiver;
+  private final Sender sender;
   private GameStateCallback gameStatusCallback;
 
   /**
@@ -164,8 +164,7 @@ public class GameCommunicationController implements IGameCommunicationController
    *
    * @return gameStateを返す
    * @throws GamePhaseException
-   * @throws IOException 通信エラーが発生したときに返される >>>>>>> a7a5b90 (perf: :zap:
-   *     GameCommunicationControllerの実装修正)
+   * @throws IOException 通信エラーが発生したときに返される
    */
   @Override
   public GameState surrender() throws GamePhaseException, IOException {
@@ -193,7 +192,6 @@ public class GameCommunicationController implements IGameCommunicationController
    *
    * @param state 更新したいstate
    */
-  // @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   private void setGameState(GameState state) throws IllegalArgumentException {
     this.game.from(state);
     this.gameStatusCallback.onGameStateChanged(state);
