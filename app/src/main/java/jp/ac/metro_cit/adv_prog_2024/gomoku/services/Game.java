@@ -8,6 +8,7 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.BoardFactory;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
@@ -126,35 +127,6 @@ public class Game {
   }
 
   /**
-   * 　リモートプレイヤーを返す
-   *
-   * @return リモートプレイヤー
-   */
-  @SuppressFBWarnings(value = {"EI_EXPOSE_REP"})
-  public Player getRemotePlayer() {
-    // 鬼のお手軽実装
-    if (currentPlayer == blackPlayer) {
-      return whitePlayer;
-    } else {
-      return blackPlayer;
-    }
-  }
-
-  /**
-   * 　リモートプレイヤーを返す
-   *
-   * @return リモートプレイヤー
-   */
-  public Player getRemotePlayer() {
-    // 鬼のお手軽実装
-    if (currentPlayer == blackPlayer) {
-      return whitePlayer;
-    } else {
-      return blackPlayer;
-    }
-  }
-
-  /**
    * 碁盤に石を設置する.
    *
    * @param color 石の色
@@ -228,9 +200,7 @@ public class Game {
    * @param state GameState
    * @throws IllegalArgumentException GameStateに含まれるプレイヤーが異なる場合にスローされる
    */
-  public void from(GameState state) throws IllegalArgumentException {
-    this.phase = state.phase();
-    this.winnerPlayer = state.winner();
+  public void from(GameState state) throws IllegalStateException {
     Player blackPlayer;
     Player whitePlayer;
     if (state.localPlayer().getColor() == StoneColor.BLACK) {
@@ -241,14 +211,16 @@ public class Game {
       whitePlayer = state.localPlayer();
     }
     if (!this.blackPlayer.equals(blackPlayer) || !this.whitePlayer.equals(whitePlayer)) {
-      throw new IllegalArgumentException("Players are different.");
+      throw new IllegalStateException("Players are not matched.");
     }
+    this.phase = state.phase();
+    this.winnerPlayer = state.winner();
     for (Vector2D pos : state.board().keySet()) {
       Stone stone = state.board().get(pos);
       try {
         this.board.putStone(pos, stone);
       } catch (Exception e) {
-        // TODO: Boardが実装されたら適切に例外処理を行う{
+        // TODO: Boardが実装されたら適切に例外処理を行う
         e.printStackTrace();
       }
     }

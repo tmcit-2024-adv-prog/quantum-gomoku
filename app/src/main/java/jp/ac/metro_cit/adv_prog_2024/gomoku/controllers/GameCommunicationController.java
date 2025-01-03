@@ -15,9 +15,10 @@ import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.IGameCommunicationController;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GameState;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.services.Game;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.services.GameFactory;
 
@@ -67,50 +68,6 @@ public class GameCommunicationController implements IGameCommunicationController
     this.game = GameFactory.create(blackPlayer, whitePlayer);
   }
 
-  // コンストラクタ
-
-  /**
-   * GameCommunicationControllerコンストラクタ
-   *
-   * @param sender Sender
-   * @param receiver Receiver
-   */
-  public GameCommunicationController(
-      Game game, Player localPlayer, Player remotePlayer, Sender sender, Receiver receiver) {
-
-    this.localPlayer = localPlayer;
-    this.remotePlayer = remotePlayer;
-    this.receiver = receiver;
-    this.sender = sender;
-    this.game = game;
-    this.gameState =
-        new GameState(GamePhase.BEFORE_START, localPlayer, remotePlayer, null, game.getBoard());
-
-    // this.setGameStateCallback();
-  }
-
-  // コンストラクタ
-
-  /**
-   * GameCommunicationControllerコンストラクタ
-   *
-   * @param sender Sender
-   * @param receiver Receiver
-   */
-  public GameCommunicationController(
-      Game game, Player localPlayer, Player remotePlayer, Sender sender, Receiver receiver) {
-
-    this.localPlayer = localPlayer;
-    this.remotePlayer = remotePlayer;
-    this.receiver = receiver;
-    this.sender = sender;
-    this.game = game;
-    this.gameState =
-        new GameState(GamePhase.BEFORE_START, localPlayer, remotePlayer, null, game.getBoard());
-
-    // this.setGameStateCallback();
-  }
-
   /**
    * GameCommunicationControllerコンストラクタ
    *
@@ -154,7 +111,7 @@ public class GameCommunicationController implements IGameCommunicationController
   @Override
   public GameState startGame(GameStateCallback callback) throws GamePhaseException {
     this.gameStatusCallback = callback;
-    this.game.startGame(localPlayer, remotePlayer);
+    this.game.startGame();
 
     // 相手からの通信を待ち受けて、受信したらgameStateを更新
     // TODO: 適切にスレッドを解放する
@@ -205,7 +162,7 @@ public class GameCommunicationController implements IGameCommunicationController
    * GameStateメソッド これを実行した側が投了又は切断を行った際に実行される関数<br>
    * 相手に勝ちを通知するはず
    *
-   * @return gameStateを返す <<<<<<< HEAD =======
+   * @return gameStateを返す
    * @throws GamePhaseException
    * @throws IOException 通信エラーが発生したときに返される >>>>>>> a7a5b90 (perf: :zap:
    *     GameCommunicationControllerの実装修正)
@@ -234,63 +191,11 @@ public class GameCommunicationController implements IGameCommunicationController
   /**
    * setGameStateメソッド　gameStateを更新する成功すると特に何も返されない
    *
-   * @param state 更新したいstate(enum)
+   * @param state 更新したいstate
    */
-  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
-  public void setGameState(GameState state) {
-    // stateからgameを更新
-    //     GamePhase phase,
-    // Player blackPlayer,
-    // Player whitePlayer,
-    // @Nullable Player winner,
-    // HashMap<Vector2D, Stone> board)
-
-  }
-
-  // 通信をするときのレシーバーの起動処理
-  /** startReciveメソッド　リモートと通信をするときに立ち上げるメソッド */
-  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
-  private void startRecive() {
-    this.receiver.startReceive();
-  }
-
-  // private Color decideColor() {
-  //   return this.localPlayer.setColoer(Color.BLACK);
-  // }
-
-  /**
-   * startGameメソッド　ゲームを開始する
-   *
-   * @param locPlayer これを操作しているプレイヤー
-   * @param remPlayer　相手のプレイヤー
-   */
-  public GameState startGame(Player locPlayer, Player remPlayer)
-      throws GamePhaseException, GamePlayerException, Exception {
-    if (this.gameStatusCallback == null) {
-      throw new IllegalStateException("gameStatusCallback is not set");
-    }
-    this.game = new Game(locPlayer, remPlayer, null);
-    try {
-      this.game = this.game.startGame(localPlayer, remotePlayer);
-      return this.game.into(localPlayer.getColor());
-    } catch (GamePhaseException e) {
-      throw e;
-    }
-  }
-
-  // public GameState into(StoneColor localPlayerColor) {
-  //   if (localPlayerColor == StoneColor.BLACK) {
-  //     return new GameState(
-  //         this.phase, this.blackPlayer, this.whitePlayer, this.winnerPlayer,
-  // this.board.getBoard());
-  //   } else {
-  //     return new GameState(
-  //         this.phase, this.whitePlayer, this.blackPlayer, this.winnerPlayer,
-  // this.board.getBoard());
-  //   }
-  // }
-
-  public void setGameStateCallback(GameStateCallback callback) {
-    this.gameStatusCallback = callback;
+  // @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
+  private void setGameState(GameState state) throws IllegalArgumentException {
+    this.game.from(state);
+    this.gameStatusCallback.onGameStateChanged(state);
   }
 }
