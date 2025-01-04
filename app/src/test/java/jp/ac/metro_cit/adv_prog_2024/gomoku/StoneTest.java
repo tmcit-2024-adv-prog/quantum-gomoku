@@ -21,8 +21,8 @@ public class StoneTest {
     Stone teststone = new Stone(testcolor, testposition);
 
     // 初期状態でcolorとpositionが正しく設定されているか確認
-    assertEquals(color, stone.getColor(), "teststoneの色が正しく設定されていません");
-    assertEquals(position, stone.getPosition(), "teststoneの位置が正しく設定されていません");
+    assertEquals(testcolor, stone.getColor(), "teststoneの色が正しく設定されていません");
+    assertEquals(testposition, stone.getPosition(), "teststoneの位置が正しく設定されていません");
   }
 
   @Test
