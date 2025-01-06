@@ -14,4 +14,5 @@ runs:
       uses: gradle/actions/setup-gradle@v4
 
     - name: Build
+      shell: bash
       run: ./gradlew build
