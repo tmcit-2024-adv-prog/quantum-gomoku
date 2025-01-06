@@ -93,6 +93,7 @@ public class MatchingController {
                 // メッセージの種類に応じて処理を分岐
                 MatchingMessage sendMsg;
                 Serializable receivedData = receivedMatchingMsg.data();
+                System.out.println(receivedMatchingMsg);
                 switch (receivedMatchingMsg.type()) {
                   case DISCOVER:
                     // Discoverメッセージを受信した場合はOfferメッセージを返す
@@ -118,6 +119,7 @@ public class MatchingController {
                         && receivedData instanceof Player
                         && !receivedData.equals(localPlayer)) {
                       Player receivedPlayer = (Player) receivedData;
+                      System.out.println(receivedPlayer);
                       if (receivedPlayer.getColor() == null) {
                         continue;
                       }

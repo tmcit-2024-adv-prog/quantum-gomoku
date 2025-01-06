@@ -1,4 +1,5 @@
 plugins {
+    base
     application
     id("com.diffplug.spotless") version "7.0.0.BETA2"
     id("com.github.spotbugs") version "6.0.24"
@@ -17,6 +18,8 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.mockito:mockito-core:5.14.2")
 }
+
+base.archivesName.set(rootProject.name)
 
 val configFileDir = layout.buildDirectory.dir("generated/config")
 val configFileName = "BuildConfig.java"
@@ -127,3 +130,4 @@ tasks {
         dependsOn("generateBuildConfig")
     }
 }
+ 

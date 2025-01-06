@@ -185,8 +185,8 @@ public class TransportSocket implements Sender, Receiver {
                             .equals(InetAddress.getLocalHost().getHostAddress())) {
                       continue;
                     }
-                    messages.add(message);
                     messageCache.put(message, new TransportTarget(packet.getAddress(), replyPort));
+                    messages.add(message);
                   } else if (next instanceof GameMessage nextGameMessage) {
                     messages.add(nextGameMessage);
                   }
