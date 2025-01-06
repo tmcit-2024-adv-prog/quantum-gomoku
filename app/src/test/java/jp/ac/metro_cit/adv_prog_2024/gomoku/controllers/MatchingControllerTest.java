@@ -387,7 +387,6 @@ public class MatchingControllerTest {
     // モックの作成
     Sender mockSender = mock(Sender.class);
     Receiver mockReceiver = mock(Receiver.class);
-    Player dummyLocalPlayer = new Player("local");
     Player dummyRemotePlayer = new Player("remote", StoneColor.BLACK);
     // Requestメッセージに自分自身が含まれているとき
     when(mockReceiver.receive())
