@@ -4,7 +4,7 @@ public enum StoneColor {
   BLACK,
   WHITE;
 
-  public StoneColor oppsite() {
+  public StoneColor opposite() {
     return this == BLACK ? WHITE : BLACK;
   }
 }

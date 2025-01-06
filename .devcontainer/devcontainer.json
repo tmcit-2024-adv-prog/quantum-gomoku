@@ -11,7 +11,8 @@
         "github.vscode-github-actions",
         "editorconfig.editorconfig",
         "yzhang.markdown-all-in-one",
-        "vivaxy.vscode-conventional-commits"
+        "vivaxy.vscode-conventional-commits",
+        "MS-SarifVSCode.sarif-viewer"
       ]
     }
   }
