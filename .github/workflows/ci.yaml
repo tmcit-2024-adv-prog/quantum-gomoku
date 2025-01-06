@@ -15,7 +15,7 @@ on:
       - release/*
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref_name }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -23,9 +23,25 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.get_commit_sha.outputs.result }}
+      is_skip: ${{ steps.get_pull_requests.outputs.skip }}
     steps:
+      - name: get pull requests for pushed branch
+        if: ${{ github.event_name == 'push' }}
+        id: get_pull_requests
+        run: |
+          prs=$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --head ${{ github.ref_name }} \
+            --base "main" \
+            --json title \
+            --jq length)
+          if ((prs > 0)); then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Get commit sha
         uses: actions/github-script@v6
+        if: ${{ steps.get_pull_requests.outputs.skip != 'true' }}
         id: get_commit_sha
         with:
           result-encoding: string
@@ -42,10 +58,12 @@ jobs:
           
       - name: Checkout
         uses: actions/checkout@v4
+        if: ${{ steps.get_pull_requests.outputs.skip != 'true' }}
         with:
           ref: ${{ steps.get_commit_sha.outputs.result }}
 
       - name: Build
+        if: ${{ steps.get_pull_requests.outputs.skip != 'true' }}
         uses: ./.github/actions/build
 
   lint_spotless:
@@ -57,6 +75,7 @@ jobs:
       pull-requests: write
     needs: 
       - build_check
+    if: ${{ needs.build_check.outputs.is_skip != 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -80,6 +99,7 @@ jobs:
       pull-requests: write
     needs: 
       - build_check
+    if: ${{ needs.build_check.outputs.is_skip != 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
