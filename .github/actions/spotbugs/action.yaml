@@ -23,7 +23,7 @@ runs:
     - name: Run reviewdog (pr)
       if: github.event_name == 'pull_request_target'
       env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
       run: |
         cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -tee
@@ -32,7 +32,7 @@ runs:
     - name: Run reviewdog (push)
       if: github.event_name == 'push'
       env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
       run: |
         cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-check -name run-reviewdog -tee

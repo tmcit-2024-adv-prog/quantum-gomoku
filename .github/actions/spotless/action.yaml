@@ -21,6 +21,6 @@ runs:
       uses: reviewdog/action-suggester@v1
       if: github.event_name == 'pull_request_target'
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ github.token }}
         tool_name: spotless
         fail_on_error: true
