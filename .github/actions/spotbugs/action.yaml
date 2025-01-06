@@ -14,7 +14,7 @@ runs:
 
     - name: spotbugs
       shell: bash
-      run: ./gradlew spotbugsMain spotbugsTest spotbugsDev spotbugsTestDev
+      run: ./gradlew spotbugsMain spotbugsTest
       continue-on-error: true
 
     - name: Set up reviewdog

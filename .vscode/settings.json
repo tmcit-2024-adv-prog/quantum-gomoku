@@ -23,8 +23,4 @@
   "conventionalCommits.promptScopes": false,
   "conventionalCommits.promptFooter": false,
   "conventionalCommits.promptBody": false,
-  "java.project.sourcePaths": [
-    "src/main/java",
-    "src/dev/java"
-  ],
 }
