@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 public class MatchingControllerTest {
 
   @Test
-  @DisplayName("[正常系] 能動的にマッチングを開始した場合にマッチングが成功する")
+  @DisplayName("[正常系] 能動的にマッチングを開始した場合にマッチングが成功する 相手の色が黒の場合、自身の色は白になる")
   public void testSuccessActiveMatching() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -52,7 +52,34 @@ public class MatchingControllerTest {
     assertEquals(remotePlayer, dummyRemotePlayer);
     // 自分自身が返ってくる
     assertEquals(localPlayer.getName(), "local");
-    assertEquals(localPlayer.getColor(), dummyRemotePlayer.getColor().opposite());
+    assertEquals(localPlayer.getColor(), StoneColor.WHITE);
+  }
+
+  @Test
+  @DisplayName("[正常系] 能動的にマッチングを開始した場合にマッチングが成功する 相手の色が白の場合、自身の色は黒になる")
+  public void testSuccessActiveMatchingWithWhiteRemote() throws Throwable {
+    // モックの作成
+    Sender mockSender = mock(Sender.class);
+    Receiver mockReceiver = mock(Receiver.class);
+    Player dummyRemotePlayer = new Player("remote", StoneColor.WHITE);
+    // 相手からはOfferメッセージとAckメッセージが送信されるとき
+    when(mockReceiver.receive())
+        .thenReturn(
+            new GameMessage(new MatchingMessage(MatchingMessageType.OFFER, dummyRemotePlayer)),
+            new GameMessage(new MatchingMessage(MatchingMessageType.ACK)));
+    MatchingController matchingController =
+        new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0).build();
+
+    // マッチングを開始すると
+    Pair<Player, Player> result = matchingController.match("local");
+    Player localPlayer = result.left();
+    Player remotePlayer = result.right();
+
+    // 相手のプレイヤーが返ってくる
+    assertEquals(remotePlayer, dummyRemotePlayer);
+    // 自分自身が返ってくる
+    assertEquals(localPlayer.getName(), "local");
+    assertEquals(localPlayer.getColor(), StoneColor.BLACK);
   }
 
   @Test
@@ -193,7 +220,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Receiverからのメッセージの取得時にMatchingMessage以外のメッセージが受信された場合は無視される")
+  @DisplayName("[正常系] Receiverからのメッセージの取得時にMatchingMessage以外のメッセージが受信された場合は無視される")
   public void testIgnoreNonMatchingMessage() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -223,7 +250,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Discoverメッセージに整数が含まれていない場合は無視される")
+  @DisplayName("[正常系] Discoverメッセージに整数が含まれていない場合は無視される")
   public void testIgnoreDiscoverMessageWithoutInteger() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -255,7 +282,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Offerメッセージに相手プレイヤーが含まれていない場合は無視される")
+  @DisplayName("[正常系] Offerメッセージに相手プレイヤーが含まれていない場合は無視される")
   public void testIgnoreOfferMessageWithoutPlayer() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -287,7 +314,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Offerメッセージに自分自身が含まれている場合は無視される")
+  @DisplayName("[正常系] Offerメッセージに自分自身が含まれている場合は無視される")
   public void testIgnoreOfferMessageWithLocalPlayer() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -318,7 +345,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Offerメッセージの相手プレイヤーの色がnullの場合は無視される")
+  @DisplayName("[正常系] Offerメッセージの相手プレイヤーの色がnullの場合は無視される")
   public void testIgnoreOfferMessageWithNullColor() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -349,7 +376,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Requestメッセージに相手プレイヤーが含まれていない場合は無視される")
+  @DisplayName("[正常系] Requestメッセージに相手プレイヤーが含まれていない場合は無視される")
   public void testIgnoreRequestMessageWithoutPlayer() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -382,7 +409,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Requestメッセージに自分自身が含まれている場合は無視される")
+  @DisplayName("[正常系] Requestメッセージに自分自身が含まれている場合は無視される")
   public void testIgnoreRequestMessageWithLocalPlayer() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -415,7 +442,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Requestメッセージの相手プレイヤーの色がnullの場合は無視される")
+  @DisplayName("[正常系] Requestメッセージの相手プレイヤーの色がnullの場合は無視される")
   public void testIgnoreRequestMessageWithNullColor() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
@@ -447,7 +474,7 @@ public class MatchingControllerTest {
   }
 
   @Test
-  @DisplayName("[異常系] Requestメッセージの相手プレイヤーの色が自身の色と同じ場合は無視される")
+  @DisplayName("[正常系] Requestメッセージの相手プレイヤーの色が自身の色と同じ場合は無視される")
   public void testIgnoreRequestMessageWithSameColor() throws Throwable {
     // モックの作成
     Sender mockSender = mock(Sender.class);
