@@ -132,7 +132,7 @@ public class GameCommunicationControllerMock implements IGameCommunicationContro
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
-              GameState state = this.putStoneInner(color.oppsite(), v);
+              GameState state = this.putStoneInner(color.opposite(), v);
               this.gameStatusCallback.onGameStateChanged(state);
             })
         .start();
