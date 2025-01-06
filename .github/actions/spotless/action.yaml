@@ -1,0 +1,26 @@
+name: spotless
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: spotless apply
+      if: github.event_name == 'pull_request_target'
+      shell: bash
+      run: ./gradlew spotlessApply
+      continue-on-error: true
+
+    - name: spotless check
+      if: github.event_name == 'push'
+      shell: bash
+      run: ./gradlew spotlessCheck
+
+    - name: Suggest changes
+      uses: reviewdog/action-suggester@v1
+      if: github.event_name == 'pull_request_target'
+      with:
+        github_token: ${{ github.token }}
+        tool_name: spotless
+        fail_on_error: true

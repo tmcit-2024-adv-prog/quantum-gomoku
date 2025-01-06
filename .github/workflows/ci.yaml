@@ -1,0 +1,106 @@
+name: ci
+
+on:
+  push:
+    branches-ignore: 
+      - main
+      - release/*
+  pull_request_target: 
+    types: 
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+      - release/*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build_check:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.get_commit_sha.outputs.result }}
+    steps:
+      - name: Get commit sha
+        uses: actions/github-script@v6
+        id: get_commit_sha
+        with:
+          result-encoding: string
+          script: |
+            if (github.event_name === 'pull_request_target') {
+              const { data: pullRequest } = await github.rest.pulls.get({
+                ...context.repo,
+                pull_number: context.payload.pull_request.number,
+              });
+              return pullRequest.merge_commit_sha;
+            } else {
+              return context.sha;
+            }
+          
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.get_commit_sha.outputs.result }}
+
+      - name: Build
+        uses: ./.github/actions/build
+
+  lint_spotless:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      issues: write
+      pull-requests: write
+    needs: 
+      - build_check
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build_check.outputs.commit_sha}}
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "corretto"
+
+      - name: Run spotless
+        uses: ./.github/actions/spotless
+          
+  lint_spotbugs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      issues: write
+      pull-requests: write
+    needs: 
+      - build_check
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build_check.outputs.commit_sha}}
+
+      - name: Run spotbugs
+        uses: ./.github/actions/spotbugs
+
+  test:
+    runs-on: arc-runner-set
+    permissions: 
+      checks: write
+      contents: read
+      pull-requests: write
+    needs: 
+      - build_check
+    if: ${{ github.event_name == 'pull_request_target' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build_check.outputs.commit_sha}}
+
+      - name: Run tests
+        uses: ./.github/actions/test
