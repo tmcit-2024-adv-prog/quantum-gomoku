@@ -38,6 +38,8 @@ jobs:
           if ((prs > 0)); then
               echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Get commit sha
         uses: actions/github-script@v6
