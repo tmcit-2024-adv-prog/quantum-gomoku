@@ -111,6 +111,7 @@ tasks {
     test {
         useJUnitPlatform()
         finalizedBy(jacocoTestReport)
+        jvmArgs = listOf("-Xmx8G")
     }
     jacocoTestReport {
         dependsOn(test)
