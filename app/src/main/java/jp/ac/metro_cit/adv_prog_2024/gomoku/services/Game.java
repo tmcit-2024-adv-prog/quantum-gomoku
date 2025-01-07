@@ -1,5 +1,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
+import java.util.HashMap;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
@@ -130,7 +132,7 @@ public class Game {
     try {
       board.putStone(pos, new Stone(color, pos));
     } catch (Exception e) {
-      throw new Exception("The Stone cannot puttted.");
+      throw new Exception("The Stone cannot placed.");
     }
 
     if (board.checkWinner(pos)) {
@@ -138,5 +140,14 @@ public class Game {
     } else {
       nextPhase();
     }
+  }
+
+  /**
+   * 盤を取得.
+   *
+   * @return 盤
+   */
+  public HashMap<Vector2D, Stone> getBoard() {
+    return board.getBoard();
   }
 }

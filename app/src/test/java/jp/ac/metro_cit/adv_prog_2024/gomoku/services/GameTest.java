@@ -1,10 +1,13 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.services;
 
+import java.util.HashMap;
+
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePlayerException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Board;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Stone;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.StoneColor;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Vector2D;
 import org.junit.jupiter.api.DisplayName;
@@ -88,6 +91,23 @@ public class GameTest {
     game.putStone(StoneColor.WHITE, new Vector2D(4, 0));
     game.putStone(StoneColor.BLACK, new Vector2D(5, 1));
     assertTrue(game.getPhase() == GamePhase.FINISHED, "Game phase is FINISHED"); // ゲームは終了している
+  }
+
+  @Test
+  @DisplayName("[正常系]盤の情報を正しく取得できる")
+  void getBoard() throws GamePhaseException, GamePlayerException, Exception {
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
+    HashMap<Vector2D, Stone> board;
+    Vector2D vec = new Vector2D(1, 1);
+
+    // ゲームを開始
+    game.startGame();
+    board = game.getBoard();
+    assertTrue(board.containsValue(vec) == false, "Stone is not found"); // 盤の情報を取得
+    game.putStone(StoneColor.BLACK, vec);
+    board = game.getBoard();
+    assertTrue(board.get(vec).getColor() == StoneColor.BLACK, "Stone is found"); // 盤の情報を取得
   }
 
   @Test
