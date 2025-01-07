@@ -14,6 +14,7 @@ runs:
 
     - name: spotbugs
       shell: bash
+      id: spotbugs
       run: ./gradlew spotbugsMain spotbugsTest
       continue-on-error: true
 
@@ -26,8 +27,8 @@ runs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
       run: |
-        cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -tee
-        cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -tee
+        cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -filter-mode nofilter
+        cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -filter-mode nofilter
 
     - name: Run reviewdog (push)
       if: github.event_name == 'push'
@@ -35,5 +36,12 @@ runs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
       run: |
-        cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-check -name run-reviewdog -tee
-        cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-check -name run-reviewdog -tee
+        cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-check -name run-reviewdog -filter-mode nofilter
+        cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-check -name run-reviewdog -filter-mode nofilter
+
+    - name: exit
+      shell: bash
+      if: steps.spotbugs.outcome == 'failure'
+      run: |
+        echo "::error::Spotbugs found issues"
+        exit 1
