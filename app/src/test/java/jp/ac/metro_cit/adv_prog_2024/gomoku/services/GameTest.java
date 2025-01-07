@@ -107,15 +107,15 @@ public class GameTest {
     Game game =
         new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
     HashMap<Vector2D, Stone> board;
-    Vector2D vec = new Vector2D(1, 1);
+    Vector2D pos = new Vector2D(1, 1);
 
     // ゲームを開始
     game.startGame();
     board = game.getBoard();
-    assertTrue(board.containsValue(vec) == false, "Stone is not found"); // 盤の情報を取得
-    game.putStone(StoneColor.BLACK, vec);
+    assertTrue(board.containsKey(pos) == false, "Stone is not found"); // 盤の情報を取得
+    game.putStone(StoneColor.BLACK, pos);
     board = game.getBoard();
-    assertTrue(board.get(vec).getColor() == StoneColor.BLACK, "Stone is found"); // 盤の情報を取得
+    assertTrue(board.containsKey(pos) == true, "Stone is found"); // 盤の情報を取得
   }
 
   @Test

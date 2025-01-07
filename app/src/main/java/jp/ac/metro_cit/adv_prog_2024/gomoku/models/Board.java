@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 public class Board {
   HashMap<Vector2D, Stone> board;
+  Vector2D size;
 
   public Board(Vector2D size) {
+    this.size = size;
     this.board = new HashMap<>();
   }
 
@@ -34,6 +36,6 @@ public class Board {
   }
 
   public HashMap<Vector2D, Stone> getBoard() {
-    return new HashMap<Vector2D, Stone>();
+    return board;
   }
 }
