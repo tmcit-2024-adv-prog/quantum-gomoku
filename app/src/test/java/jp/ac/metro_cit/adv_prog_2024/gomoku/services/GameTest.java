@@ -102,6 +102,23 @@ public class GameTest {
   }
 
   @Test
+  @DisplayName("[正常系]盤の情報を正しく取得できる")
+  void getBoard() throws GamePhaseException, GamePlayerException, Exception {
+    Game game =
+        new Game(new Player("player1"), new Player("player2"), new Board(new Vector2D(10, 10)));
+    HashMap<Vector2D, Stone> board;
+    Vector2D vec = new Vector2D(1, 1);
+
+    // ゲームを開始
+    game.startGame();
+    board = game.getBoard();
+    assertTrue(board.containsValue(vec) == false, "Stone is not found"); // 盤の情報を取得
+    game.putStone(StoneColor.BLACK, vec);
+    board = game.getBoard();
+    assertTrue(board.get(vec).getColor() == StoneColor.BLACK, "Stone is found"); // 盤の情報を取得
+  }
+
+  @Test
   @DisplayName("[正常系]ゲームが終了した後、勝者を取得すると、勝者が取得できる")
   void getWinner() throws GamePhaseException {
     Game game =
