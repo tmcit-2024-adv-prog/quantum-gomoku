@@ -111,7 +111,8 @@ tasks {
     test {
         useJUnitPlatform()
         finalizedBy(jacocoTestReport)
-        jvmArgs = listOf("-Xmx8G")
+        maxHeapSize = "10240m"
+        jvmArgs = listOf("-Xmx8G", "-XX:MaxPermSize=10240m")
     }
     jacocoTestReport {
         dependsOn(test)
