@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Sender;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.BroadcastWrapper;
@@ -75,6 +76,7 @@ public class TransportSocket implements Sender, Receiver {
   private final LinkedBlockingQueue<GameState> gameStates = new LinkedBlockingQueue<>();
   private final LinkedBlockingQueue<GameMessage> messages = new LinkedBlockingQueue<>();
 
+  @SuppressFBWarnings(value = {"CT_CONSTRUCTOR_THROW"})
   public TransportSocket(TransportSocketProps props) {
     this.props = props;
 

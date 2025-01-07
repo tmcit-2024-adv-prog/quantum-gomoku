@@ -2,6 +2,8 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
 import java.util.HashMap;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class Board {
   HashMap<Vector2D, Stone> board;
   Vector2D size;
@@ -35,6 +37,7 @@ public class Board {
     return false;
   }
 
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP"})
   public HashMap<Vector2D, Stone> getBoard() {
     return board;
   }
