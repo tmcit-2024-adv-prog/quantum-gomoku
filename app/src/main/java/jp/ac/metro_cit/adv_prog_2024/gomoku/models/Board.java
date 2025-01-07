@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 public class Board {
   HashMap<Vector2D, Stone> board;
+  Vector2D size;
 
   public Board(Vector2D size) {
+    this.size = size;
     this.board = new HashMap<>();
   }
 
@@ -18,6 +20,9 @@ public class Board {
   }
 
   public void putStone(Vector2D pos, Stone stone) throws Exception {
+    if (pos.x < 0 || pos.x >= size.x || pos.y < 0 || pos.y >= size.y) {
+      throw new Exception("out of size"); // 範囲外の座標を指定した場合
+    }
     try {
       board.put(pos, stone);
     } catch (Exception e) {
@@ -31,6 +36,6 @@ public class Board {
   }
 
   public HashMap<Vector2D, Stone> getBoard() {
-    return new HashMap<Vector2D, Stone>();
+    return board;
   }
 }
