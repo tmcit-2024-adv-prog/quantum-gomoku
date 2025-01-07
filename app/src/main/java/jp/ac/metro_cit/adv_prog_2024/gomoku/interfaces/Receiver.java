@@ -47,6 +47,9 @@ public interface Receiver {
    */
   void initReceiver() throws IOException;
 
+  /** ブロードキャストの通信を受け付ける */
+  void startReceiveBroadcast();
+
   /** 通信を開始する */
   void startReceive();
 
