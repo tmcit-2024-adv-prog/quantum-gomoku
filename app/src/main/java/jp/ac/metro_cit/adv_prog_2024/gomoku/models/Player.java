@@ -28,6 +28,11 @@ public class Player implements Serializable {
    * @param color 色(StoneColor)
    * @param name プレイヤー名(String)
    */
+  public Player(String name, StoneColor color) {
+    this.name = name;
+    this.color = color;
+  }
+
   public Player(StoneColor color, String name) {
     this.color = color;
     this.name = name;
