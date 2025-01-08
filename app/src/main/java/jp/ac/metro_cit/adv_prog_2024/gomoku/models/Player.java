@@ -1,5 +1,6 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
+import java.io.Serializable;
 import javax.annotation.Nullable;
 
 /**
@@ -8,7 +9,7 @@ import javax.annotation.Nullable;
  * @author 6306 hoshi
  * @version 1.0
  */
-public class Player {
+public class Player implements Serializable {
   private StoneColor color = null;
   private String name;
 
