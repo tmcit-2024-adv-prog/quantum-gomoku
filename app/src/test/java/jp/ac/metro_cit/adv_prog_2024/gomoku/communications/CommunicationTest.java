@@ -133,41 +133,40 @@ public class CommunicationTest {
   }
 
   /** ブロードキャストが行えることを検証する */
-  // @Test
-  // @DisplayName("[正常系] ブロードキャストを用いたデータの送受信が行えることを確認")
-  // void initBroadcast() throws InterruptedException {
-  //   TransportSocketProps senderProps = new TransportSocketProps(null, 5006, 5008, 5007);
-  //   TransportSocket sender = new TransportSocket(senderProps);
-  //   Assertions.assertDoesNotThrow(sender::initSender);
+  @Test
+  @DisplayName("[正常系] ブロードキャストを用いたデータの送受信が行えることを確認")
+  void initBroadcast() throws InterruptedException {
+    TransportSocketProps senderProps = new TransportSocketProps(null, 5006, 5008, 5007);
+    TransportSocket sender = new TransportSocket(senderProps);
+    Assertions.assertDoesNotThrow(sender::initSender);
 
-  //   TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5006, 5007, 5007);
-  //   TransportSocket receiver = new TransportSocket(receiverProps);
-  //   System.out.println("Init Receiver");
-  //   Assertions.assertDoesNotThrow(receiver::initReceiver);
+    TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5006, 5007, 5007);
+    TransportSocket receiver = new TransportSocket(receiverProps);
+    System.out.println("Init Receiver");
+    Assertions.assertDoesNotThrow(receiver::initReceiver);
 
-  //   System.out.println("Waiting for initializing receiver");
-  //   Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    System.out.println("Waiting for initializing receiver");
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-  //   Assertions.assertDoesNotThrow(receiver::startReceive);
-  //   Assertions.assertDoesNotThrow(receiver::startReceiveBroadcast);
-  //   Assertions.assertDoesNotThrow(sender::startReceiveBroadcast);
-  //   Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    Assertions.assertDoesNotThrow(receiver::startReceive);
+    Assertions.assertDoesNotThrow(receiver::startReceiveBroadcast);
+    Assertions.assertDoesNotThrow(sender::startReceiveBroadcast);
 
-  //   System.out.println("Send broadcast message");
-  //   Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting")));
+    System.out.println("Send broadcast message");
+    Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting")));
 
-  //   System.out.println("Waiting for receive");
-  //   Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    System.out.println("Waiting for receive");
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-  //   Assertions.assertDoesNotThrow(
-  //       () -> {
-  //         GameMessage message = receiver.receive();
-  //         receiver.reply(message, new GameMessage("Reply"));
-  //       });
+    Assertions.assertDoesNotThrow(
+        () -> {
+          GameMessage message = receiver.receive();
+          receiver.reply(message, new GameMessage("Reply"));
+        });
 
-  //   System.out.println("Waiting for receive");
-  //   Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    System.out.println("Waiting for receive");
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
-  //   Assertions.assertEquals("Reply", sender.receive().data());
-  // }
+    Assertions.assertEquals("Reply", sender.receive().data());
+  }
 }
