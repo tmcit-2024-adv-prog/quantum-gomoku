@@ -151,6 +151,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(receiver::startReceive);
     Assertions.assertDoesNotThrow(receiver::startReceiveBroadcast);
     Assertions.assertDoesNotThrow(sender::startReceiveBroadcast);
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
 
     System.out.println("Send broadcast message");
     Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting")));

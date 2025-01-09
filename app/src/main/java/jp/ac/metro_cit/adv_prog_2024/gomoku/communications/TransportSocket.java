@@ -108,7 +108,7 @@ public class TransportSocket implements Sender, Receiver {
 
     // タイムアウトを30秒に設定
     // 30秒間コネクションがなかった場合はエラーを投げる
-    // this.serverSocket.setSoTimeout(30000);
+    this.serverSocket.setSoTimeout(30000);
     // 別のスレッドで通信の待受を行う
     new Thread(
             () -> {
