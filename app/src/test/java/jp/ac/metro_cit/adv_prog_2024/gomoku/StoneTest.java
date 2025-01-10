@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StoneTest {
   @Test
-  @DisplayName("[正常系] stoneオブジェクトの初期状態が正しく設定される")
+  @DisplayName("[正常系] stoneオブジェクトの初期状態が与えられた情報の通りに設定される")
   void testConstructedStoneInitialValue() {
     // Stoneに関する構成情報の作成
     StoneColor testColor = StoneColor.BLACK;
@@ -21,8 +21,8 @@ public class StoneTest {
     Stone testStone = new Stone(testColor, testPosition);
 
     // 初期状態でcolorとpositionが正しく設定されているか確認
-    assertEquals(testColor, testStone.getColor(), "石の色が正しく設定されていません");
-    assertEquals(testPosition, testStone.getPos(), "石の位置が正しく設定されていません");
+    assertEquals(testColor, testStone.getColor(), "石の色が与えられた通りに設定されていません");
+    assertEquals(testPosition, testStone.getPos(), "石の位置が与えられた通りに設定されていません");
   }
 
   @Test
@@ -88,7 +88,7 @@ public class StoneTest {
   }
 
   @Test
-  @DisplayName("[正常系] stoneオブジェクトがhashCodeで正しくハッシュを計算する")
+  @DisplayName("[正常系] stoneオブジェクトがhashCodeでハッシュを計算する")
   void testStoneHashCode() {
     // 同じ構成情報を持つstoneオブジェクトを作成
     StoneColor testColor = StoneColor.BLACK;
@@ -102,7 +102,7 @@ public class StoneTest {
     assertEquals(
         testStone1.hashCode(),
         testStone2.hashCode(),
-        "同じ構成情報を持つ2つのstoneオブジェクトのハッシュコードが一致しないため、正しくハッシュの計算ができていない");
+        "同じ構成情報を持つ2つのstoneオブジェクトのハッシュコードが一致しないため、ハッシュの計算ができていない");
   }
 
   @Test
@@ -119,6 +119,6 @@ public class StoneTest {
     assertNotEquals(
         testStone1.hashCode(),
         testStone2.hashCode(),
-        "2つのstoneオブジェクトについて、それぞれの構成情報が異なるのに対してハッシュコードが一致するため、正しくハッシュの計算ができていない");
+        "2つのstoneオブジェクトについて、それぞれの構成情報が異なるのに対してハッシュコードが一致するため、ハッシュの計算ができていない");
   }
 }

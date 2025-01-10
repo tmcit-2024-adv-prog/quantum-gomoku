@@ -43,11 +43,8 @@ public class Stone {
   }
 
   /**
-   * objectの型がStoneであるとき、colorとpositionが同等かを判定し、その結果を返す。また、objectの型がStoneでないとき、falseを返す。
-   *
-   * @author 6301 tomoyuki
-   * @param object 比較対象のオブジェクト
-   * @return true or false objectの型がStoneであり、colorとpositionが同等であるとき、tureを返し、いずれかが異なるときはfalseを返す。
+   * @author othermember
+   * @param object
    */
   @Override
   public boolean equals(Object object) {
@@ -60,10 +57,7 @@ public class Stone {
   }
 
   /**
-   * colorとpositionを元にハッシュコードを計算し、結果を返す。
-   *
-   * @author 6301 tomoyuki
-   * @return hashcode ハッシュコードの計算結果
+   * @author othermember
    */
   @Override
   public int hashCode() {
