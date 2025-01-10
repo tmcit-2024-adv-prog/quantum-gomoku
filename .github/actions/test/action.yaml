@@ -16,6 +16,7 @@ runs:
       shell: bash
       env:
         GRADLE_OPTS: -Dorg.gradle.daemon=false
+      timeout-minutes: 5
       run: ./gradlew jacocoTestReport
 
     - name: Report test results
