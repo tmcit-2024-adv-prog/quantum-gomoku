@@ -1,6 +1,7 @@
 package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
@@ -44,7 +45,7 @@ public class Player implements Serializable {
    * @param color プレイヤーに設定する石の色
    * @throws IllegalStateException 色が既に設定されている場合
    */
-  public void setColor(StoneColor color) {
+  public void setColor(StoneColor color) throws IllegalStateException {
     if (this.color != null) {
       throw new IllegalStateException("既に色が与えられているため、上書きできません。");
     }
@@ -68,5 +69,26 @@ public class Player implements Serializable {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * @author othermember
+   * @param obj
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Player) {
+      Player player = (Player) obj;
+      return this.name.equals(player.name) && this.color == player.color;
+    }
+    return false;
+  }
+
+  /**
+   * @author othermember
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.name, this.color);
   }
 }
