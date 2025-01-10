@@ -112,6 +112,7 @@ jobs:
 
   test:
     runs-on: arc-runner-set
+    timeout-minutes: 5
     permissions: 
       checks: write
       contents: read
