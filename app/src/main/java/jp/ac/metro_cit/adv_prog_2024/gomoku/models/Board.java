@@ -110,17 +110,16 @@ public class Board {
   }
 
   /** (private)指定された方向に連続する石の数をカウント */
-  private int countStones(Vector2D pos, int dx, int dy, StoneColor currentColor) {
+  private int countStones(Vector2D pos, int dx, int dy, StoneColor checkColor) {
     int count = 0;
     int x = pos.x;
     int y = pos.y;
     while (true) {
       x += dx;
       y += dy;
-      Vector2D nearpos = new Vector2D(x, y);
-      Stone posStone = board.get(nearpos);
+      Stone neighboringStone = board.get(new Vector2D(x, y));
       // 隣の石(posStone)が置かれてない(null)か、隣の石の色が異なるならカウント終了
-      if (posStone == null || posStone.getColor() != currentColor) {
+      if (neighboringStone == null || neighboringStone.getColor() != checkColor) {
         break;
       }
       count++;

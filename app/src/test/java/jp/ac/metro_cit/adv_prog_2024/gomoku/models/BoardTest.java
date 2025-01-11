@@ -54,6 +54,7 @@ public class BoardTest {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(0, 0), new Stone(StoneColor.WHITE, new Vector2D(0, 0)));
     Stone stone = board.getStone(new Vector2D(0, 0));
+    assertNotNull(stone, "Stone is not null");
     assertTrue(stone.getColor() == StoneColor.WHITE);
   }
 
@@ -64,6 +65,7 @@ public class BoardTest {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(0, 0), new Stone(StoneColor.BLACK, new Vector2D(0, 0)));
     Stone stone = board.getStone(new Vector2D(0, 0));
+    assertNotNull(stone, "Stone is not null");
     assertTrue(stone.getColor() == StoneColor.BLACK);
   }
 
