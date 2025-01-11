@@ -2,19 +2,23 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.models;
 
 import java.util.HashMap;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.BoardParamNullException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.BoardPositionException;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.BoardPutStoneException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoardTest {
   @Test
   @DisplayName("[正常系]盤が生成したとき、それを取得できる")
-  void initBoardClass() throws Exception {
+  void initBoardClass() {
     Board board = new Board(new Vector2D(19, 19));
     HashMap<Vector2D, Stone> getBoard = board.getBoard();
     assertNotNull(board, "Create Board");
@@ -22,8 +26,31 @@ public class BoardTest {
   }
 
   @Test
+  @DisplayName("[正常系]指定した座標に石がない(null)とき、それを確認できる")
+  void getStoneNull() throws BoardParamNullException {
+    Board board = new Board(new Vector2D(19, 19));
+    Stone stone = board.getStone(new Vector2D(0, 0));
+    assertNull(stone, "Stone is null");
+  }
+
+  @Test
+  @DisplayName("[異常系]指定した座標が null のとき、BoardParamNullExceptionが発生する")
+  void getStoneParamNull() throws BoardParamNullException {
+    Board board = new Board(new Vector2D(19, 19));
+    BoardParamNullException exception =
+        assertThrows(
+            BoardParamNullException.class,
+            () -> {
+              board.getStone(null);
+            });
+
+    assertEquals("Position cannot be null", exception.getMessage());
+  }
+
+  @Test
   @DisplayName("[正常系]白い石が置かれたとき、それを確認できる")
-  void putStoneWhite() throws Exception {
+  void putStoneWhite()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(0, 0), new Stone(StoneColor.WHITE, new Vector2D(0, 0)));
     Stone stone = board.getStone(new Vector2D(0, 0));
@@ -32,7 +59,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]黒い石が置かれたとき、それを確認できる")
-  void putStoneBlack() throws Exception {
+  void putStoneBlack()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(0, 0), new Stone(StoneColor.BLACK, new Vector2D(0, 0)));
     Stone stone = board.getStone(new Vector2D(0, 0));
@@ -41,7 +69,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]指定した座標の石がnullで同じ石が5個並んでいるか確認するとき、まだ同じ石が5個並んでいないことを確認できる")
-  void checkWinnerNull() throws Exception {
+  void checkWinnerNull()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(12, 0), new Stone(StoneColor.WHITE, new Vector2D(12, 0)));
     board.putStone(new Vector2D(12, 1), new Stone(StoneColor.WHITE, new Vector2D(12, 1)));
@@ -55,7 +84,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]白が5個縦に並んで置かれたとき、同じ石が5個並んだことを確認できる")
-  void checkWinnerWhiteTate5() throws Exception {
+  void checkWinnerWhiteTate5()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(0, 0), new Stone(StoneColor.WHITE, new Vector2D(0, 0)));
     board.putStone(new Vector2D(0, 1), new Stone(StoneColor.WHITE, new Vector2D(0, 1)));
@@ -68,7 +98,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]黒が4個縦に並んで置かれたとき、まだ同じ石が5個並んでいないことを確認できる")
-  void checkWinnerBlackTate4() throws Exception {
+  void checkWinnerBlackTate4()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(11, 0), new Stone(StoneColor.BLACK, new Vector2D(11, 0)));
     board.putStone(new Vector2D(11, 1), new Stone(StoneColor.BLACK, new Vector2D(11, 1)));
@@ -80,7 +111,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]白と黒が5個混じって縦に並んで置かれたとき、まだ同じ石が5個並んでいないことを確認できる")
-  void checkWinnerMix5() throws Exception {
+  void checkWinnerMix5()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(11, 10), new Stone(StoneColor.BLACK, new Vector2D(11, 10)));
     board.putStone(new Vector2D(11, 11), new Stone(StoneColor.WHITE, new Vector2D(11, 11)));
@@ -93,7 +125,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]黒が5個横に並んで置かれたとき、同じ石が5個並んだことを確認できる")
-  void checkWinnerBlackYoko5() throws Exception {
+  void checkWinnerBlackYoko5()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(1, 0), new Stone(StoneColor.BLACK, new Vector2D(1, 0)));
     board.putStone(new Vector2D(2, 0), new Stone(StoneColor.BLACK, new Vector2D(2, 0)));
@@ -106,7 +139,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]白が4個横に並んで置かれたとき、まだ同じ石が5個並んでいないことを確認できる")
-  void checkWinnerWhiteYoko4() throws Exception {
+  void checkWinnerWhiteYoko4()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(15, 18), new Stone(StoneColor.WHITE, new Vector2D(15, 18)));
     board.putStone(new Vector2D(16, 18), new Stone(StoneColor.WHITE, new Vector2D(16, 18)));
@@ -118,7 +152,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]白が5個右斜め下に並んで置かれたとき、同じ石が5個並んだことを確認できる")
-  void checkWinnerWhiteNaname5() throws Exception {
+  void checkWinnerWhiteNaname5()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(14, 18), new Stone(StoneColor.WHITE, new Vector2D(14, 18)));
     board.putStone(new Vector2D(15, 17), new Stone(StoneColor.WHITE, new Vector2D(15, 17)));
@@ -131,7 +166,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]黒が4個右斜め下に並んで置かれたとき、まだ同じ石が5個並んでいないことを確認できる")
-  void checkWinnerBlackNaname4() throws Exception {
+  void checkWinnerBlackNaname4()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(6, 10), new Stone(StoneColor.BLACK, new Vector2D(6, 10)));
     board.putStone(new Vector2D(7, 9), new Stone(StoneColor.BLACK, new Vector2D(7, 9)));
@@ -143,7 +179,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]黒が5個右斜め上に並んで置かれたとき、同じ石が5個並んだことを確認できる")
-  void checkWinnerBlackNaname5() throws Exception {
+  void checkWinnerBlackNaname5()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(1, 1), new Stone(StoneColor.BLACK, new Vector2D(1, 1)));
     board.putStone(new Vector2D(2, 2), new Stone(StoneColor.BLACK, new Vector2D(2, 2)));
@@ -156,7 +193,8 @@ public class BoardTest {
 
   @Test
   @DisplayName("[正常系]白が4個右斜め上に並んで置かれたとき、まだ同じ石が5個並んでいないことを確認できる")
-  void checkWinnerWhiteNaname4() throws Exception {
+  void checkWinnerWhiteNaname4()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(11, 12), new Stone(StoneColor.WHITE, new Vector2D(11, 12)));
     board.putStone(new Vector2D(12, 13), new Stone(StoneColor.WHITE, new Vector2D(12, 13)));
@@ -167,13 +205,13 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]nullの座標に石が置かれたとき、IllegalArgumentExceptionが発生する")
-  void putStonePositionNull() {
+  @DisplayName("[異常系]nullの座標に石が置かれたとき、BoardParamNullExceptionが発生する")
+  void putStoneParamPositionNull() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardParamNullException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardParamNullException.class,
             () -> {
               board.putStone(null, new Stone(StoneColor.WHITE, new Vector2D(18, 18)));
             });
@@ -182,13 +220,13 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]nullの石が置かれたとき、IllegalArgumentExceptionが発生する")
-  void putStoneStoneNull() {
+  @DisplayName("[異常系]nullの石が置かれたとき、BoardParamNullExceptionが発生する")
+  void putStoneParamStoneNull() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardParamNullException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardParamNullException.class,
             () -> {
               board.putStone(new Vector2D(10, 15), null);
             });
@@ -197,13 +235,13 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]不正な座標(19, 0)に石が置かれたとき、IllegalArgumentExceptionが発生する")
+  @DisplayName("[異常系]不正な座標(19, 0)に石が置かれたとき、BoardPositionExceptionが発生する")
   void putStonePositionErrorX19Y0() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardPositionException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardPositionException.class,
             () -> {
               board.putStone(new Vector2D(19, 0), new Stone(StoneColor.WHITE, new Vector2D(19, 0)));
             });
@@ -212,13 +250,13 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]不正な座標(0, 19)に石が置かれたとき、IllegalArgumentExceptionが発生する")
+  @DisplayName("[異常系]不正な座標(0, 19)に石が置かれたとき、BoardPositionExceptionが発生する")
   void putStonePositionErrorX0Y19() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardPositionException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardPositionException.class,
             () -> {
               board.putStone(new Vector2D(0, 19), new Stone(StoneColor.WHITE, new Vector2D(0, 19)));
             });
@@ -227,13 +265,13 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]不正な座標(-1, 0)に石が置かれたとき、IllegalArgumentExceptionが発生する")
+  @DisplayName("[異常系]不正な座標(-1, 0)に石が置かれたとき、BoardPositionExceptionが発生する")
   void putStonePositionErrorXminus1Y0() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardPositionException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardPositionException.class,
             () -> {
               board.putStone(new Vector2D(-1, 0), new Stone(StoneColor.WHITE, new Vector2D(-1, 0)));
             });
@@ -242,13 +280,13 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]不正な座標(0, -1)に石が置かれたとき、IllegalArgumentExceptionが発生する")
+  @DisplayName("[異常系]不正な座標(0, -1)に石が置かれたとき、BoardPositionExceptionが発生する")
   void putStonePositionErrorX0Yminus1() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardPositionException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardPositionException.class,
             () -> {
               board.putStone(new Vector2D(0, -1), new Stone(StoneColor.WHITE, new Vector2D(0, -1)));
             });
@@ -257,29 +295,30 @@ public class BoardTest {
   }
 
   @Test
-  @DisplayName("[異常系]すでに石が置かれている座標に石を置かれたとき、IllegalStateExceptionが発生する")
-  void putStoneStoneError() throws Exception {
+  @DisplayName("[異常系]すでに石が置かれている座標に石を置かれたとき、BoardPutStoneExceptionが発生する")
+  void putStoneStoneError()
+      throws BoardParamNullException, BoardPositionException, BoardPutStoneException {
     Board board = new Board(new Vector2D(19, 19));
     board.putStone(new Vector2D(10, 0), new Stone(StoneColor.WHITE, new Vector2D(10, 0)));
 
-    Exception exception =
+    BoardPutStoneException exception =
         assertThrows(
-            IllegalStateException.class,
+            BoardPutStoneException.class,
             () -> {
               board.putStone(new Vector2D(10, 0), new Stone(StoneColor.BLACK, new Vector2D(10, 0)));
             });
 
-    assertEquals("Position is already occupied", exception.getMessage());
+    assertEquals("Position is already occupied by stone", exception.getMessage());
   }
 
   @Test
-  @DisplayName("[異常系]不正な座標(0, 19)で同じ石が5個並んでいるか確認するとき、IllegalArgumentExceptionが発生する")
-  void checkWinnerError() {
+  @DisplayName("[異常系]不正な座標(0, 19)で同じ石が5個並んでいるか確認するとき、BoardPositionExceptionが発生する")
+  void checkWinnerPositionError() {
     Board board = new Board(new Vector2D(19, 19));
 
-    Exception exception =
+    BoardPositionException exception =
         assertThrows(
-            IllegalArgumentException.class,
+            BoardPositionException.class,
             () -> {
               board.checkWinner(new Vector2D(0, 19));
             });
