@@ -33,10 +33,11 @@ public class Game {
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
   public Game(Player blackPlayer, Player whitePlayer, Board board) {
     this.phase = GamePhase.BEFORE_START;
+    if (blackPlayer.getColor() != StoneColor.BLACK || whitePlayer.getColor() != StoneColor.WHITE) {
+      throw new IllegalStateException("The player color and the argument color are different");
+    }
     this.blackPlayer = blackPlayer;
     this.whitePlayer = whitePlayer;
-    this.blackPlayer.setColor(StoneColor.BLACK);
-    this.whitePlayer.setColor(StoneColor.WHITE);
     this.currentPlayer = this.blackPlayer;
     this.board = board;
   }
