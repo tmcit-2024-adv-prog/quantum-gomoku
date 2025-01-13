@@ -31,7 +31,7 @@ public class Game {
    * @param board 盤面
    */
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"})
-  public Game(Player blackPlayer, Player whitePlayer, Board board) {
+  public Game(Player blackPlayer, Player whitePlayer, Board board) throws IllegalStateException {
     this.phase = GamePhase.BEFORE_START;
     if (blackPlayer.getColor() != StoneColor.BLACK || whitePlayer.getColor() != StoneColor.WHITE) {
       throw new IllegalStateException("The player color and the argument color are different");
