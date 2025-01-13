@@ -30,7 +30,7 @@ public class Game {
    * @param whitePlayer 白の碁石を置くプレイヤー
    * @param board 盤面
    */
-  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"})
   public Game(Player blackPlayer, Player whitePlayer, Board board) {
     this.phase = GamePhase.BEFORE_START;
     if (blackPlayer.getColor() != StoneColor.BLACK || whitePlayer.getColor() != StoneColor.WHITE) {
@@ -48,6 +48,7 @@ public class Game {
    * @param blackPlayer 黒の碁石を置くプレイヤー
    * @param whitePlayer 白の碁石を置くプレイヤー
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"})
   public Game(Player blackPlayer, Player whitePlayer) {
     this(blackPlayer, whitePlayer, BoardFactory.create());
   }
