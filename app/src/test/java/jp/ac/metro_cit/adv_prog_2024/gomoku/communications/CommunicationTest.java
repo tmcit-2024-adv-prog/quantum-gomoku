@@ -97,7 +97,7 @@ public class CommunicationTest {
     System.out.println("Init Receiver");
     Assertions.assertDoesNotThrow(receiver::initReceiver);
     System.out.println("Waiting for connection");
-    Assertions.assertDoesNotThrow(() -> Thread.sleep(3000));
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(500));
 
     System.out.println("Start Receive");
     Assertions.assertDoesNotThrow(receiver::startReceive);
@@ -111,7 +111,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(() -> sender.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
-    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(300));
 
     Assertions.assertEquals(dummyState, receiver.receiveState());
     Assertions.assertEquals("Hello", receiver.receive().data());
@@ -122,7 +122,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(() -> receiver.send(new GameMessage("Hello")));
 
     System.out.println("Waiting for receive");
-    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(300));
 
     Assertions.assertEquals(dummyState, sender.receiveState());
     Assertions.assertEquals("Hello", sender.receive().data());
@@ -146,7 +146,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(receiver::initReceiver);
 
     System.out.println("Waiting for initializing receiver");
-    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(300));
 
     Assertions.assertDoesNotThrow(receiver::startReceive);
     Assertions.assertDoesNotThrow(receiver::startReceiveBroadcast);
@@ -156,7 +156,7 @@ public class CommunicationTest {
     Assertions.assertDoesNotThrow(() -> sender.broadcast(new GameMessage("Broadcasting")));
 
     System.out.println("Waiting for receive");
-    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(300));
 
     Assertions.assertDoesNotThrow(
         () -> {
@@ -165,7 +165,7 @@ public class CommunicationTest {
         });
 
     System.out.println("Waiting for receive");
-    Assertions.assertDoesNotThrow(() -> Thread.sleep(1000));
+    Assertions.assertDoesNotThrow(() -> Thread.sleep(300));
 
     Assertions.assertEquals("Reply", sender.receive().data());
   }
