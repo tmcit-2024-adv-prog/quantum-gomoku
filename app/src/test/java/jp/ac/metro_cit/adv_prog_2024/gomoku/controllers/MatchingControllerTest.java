@@ -580,6 +580,7 @@ public class MatchingControllerTest {
     MatchingController matchingController =
         new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0)
             .setRetryCount(3)
+            .setRetryInterval(Duration.ofMillis(1))
             .setTimeout(Duration.ofDays(1))
             .build();
 
