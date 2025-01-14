@@ -111,7 +111,8 @@ jobs:
         uses: ./.github/actions/spotbugs
 
   test:
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions: 
       checks: write
       contents: read

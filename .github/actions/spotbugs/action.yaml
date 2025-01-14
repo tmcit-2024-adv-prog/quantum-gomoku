@@ -27,8 +27,8 @@ runs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
       run: |
-        cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -filter-mode nofilter
-        cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-pr-review -name run-reviewdog -filter-mode nofilter
+        cat ./app/build/reports/spotbugs/main.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -filter-mode nofilter
+        cat ./app/build/reports/spotbugs/test.sarif | reviewdog -f sarif -reporter=github-pr-check -name run-reviewdog -filter-mode nofilter
 
     - name: Run reviewdog (push)
       if: github.event_name == 'push'
