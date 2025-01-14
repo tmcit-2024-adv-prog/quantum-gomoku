@@ -101,8 +101,6 @@ public class GameTest {
     game.putStone(StoneColor.BLACK, new Vector2D(3, 1));
     game.putStone(StoneColor.WHITE, new Vector2D(3, 0));
     game.putStone(StoneColor.BLACK, new Vector2D(4, 1));
-    game.putStone(StoneColor.WHITE, new Vector2D(4, 0));
-    game.putStone(StoneColor.BLACK, new Vector2D(5, 1));
     assertTrue(game.getPhase() == GamePhase.FINISHED, "Game phase is FINISHED"); // ゲームは終了している
   }
 
