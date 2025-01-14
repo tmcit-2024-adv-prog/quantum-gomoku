@@ -5,18 +5,18 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.controller.GameMatchController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.MatchingController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.Ui;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.user_components.UserButton;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.user_components.UserLabel;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.utils.Pair;
 
 public class MatchingPage extends JPanel {
   private Ui parentFrame;
   private JLabel playerNameLabel;
   private JLabel matchingMessageLabel;
   private JButton backButton;
-  private JButton buttleButton;
 
   private Player localPlayer;
   private Player remotePlayer;
@@ -26,31 +26,24 @@ public class MatchingPage extends JPanel {
 
     initializeComponents();
     setupLayout();
-    setupEventHandlers();
     matchingEvent();
   }
 
   private void initializeComponents() {
     matchingMessageLabel = UserLabel.create("対戦相手を探しています...");
-    playerNameLabel = UserLabel.create(parentFrame.getLocalPlayerName());
+    playerNameLabel = UserLabel.create("あなたの名前：" + parentFrame.getLocalPlayerName());
 
     // ラベルの設定
     playerNameLabel.setHorizontalAlignment(JLabel.CENTER);
     playerNameLabel.setVerticalAlignment(JLabel.CENTER);
     matchingMessageLabel.setHorizontalAlignment(JLabel.CENTER);
     matchingMessageLabel.setVerticalAlignment(JLabel.CENTER);
-
-    // ボタンの作成
-    backButton = UserButton.create("戻る");
-    buttleButton = UserButton.create("バトル画面テスト");
   }
 
   private void setupLayout() {
     setLayout(new BorderLayout());
     add(matchingMessageLabel, BorderLayout.NORTH);
     add(playerNameLabel, BorderLayout.CENTER);
-    add(backButton, BorderLayout.SOUTH);
-    add(buttleButton, BorderLayout.EAST);
   }
 
   private void matchingEvent() {
@@ -59,12 +52,12 @@ public class MatchingPage extends JPanel {
     // 非同期処理を使ってマッチングを実行
     new Thread(
             () -> {
-              GameMatchController gameMatchController = new GameMatchController();
+              MatchingController gameMatchController = parentFrame.getMatchingController();
               try {
                 String localplayerName = parentFrame.getLocalPlayerName();
-                Player[] players = gameMatchController.match(localplayerName);
-                localPlayer = players[0];
-                remotePlayer = players[1];
+                Pair<Player, Player> players = gameMatchController.match(localplayerName);
+                localPlayer = players.left();
+                remotePlayer = players.right();
                 parentFrame.setLocalPlayer(localPlayer);
                 parentFrame.setRemotePlayer(remotePlayer);
                 // マッチング成功時のUI更新をEDT(Event Dispatch Thread)で実行
@@ -86,14 +79,17 @@ public class MatchingPage extends JPanel {
     playerNameLabel.setText("対戦相手：" + remotePlayer.getName());
     try {
       Thread.sleep(5000);
-      javax.swing.SwingUtilities.invokeLater(parentFrame::showGamePage);
+      javax.swing.SwingUtilities.invokeLater(
+          () -> {
+            try {
+              parentFrame.showGamePage();
+            } catch (GamePhaseException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+          });
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-  }
-
-  private void setupEventHandlers() {
-    backButton.addActionListener(e -> parentFrame.showStartPage());
-    buttleButton.addActionListener(e -> parentFrame.showGamePage());
   }
 }

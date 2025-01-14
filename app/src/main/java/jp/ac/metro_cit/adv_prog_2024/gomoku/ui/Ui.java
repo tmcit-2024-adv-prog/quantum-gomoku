@@ -3,7 +3,10 @@ package jp.ac.metro_cit.adv_prog_2024.gomoku.ui;
 import java.awt.Color;
 import javax.swing.JFrame;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.controller.GameCommunicationController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.GameCommunicationController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.GameCommunicationControllerBuilder;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.MatchingController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.Player;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.pages.GamePage;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.ui.pages.MatchingPage;
@@ -18,16 +21,17 @@ public class Ui extends JFrame {
   private String localPlayerName;
   private Player localPlayer;
   private Player remotePlayer;
-  private GameCommunicationController gameCommunicationController;
+  private GameCommunicationControllerBuilder gccBuilder;
+  private MatchingController matchingController;
 
-  public static void openStartWindow(GameCommunicationController gameCommunicationController) {
-    Ui frame = new Ui("五目並べ", gameCommunicationController);
-    frame.setVisible(true);
+  public void openStartWindow() {
+    this.setVisible(true);
   }
 
-  Ui(String title, GameCommunicationController gameCommunicationController) {
-    this.gameCommunicationController = gameCommunicationController;
-    setTitle(title);
+  public Ui(MatchingController matchingController, GameCommunicationControllerBuilder gccBuilder) {
+    this.gccBuilder = gccBuilder;
+    this.matchingController = matchingController;
+    setTitle("五目並べ");
     setSize(1280, 1024);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setBackground(Color.WHITE);
@@ -50,7 +54,9 @@ public class Ui extends JFrame {
     repaint();
   }
 
-  public void showGamePage() {
+  public void showGamePage() throws GamePhaseException {
+    GameCommunicationController gameCommunicationController =
+        (GameCommunicationController) gccBuilder.build(localPlayer, remotePlayer);
     GamePage gamePage = new GamePage(this, gameCommunicationController);
     setContentPane(gamePage);
     revalidate();
@@ -79,5 +85,9 @@ public class Ui extends JFrame {
 
   public Player getRemotePlayer() {
     return remotePlayer;
+  }
+
+  public MatchingController getMatchingController() {
+    return matchingController;
   }
 }

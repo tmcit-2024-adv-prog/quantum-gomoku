@@ -6,12 +6,14 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import jp.ac.metro_cit.adv_prog_2024.gomoku.controller.GameCommunicationController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.GameCommunicationController;
+import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.GamePhaseException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.PutStoneException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.GameStateCallback;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.models.GamePhase;
@@ -45,15 +47,16 @@ public class GamePage extends JPanel implements GameStateCallback {
    *
    * @param parentFrame Ui
    * @param gameController GameCommunicationController
+   * @throws GamePhaseException
    */
-  public GamePage(Ui parentFrame, GameCommunicationController gameController) {
+  public GamePage(Ui parentFrame, GameCommunicationController gameController)
+      throws GamePhaseException {
     this.parentFrame = parentFrame;
     this.gameController = gameController;
-    this.gameController.setGameStateCallback(this);
 
     Player localPlayer = parentFrame.getLocalPlayer();
     Player remotePlayer = parentFrame.getRemotePlayer();
-    GameState initialGameState = gameController.startGame(localPlayer, remotePlayer);
+    GameState initialGameState = gameController.startGame(this);
 
     currentPhaseLabel = UserLabel.create("黒のターン");
     playersNameLabel = UserLabel.create(localPlayer.getName() + " vs " + remotePlayer.getName());
@@ -178,11 +181,12 @@ public class GamePage extends JPanel implements GameStateCallback {
               updatedState.winner() == null ? "なし" : updatedState.winner().getName();
           currentPhaseLabel.setText("ゲーム終了! 勝者: " + winnerName);
           disableAllButtons();
-
-          southPanel.add(backButton, BorderLayout.CENTER);
         }
       } catch (PutStoneException ex) {
         coordinatesLabel.setText("無効な操作: (" + row + ", " + col + ")");
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
       }
     }
   }
@@ -191,7 +195,13 @@ public class GamePage extends JPanel implements GameStateCallback {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      GameState updatedState = gameController.surrender();
+      GameState updatedState = gameController.getGameState();
+      try {
+        updatedState = gameController.surrender();
+      } catch (GamePhaseException | IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
       updateBoardButtons(updatedState);
       updatePhaseLabel();
       disableAllButtons();
