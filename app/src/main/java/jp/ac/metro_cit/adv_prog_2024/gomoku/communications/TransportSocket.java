@@ -175,7 +175,10 @@ public class TransportSocket implements Sender, Receiver {
                   ByteArrayInputStream bis = new ByteArrayInputStream(packet.getData());
                   ObjectInputStream ois = new ObjectInputStream(bis);
                   Serializable next = (Serializable) ois.readObject();
-                  if (next instanceof BroadcastWrapper(int replyPort, GameMessage message)) {
+                  if (next instanceof BroadcastWrapper(int sourcePort, int replyPort, GameMessage message)) {
+                    if (sourcePort == props.port() && packet.getAddress().equals(InetAddress.getLocalHost())) {
+                      continue;
+                    }
                     messages.add(message);
                     messageCache.put(message, new TransportTarget(packet.getAddress(), replyPort));
                   } else if (next instanceof GameMessage nextGameMessage) {
@@ -272,7 +275,7 @@ public class TransportSocket implements Sender, Receiver {
     }
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     ObjectOutputStream out = new ObjectOutputStream(bos);
-    BroadcastWrapper wrapper = new BroadcastWrapper(this.props.subPort(), message);
+    BroadcastWrapper wrapper = new BroadcastWrapper(props.targetPort(), this.props.subPort(), message);
     out.writeObject(wrapper);
     DatagramPacket datagramPacket =
         new DatagramPacket(
@@ -301,7 +304,7 @@ public class TransportSocket implements Sender, Receiver {
     }
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     ObjectOutputStream out = new ObjectOutputStream(bos);
-    BroadcastWrapper wrapper = new BroadcastWrapper(this.props.subPort(), replyMessage);
+    BroadcastWrapper wrapper = new BroadcastWrapper(this.props.targetPort(), this.props.subPort(), replyMessage);
     out.writeObject(wrapper);
     DatagramPacket datagramPacket =
         new DatagramPacket(
