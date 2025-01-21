@@ -30,13 +30,14 @@ public class Game {
    * @param whitePlayer 白の碁石を置くプレイヤー
    * @param board 盤面
    */
-  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
-  public Game(Player blackPlayer, Player whitePlayer, Board board) {
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"})
+  public Game(Player blackPlayer, Player whitePlayer, Board board) throws IllegalStateException {
     this.phase = GamePhase.BEFORE_START;
+    if (blackPlayer.getColor() != StoneColor.BLACK || whitePlayer.getColor() != StoneColor.WHITE) {
+      throw new IllegalStateException("The player color and the argument color are different");
+    }
     this.blackPlayer = blackPlayer;
     this.whitePlayer = whitePlayer;
-    this.blackPlayer.setColor(StoneColor.BLACK);
-    this.whitePlayer.setColor(StoneColor.WHITE);
     this.currentPlayer = this.blackPlayer;
     this.board = board;
   }
@@ -47,6 +48,7 @@ public class Game {
    * @param blackPlayer 黒の碁石を置くプレイヤー
    * @param whitePlayer 白の碁石を置くプレイヤー
    */
+  @SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"})
   public Game(Player blackPlayer, Player whitePlayer) {
     this(blackPlayer, whitePlayer, BoardFactory.create());
   }
