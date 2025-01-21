@@ -8,4 +8,5 @@ import java.io.Serializable;
  * @param replyPort 返送先のポート
  * @param message 送受信するデータ
  */
-public record BroadcastWrapper(int replyPort, GameMessage message) implements Serializable {}
+public record BroadcastWrapper(int sourcePort, int replyPort, GameMessage message)
+    implements Serializable {}

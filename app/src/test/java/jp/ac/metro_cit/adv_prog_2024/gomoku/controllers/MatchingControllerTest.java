@@ -582,7 +582,6 @@ public class MatchingControllerTest {
             .setRetryCount(3)
             .setTimeout(Duration.ofDays(1))
             .build();
-
     // マッチングを開始するとMatchingTimeoutExceptionが発生する
     assertThrows(MatchingTimeoutException.class, () -> matchingController.match("local"));
     verify(mockSender, times(3)).broadcast(any(GameMessage.class));
