@@ -577,13 +577,11 @@ public class MatchingControllerTest {
     // receiver.receive()はDiscoverを返す
     when(mockReceiver.receive())
         .thenReturn(new GameMessage(new MatchingMessage(MatchingMessageType.DISCOVER, 1)));
-    System.out.println("DEBUG : 580");
     MatchingController matchingController =
         new MatchingControllerBuilder(mockSender, mockReceiver, () -> 0)
             .setRetryCount(3)
             .setTimeout(Duration.ofDays(1))
             .build();
-    System.out.println("DEBUG : 581");
     // マッチングを開始するとMatchingTimeoutExceptionが発生する
     assertThrows(MatchingTimeoutException.class, () -> matchingController.match("local"));
     verify(mockSender, times(3)).broadcast(any(GameMessage.class));
