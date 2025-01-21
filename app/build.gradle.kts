@@ -115,7 +115,7 @@ tasks {
         jvmArgs = listOf("-Xmx8G")
     }
     jacocoTestReport {
-//        dependsOn(test)
+        dependsOn(test)
         reports {
             xml.required = true
         }
