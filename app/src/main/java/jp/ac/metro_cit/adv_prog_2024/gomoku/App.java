@@ -4,7 +4,6 @@ import java.util.Random;
 
 import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TransportSocket;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TransportSocketProps;
-import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.GameCommunicationControllerBuilder;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.MatchingController;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.controllers.MatchingControllerBuilder;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.MatchingFailedException;
@@ -22,8 +21,8 @@ public class App {
     Random random = new Random();
     MatchingController matchingController =
         new MatchingControllerBuilder(socket, socket, () -> random.nextInt(1024)).build();
-    GameCommunicationControllerBuilder gccBuilder =
-        new GameCommunicationControllerBuilder(socket, socket);
+    // GameCommunicationControllerBuilder gccBuilder =
+    //     new GameCommunicationControllerBuilder(socket, socket);
     // Ui ui = new Ui();
     // ui.openWindow();
     try {
