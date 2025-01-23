@@ -1,0 +1,12 @@
+services:
+  host1: &host
+    image: quantum-gomoku:base
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["java", "-jar", "quantum-gomoku.jar", "host1"]
+    tty: true
+    stdin_open: true
+  host2:
+    <<: *host
+    command: ["sh", "-c", "sleep 0.1; java -jar quantum-gomoku.jar host2"]

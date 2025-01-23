@@ -26,7 +26,7 @@ public class App {
     // Ui ui = new Ui();
     // ui.openWindow();
     try {
-      System.out.println(matchingController.match("local"));
+      System.out.println(matchingController.match(args[0]));
     } catch (MatchingTimeoutException | MatchingFailedException e) {
       e.printStackTrace();
       System.err.println("Mathcing failed");
