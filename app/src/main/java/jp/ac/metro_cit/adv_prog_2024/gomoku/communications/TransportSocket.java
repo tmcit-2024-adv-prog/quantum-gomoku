@@ -178,8 +178,11 @@ public class TransportSocket implements Sender, Receiver {
                   if (next
                       instanceof
                       BroadcastWrapper(int sourcePort, int replyPort, GameMessage message)) {
-                    if (sourcePort == props.port()
-                        && packet.getAddress().equals(InetAddress.getLocalHost())) {
+                    if (sourcePort == props.targetPort()
+                        && packet
+                            .getAddress()
+                            .getHostAddress()
+                            .equals(InetAddress.getLocalHost().getHostAddress())) {
                       continue;
                     }
                     messages.add(message);
