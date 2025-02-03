@@ -87,7 +87,6 @@ classDiagram
   }
   class 石の色 {
     <<enum>>
-    未定
     黒
     白
   }
