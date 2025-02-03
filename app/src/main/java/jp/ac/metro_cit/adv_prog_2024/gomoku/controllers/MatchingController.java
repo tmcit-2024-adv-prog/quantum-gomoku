@@ -57,14 +57,14 @@ public class MatchingController {
   /**
    * マッチングする
    *
-   * @param localPlayerNmae ローカルプレイヤーの名前
+   * @param localPlayerName ローカルプレイヤーの名前
    * @return マッチングに成功した場合は自身と相手プレイヤーを返す <localPlayer, remotePlayer>
    * @throws MatchingTimeoutException マッチングがタイムアウトした場合
    * @throws MatchingFailedException マッチングに失敗した場合
    */
-  public Pair<Player, Player> match(String localPlayerNmae)
+  public Pair<Player, Player> match(String localPlayerName)
       throws MatchingTimeoutException, MatchingFailedException {
-    Player localPlayer = new Player(localPlayerNmae);
+    Player localPlayer = new Player(localPlayerName);
     // マッチングメッセージを受信して相手プレイヤーを取得
     CompletableFuture<Player> receiveFuture =
         CompletableFuture.supplyAsync(
@@ -93,6 +93,7 @@ public class MatchingController {
                 // メッセージの種類に応じて処理を分岐
                 MatchingMessage sendMsg;
                 Serializable receivedData = receivedMatchingMsg.data();
+                System.out.println(receivedMatchingMsg);
                 switch (receivedMatchingMsg.type()) {
                   case DISCOVER:
                     // Discoverメッセージを受信した場合はOfferメッセージを返す
@@ -118,6 +119,7 @@ public class MatchingController {
                         && receivedData instanceof Player
                         && !receivedData.equals(localPlayer)) {
                       Player receivedPlayer = (Player) receivedData;
+                      System.out.println(receivedPlayer);
                       if (receivedPlayer.getColor() == null) {
                         continue;
                       }
