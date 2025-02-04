@@ -201,6 +201,10 @@ public class TransportSocket implements Sender, Receiver {
                     messageCache.put(message, new TransportTarget(packet.getAddress(), replyPort));
                     messages.add(message);
                   } else if (next instanceof GameMessage nextGameMessage) {
+                    nextGameMessage.setSource(socket.getInetAddress().getHostAddress());
+                    nextGameMessage.setSourcePort(socket.getPort());
+                    nextGameMessage.setTarget(socket.getLocalAddress().getHostAddress());
+                    nextGameMessage.setTargetPort(socket.getLocalPort());
                     messages.add(nextGameMessage);
                   }
                 }
@@ -227,6 +231,10 @@ public class TransportSocket implements Sender, Receiver {
                   if (next instanceof GameState nextState) {
                     gameStates.add(nextState);
                   } else if (next instanceof GameMessage nextMessage) {
+                    nextMessage.setSource(socket.getInetAddress().getHostAddress());
+                    nextMessage.setSourcePort(socket.getPort());
+                    nextMessage.setTarget(socket.getLocalAddress().getHostAddress());
+                    nextMessage.setTargetPort(socket.getLocalPort());
                     messages.add(nextMessage);
                   }
                 }
