@@ -76,6 +76,9 @@ public class TransportSocket implements Sender, Receiver {
   private final LinkedBlockingQueue<GameState> gameStates = new LinkedBlockingQueue<>();
   private final LinkedBlockingQueue<GameMessage> messages = new LinkedBlockingQueue<>();
 
+  private String targetAddress = null;
+  private int targetPort = 0;
+
   @SuppressFBWarnings(value = {"CT_CONSTRUCTOR_THROW"})
   public TransportSocket(TransportSocketProps props) {
     this.props = props;
@@ -132,18 +135,17 @@ public class TransportSocket implements Sender, Receiver {
   @Override
   public void initReceiver() throws IOException {
     // 引数から紐付けるアドレスとポートを取得
-    String address = props.address();
     int port = props.port();
     int subPort = props.subPort();
     // レシーバーの場合は宛先のアドレスが必要なため、nullの場合にエラーを出す
-    if (address == null) {
+    if (targetAddress == null) {
       throw new IllegalArgumentException();
     } else {
       try {
         if (this.receiverDatagramSocket == null) {
           this.receiverDatagramSocket = new DatagramSocket(subPort);
         }
-        this.socket = new Socket(address, port);
+        this.socket = new Socket(targetAddress, targetPort);
         new Thread(
                 () -> {
                   try {
@@ -161,6 +163,17 @@ public class TransportSocket implements Sender, Receiver {
         messages.add(new GameMessage(("Connection refused")));
       }
     }
+  }
+
+  /**
+   * 通信相手のアドレスとポートを設定する
+   *
+   * @param address 通信相手のアドレス
+   * @param port 通信相手のポート
+   */
+  public void setTargetAddress(String address, int port) {
+    this.targetAddress = address;
+    this.targetPort = port;
   }
 
   public void startReceiveBroadcast() {

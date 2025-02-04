@@ -25,6 +25,7 @@ public class CommunicationTest {
     TransportSocket socket = new TransportSocket(props);
 
     // レシーバー側の初期化時にアドレスがnullを指定した場合にはIllegalArgumentExceptionが発生することを確認
+    socket.setTargetAddress(null, 1000);
     Assertions.assertThrows(IllegalArgumentException.class, socket::initReceiver);
     // 通信を確立する前にstartReceiveを呼び出した場合にIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
@@ -76,6 +77,7 @@ public class CommunicationTest {
     TransportSocketProps props = new TransportSocketProps("127.0.0.1", 5004, 5004, 5004);
     TransportSocket socket = new TransportSocket(props);
     // 通信の開始時にエラーが発生しないことを確認する
+    socket.setTargetAddress("127.0.0.1", 5004);
     Assertions.assertDoesNotThrow(socket::initReceiver);
     // 通信が確立していない場合にstartReceiveを実行するとIllegalStateExceptionが発生することを確認
     Assertions.assertThrows(IllegalStateException.class, socket::startReceive);
@@ -95,6 +97,7 @@ public class CommunicationTest {
     TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5005, 5015, 5005);
     TransportSocket receiver = new TransportSocket(receiverProps);
     System.out.println("Init Receiver");
+    receiver.setTargetAddress("127.0.0.1", 5005);
     Assertions.assertDoesNotThrow(receiver::initReceiver);
     System.out.println("Waiting for connection");
     Assertions.assertDoesNotThrow(() -> Thread.sleep(500));
@@ -143,6 +146,7 @@ public class CommunicationTest {
     TransportSocketProps receiverProps = new TransportSocketProps("127.0.0.1", 5006, 5007, 5007);
     TransportSocket receiver = new TransportSocket(receiverProps);
     System.out.println("Init Receiver");
+    receiver.setTargetAddress("127.0.0.1", 5007);
     Assertions.assertDoesNotThrow(receiver::initReceiver);
 
     System.out.println("Waiting for initializing receiver");
