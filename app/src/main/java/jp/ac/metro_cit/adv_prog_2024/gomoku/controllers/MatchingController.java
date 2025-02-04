@@ -11,6 +11,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import javax.lang.model.type.NullType;
 
+import jp.ac.metro_cit.adv_prog_2024.gomoku.communications.TransportSocket;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.MatchingFailedException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.exceptions.MatchingTimeoutException;
 import jp.ac.metro_cit.adv_prog_2024.gomoku.interfaces.Receiver;
@@ -66,7 +67,7 @@ public class MatchingController {
       throws MatchingTimeoutException, MatchingFailedException {
     Player localPlayer = new Player(localPlayerName);
     // マッチングメッセージを受信して相手プレイヤーを取得
-    CompletableFuture<Player> receiveFuture =
+    CompletableFuture<Pair<Player, String>> receiveFuture =
         CompletableFuture.supplyAsync(
             () -> {
               Player remotePlayer = null;
@@ -151,7 +152,7 @@ public class MatchingController {
                   case ACK:
                     // Ackメッセージを受信した場合は相手プレイヤーを返す
                     if (phase == MatchingMessageType.REQUEST) {
-                      return remotePlayer;
+                      return Pair.of(remotePlayer, receivedMsg.source());
                     }
                     continue;
 
@@ -181,7 +182,7 @@ public class MatchingController {
 
                   case ACK:
                     // Ackメッセージを送信した場合はRequestメッセージを受信した相手プレイヤーを返す
-                    return remotePlayer;
+                    return Pair.of(remotePlayer, receivedMsg.source());
 
                   default:
                     // ここに到達することはない
@@ -239,7 +240,13 @@ public class MatchingController {
       }
     }
     try {
-      Player remotePlayer = receiveFuture.get();
+      Pair<Player, String> pair = receiveFuture.get();
+      Player remotePlayer = pair.left();
+      String address = pair.right();
+      ((TransportSocket) this.sender).setTargetAddress(address, 58946);
+      ((TransportSocket) this.receiver).setTargetAddress(address, 58946);
+      this.receiver.initReceiver();
+      this.receiver.startReceive();
       return Pair.of(localPlayer, remotePlayer);
     } catch (Exception e) {
       e.printStackTrace();
