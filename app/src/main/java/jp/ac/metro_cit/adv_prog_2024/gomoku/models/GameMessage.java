@@ -25,23 +25,23 @@ public class GameMessage implements Serializable {
     this.target = target;
   }
 
-  public int getSourcePort() {
+  public int sourcePort() {
     return sourcePort;
   }
 
-  public int getTargetPort() {
+  public int targetPort() {
     return targetPort;
   }
 
-  public Serializable getData() {
+  public Serializable data() {
     return data;
   }
 
-  public String getSource() {
+  public String source() {
     return source;
   }
 
-  public String getTarget() {
+  public String target() {
     return target;
   }
 
